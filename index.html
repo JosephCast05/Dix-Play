@@ -7,594 +7,401 @@
     <style>
         :root {
             --pv-red: #e31e24;
-            --pv-anthracite: #2a2a2a;
-            --pv-black: #121212;
-            --pv-dark: #1e1e1e;
-            --pv-white: #ffffff;
-            --pv-grey-text: #b0b0b0;
-            --border-color: #333;
+            --pv-bg-dark: #141414;
+            --pv-panel: #1f1f1f;
+            --pv-border: #333;
+            --pv-text: #e0e0e0;
+            --pv-text-muted: #888;
+            --pv-accent-hover: #ff2a31;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { background-color: var(--pv-bg-dark); color: var(--pv-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        body { 
-            background-color: var(--pv-black); 
-            color: var(--pv-white); 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh;
-            overflow: hidden;
+        /* HEADER (Stile Maxhub) */
+        .header {
+            height: 60px; background: var(--pv-panel); display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid var(--pv-border); z-index: 10;
         }
-
-        /* HEADER */
-        .navbar {
-            background: var(--pv-dark);
-            height: 70px;
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-            border-bottom: 2px solid var(--pv-red);
-            justify-content: space-between;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 10;
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-left img { height: 35px; }
+        .header-title { font-size: 1.1rem; font-weight: 600; border-left: 1px solid var(--pv-border); padding-left: 20px; }
+        .header-actions button {
+            background: var(--pv-red); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.2s;
         }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .navbar-brand img {
-            height: 40px;
-            object-fit: contain;
-        }
-
-        .navbar-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: var(--pv-grey-text);
-            border-left: 1px solid #444;
-            padding-left: 20px;
-        }
+        .header-actions button:hover { background: var(--pv-accent-hover); }
 
         /* MAIN LAYOUT */
-        .app-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* SIDEBARS */
-        .sidebar {
-            width: 350px;
-            background: var(--pv-anthracite);
-            padding: 30px 25px;
-            overflow-y: auto;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .sidebar.right {
-            border-right: none;
-            border-left: 1px solid var(--border-color);
-            background: var(--pv-dark);
-        }
-
-        .section-title {
-            color: var(--pv-white);
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 5px;
-        }
-
-        .section-title::before {
-            content: '';
-            display: block;
-            width: 4px;
-            height: 16px;
-            background: var(--pv-red);
-            border-radius: 2px;
-        }
-
-        /* FORM ELEMENTS */
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 15px;
+        /* LEFT PANEL (CONTROLS) */
+        .left-panel {
+            width: 340px; background: var(--pv-panel); border-right: 1px solid var(--pv-border); padding: 20px;
+            display: flex; flex-direction: column; gap: 25px; overflow-y: auto;
         }
         
-        .input-row .input-group {
-            flex: 1;
+        .control-group { display: flex; flex-direction: column; gap: 10px; }
+        .control-label { font-size: 0.85rem; font-weight: 600; color: var(--pv-text-muted); text-transform: uppercase; }
+
+        /* Segmented Controls (Indoor/Outdoor & Cabinet) */
+        .segmented-control { display: flex; background: var(--pv-bg-dark); border-radius: 6px; padding: 4px; border: 1px solid var(--pv-border); }
+        .segment-btn {
+            flex: 1; text-align: center; padding: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--pv-text-muted);
+            border-radius: 4px; transition: 0.3s;
+        }
+        .segment-btn.active { background: var(--pv-panel); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 1px solid var(--pv-red); }
+
+        select {
+            width: 100%; background: var(--pv-bg-dark); color: white; border: 1px solid var(--pv-border); padding: 10px; border-radius: 6px; outline: none;
+        }
+        select:focus { border-color: var(--pv-red); }
+
+        /* +/- Spinners for Columns/Rows */
+        .spinner-row { display: flex; justify-content: space-between; align-items: center; background: var(--pv-bg-dark); border: 1px solid var(--pv-border); border-radius: 6px; padding: 5px; }
+        .spinner-btn {
+            width: 32px; height: 32px; background: var(--pv-panel); border: 1px solid var(--pv-border); color: white; border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+        .spinner-btn:hover { background: var(--pv-red); border-color: var(--pv-red); }
+        .spinner-val { font-size: 1rem; font-weight: 600; text-align: center; width: 50px; background: transparent; border: none; color: white; }
+
+        /* Dimension Inputs */
+        .dim-inputs { display: flex; gap: 10px; }
+        .dim-input-wrapper { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .dim-input-wrapper input { width: 100%; background: var(--pv-bg-dark); color: white; border: 1px solid var(--pv-border); padding: 10px; border-radius: 6px; }
+        .dim-input-wrapper span { font-size: 0.7rem; color: var(--pv-text-muted); text-align: right; }
+
+        /* CENTER STAGE */
+        .center-stage {
+            flex: 1; background: #0a0a0a; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+            background-image: radial-gradient(circle at center, #222 0%, #0a0a0a 100%);
         }
 
-        label { 
-            font-size: 0.75rem; 
-            color: var(--pv-grey-text); 
-            text-transform: uppercase; 
-            font-weight: 600; 
-        }
+        .visualizer-wrapper { display: flex; align-items: flex-end; gap: 20px; position: relative; }
+        .wall-grid { display: grid; background: #000; border: 2px solid #555; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .cabinet-cell { border: 1px solid rgba(255,255,255,0.1); background: rgba(30,30,30,0.9); }
+        
+        .human-figure { opacity: 0.7; }
+        .meas-w { position: absolute; top: -30px; left: 0; width: 100%; text-align: center; color: #aaa; font-size: 0.85rem; font-weight: bold; }
+        .meas-h { position: absolute; right: -50px; top: 0; height: 100%; writing-mode: vertical-rl; text-align: center; color: #aaa; font-size: 0.85rem; font-weight: bold; transform: rotate(180deg); }
 
-        input, select {
-            width: 100%; 
-            background: var(--pv-black); 
-            border: 1px solid #444;
-            color: var(--pv-white); 
-            padding: 12px 15px; 
-            font-size: 0.95rem;
-            border-radius: 6px; 
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--pv-red);
-        }
-
-        input[readonly] {
-            background: #1a1a1a;
-            color: #777;
-            border-color: #333;
-        }
-
-        .btn-reset {
-            padding: 15px; 
-            background: transparent; 
-            border: 1px solid var(--pv-red);
-            color: var(--pv-red); 
-            text-transform: uppercase; 
-            font-weight: 700;
-            cursor: pointer; 
-            border-radius: 6px; 
-            margin-top: 10px;
-            transition: all 0.3s;
-            letter-spacing: 1px;
+        /* RIGHT PANEL (RESULTS FLOATING/FIXED) */
+        .right-panel {
+            width: 300px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); display: flex; flex-direction: column;
         }
         
-        .btn-reset:hover { 
-            background: var(--pv-red); 
-            color: white; 
-        }
-
-        /* ERRORS */
-        .error-overlay {
-            display: none; 
-            background: rgba(227, 30, 36, 0.1); 
-            border-left: 4px solid var(--pv-red);
-            padding: 15px; 
-            border-radius: 4px; 
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
-        /* CENTER STAGE (VISUALIZER) */
-        .stage {
-            flex: 1;
-            background: radial-gradient(circle at center, #2a2a2a 0%, #121212 100%);
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding: 40px;
-        }
-
-        .led-wall-container {
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .led-grid-wrapper {
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            border: 2px solid #555;
-            background: #000;
-        }
-
-        .led-grid {
-            display: grid;
-            width: 100%;
-            height: 100%;
-        }
-
-        .cabinet {
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(30, 30, 30, 0.8);
-            box-sizing: border-box;
-        }
-
-        .dimension-label {
-            position: absolute;
-            color: var(--pv-grey-text);
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .result-section { padding: 20px; border-bottom: 1px solid var(--pv-border); }
+        .result-title { font-size: 0.9rem; color: white; margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .result-title::before { content: ''; width: 4px; height: 14px; background: var(--pv-red); display: block; border-radius: 2px; }
         
-        .dim-w { top: -30px; left: 0; width: 100%; }
-        .dim-h { right: -60px; top: 0; height: 100%; writing-mode: vertical-rl; transform: rotate(180deg); }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; }
+        .result-label { color: var(--pv-text-muted); }
+        .result-val { font-weight: 700; color: white; }
+        .highlight-val { color: var(--pv-red); font-size: 1.1rem; }
 
-        .human-scale {
-            height: 180px; /* Rappresenta ~1.8m */
-            opacity: 0.6;
-        }
-
-        /* RESULTS CARDS */
-        .result-group {
-            background: var(--pv-anthracite);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-        }
-
-        .result-group.highlight {
-            border-color: var(--pv-red);
-            background: linear-gradient(145deg, var(--pv-anthracite) 0%, rgba(227, 30, 36, 0.05) 100%);
-        }
-
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #333;
-        }
-        .result-row:last-child { border-bottom: none; padding-bottom: 0; }
-
-        .val-label { font-size: 0.8rem; color: var(--pv-grey-text); }
-        .val-output { font-size: 1.05rem; font-weight: 700; color: var(--pv-white); }
-        .val-red { color: var(--pv-red); }
-
-        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--pv-black); }
-        ::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: var(--pv-bg-dark); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--pv-red); }
     </style>
 </head>
 <body>
 
-    <div class="navbar">
-        <div class="navbar-brand">
-            <img src="logo.png" alt="Primeview Logo" onerror="this.src='https://via.placeholder.com/150x40/121212/e31e24?text=PRIMEVIEW'">
-            <div class="navbar-title">Dix-Play LED Configurator</div>
+    <header class="header">
+        <div class="header-left">
+            <img src="logo.png" alt="Primeview" onerror="this.src='https://via.placeholder.com/150x40/1f1f1f/e31e24?text=PRIMEVIEW'">
+            <span class="header-title">Dix-Play LED Configurator</span>
         </div>
-    </div>
+        <div class="header-actions">
+            <button onclick="resetApp()">Reset</button>
+        </div>
+    </header>
 
-    <div class="app-container">
+    <div class="main-container">
         
-        <div class="sidebar">
+        <aside class="left-panel">
             
-            <div id="errorBox" class="error-overlay">
-                <strong style="color:var(--pv-red)">CABINET ALIGNMENT ERROR</strong><br>
-                Physical dimensions do not match whole cabinets (600x337.5mm).<br>
-                <span id="errorSuggestions" style="color:#aaa; display:block; margin-top:8px;"></span>
+            <div class="control-group">
+                <span class="control-label">1. Environment</span>
+                <div class="segmented-control">
+                    <div class="segment-btn active" id="btn-indoor" onclick="setEnvironment('indoor')">Indoor</div>
+                    <div class="segment-btn" id="btn-outdoor" onclick="setEnvironment('outdoor')">Outdoor</div>
+                </div>
             </div>
 
-            <div>
-                <div class="section-title">Physical Specs</div>
-                <div style="height: 15px;"></div>
+            <div class="control-group">
+                <span class="control-label">2. Cabinet Type</span>
+                <div class="segmented-control">
+                    <div class="segment-btn active" id="btn-cab27" onclick="setCabinet('27')">27" (600x337.5)</div>
+                    <div class="segment-btn" id="btn-cab55" onclick="setCabinet('55')">55" (1200x675)</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">3. Pixel Pitch (mm)</span>
+                <select id="pitchSelect" onchange="calculate()"></select>
+            </div>
+
+            <div class="control-group" style="margin-top: 10px;">
+                <span class="control-label">4. Display Size (Cabinets)</span>
                 
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Target Diagonal (Inch)</label>
-                        <input type="number" id="diag" placeholder="e.g. 135" step="0.1" oninput="manualInput('diag')">
-                    </div>
-                    <div class="input-group">
-                        <label>Aspect Ratio</label>
-                        <select id="ratio" onchange="manualInput('ratio')">
-                            <option value="custom" selected>Custom / Free</option>
-                            <option value="1.77777777778">16:9 (Standard)</option>
-                            <option value="2.33333333333">21:9 (Ultrawide)</option>
-                            <option value="3.55555555556">32:9 (Panoramic)</option>
-                        </select>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="width:60px; font-size:0.8rem; color:#aaa;">Columns</span>
+                    <div class="spinner-row" style="flex:1;">
+                        <button class="spinner-btn" onclick="updateCabinets('col', -1)">-</button>
+                        <input type="number" id="colCount" class="spinner-val" value="4" readonly>
+                        <button class="spinner-btn" onclick="updateCabinets('col', 1)">+</button>
                     </div>
                 </div>
 
-                <div style="height: 15px;"></div>
-
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Width (mm)</label>
-                        <input type="number" id="manualW" placeholder="Width" oninput="manualInput('mm')">
-                    </div>
-                    <div class="input-group">
-                        <label>Height (mm)</label>
-                        <input type="number" id="manualH" placeholder="Height" oninput="manualInput('mm')">
+                <div style="display:flex; gap:10px; align-items:center; margin-top:5px;">
+                    <span style="width:60px; font-size:0.8rem; color:#aaa;">Rows</span>
+                    <div class="spinner-row" style="flex:1;">
+                        <button class="spinner-btn" onclick="updateCabinets('row', -1)">-</button>
+                        <input type="number" id="rowCount" class="spinner-val" value="4" readonly>
+                        <button class="spinner-btn" onclick="updateCabinets('row', 1)">+</button>
                     </div>
                 </div>
             </div>
 
-            <div>
-                <div class="section-title">Pixel Specs</div>
-                <div style="height: 15px;"></div>
-
-                <div class="input-group">
-                    <label>Pixel Pitch (mm)</label>
-                    <select id="pitch" onchange="manualInput('pitch')">
-                        <option value="2.5">2.5 mm</option>
-                        <option value="2.1">2.1 mm</option>
-                        <option value="1.87">1.87 mm COB</option>
-                        <option value="1.56" selected>1.56 mm COB</option>
-                        <option value="1.25">1.25 mm COB</option>
-                        <option value="0.93">0.93 mm COB</option>
-                        <option value="0.7">0.7 mm COB</option>
-                    </select>
-                </div>
-
-                <div style="height: 15px;"></div>
-
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Horiz. Res</label>
-                        <input type="number" id="resW" placeholder="---" readonly>
+            <div class="control-group" style="margin-top: 10px;">
+                <span class="control-label">Physical Dimensions (Target mm)</span>
+                <div class="dim-inputs">
+                    <div class="dim-input-wrapper">
+                        <input type="number" id="targetW" placeholder="Width" onchange="calculateFromMM()">
+                        <span>Width (mm)</span>
                     </div>
-                    <div class="input-group">
-                        <label>Vert. Res</label>
-                        <input type="number" id="resH" placeholder="---" readonly>
+                    <div class="dim-input-wrapper">
+                        <input type="number" id="targetH" placeholder="Height" onchange="calculateFromMM()">
+                        <span>Height (mm)</span>
                     </div>
                 </div>
             </div>
 
-            <button class="btn-reset" onclick="resetAll()">Reset Configurator</button>
-        </div>
+        </aside>
 
-        <div class="stage">
-            <div class="led-wall-container">
-                <div class="led-grid-wrapper" id="wallWrapper" style="display:none;">
-                    <div class="dimension-label dim-w" id="lblWidth">0 mm</div>
-                    <div class="dimension-label dim-h" id="lblHeight">0 mm</div>
-                    <div class="led-grid" id="ledGrid"></div>
+        <main class="center-stage" id="stageContainer">
+            <div class="visualizer-wrapper">
+                <div style="position:relative;">
+                    <div class="meas-w" id="lbl-w">0 mm</div>
+                    <div class="meas-h" id="lbl-h">0 mm</div>
+                    <div class="wall-grid" id="wallGrid"></div>
                 </div>
                 
-                <svg class="human-scale" id="humanScale" style="display:none;" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
+                <svg class="human-figure" id="humanSvg" viewBox="0 0 320 700" fill="#777" xmlns="http://www.w3.org/2000/svg">
                     <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
                 </svg>
             </div>
-        </div>
+        </main>
 
-        <div class="sidebar right">
-            <div class="section-title">System Overview</div>
+        <aside class="right-panel">
             
-            <div class="result-group">
-                <div class="result-row"><span class="val-label">Layout (WxH Cabs)</span><span class="val-output val-red" id="cabLayout">-</span></div>
-                <div class="result-row"><span class="val-label">Total Cabinets</span><span class="val-output" id="totalCabs">-</span></div>
-                <div class="result-row"><span class="val-label">Active Area</span><span class="val-output" id="activeArea">-</span></div>
-                <div class="result-row"><span class="val-label">Aspect Ratio</span><span class="val-output val-red" id="currentRatioOutput">-</span></div>
+            <div class="result-section">
+                <div class="result-title">System Specs</div>
+                <div class="result-item"><span class="result-label">Total Cabinets</span><span class="result-val highlight-val" id="res-cabs">0</span></div>
+                <div class="result-item"><span class="result-label">Physical Size</span><span class="result-val" id="res-size">0 x 0 mm</span></div>
+                <div class="result-item"><span class="result-label">Display Diagonal</span><span class="result-val" id="res-diag">0"</span></div>
+                <div class="result-item"><span class="result-label">Aspect Ratio</span><span class="result-val" id="res-ratio">-</span></div>
             </div>
 
-            <div class="result-group" id="ratioAdvisorCard" style="display:none; border-left: 3px solid #f39c12;">
-                <span class="val-label" style="display:block; margin-bottom:5px; color:#f39c12;">Ratio Advisor</span>
-                <div id="ratioAdvisorContent" style="font-size: 0.75rem; color:#ccc; line-height: 1.5;"></div>
+            <div class="result-section">
+                <div class="result-title">Pixel Resolution</div>
+                <div class="result-item"><span class="result-label">Horizontal</span><span class="result-val" id="res-px-w">0 px</span></div>
+                <div class="result-item"><span class="result-label">Vertical</span><span class="result-val" id="res-px-h">0 px</span></div>
+                <div class="result-item"><span class="result-label">Total Pixels</span><span class="result-val" id="res-px-total">0</span></div>
             </div>
 
-            <div class="result-group">
-                <div class="result-row"><span class="val-label">Total Pixels</span><span class="val-output" id="totalPx">-</span></div>
-                <div class="result-row"><span class="val-label">Novastar Ports (650k)</span><span class="val-output" id="ports650">-</span></div>
-                <div class="result-row"><span class="val-label">Novastar Ports (5G)</span><span class="val-output" id="ports5G">-</span></div>
+            <div class="result-section" style="flex:1; background: #1a1a1a;">
+                <div class="result-title">Processing & Power</div>
+                <div class="result-item"><span class="result-label">Novastar Unit</span><span class="result-val highlight-val" id="res-nova">-</span></div>
+                <div class="result-item"><span class="result-label">Ports Used (1G)</span><span class="result-val" id="res-ports">0</span></div>
+                <div class="result-item"><span class="result-label">Brompton Ports</span><span class="result-val" id="res-brompton">0</span></div>
             </div>
 
-            <div class="result-group highlight">
-                <div class="result-row"><span class="val-label">Recommended Nova</span><span class="val-output val-red" id="novaProcessor">-</span></div>
-                <div class="result-row"><span class="val-label">Brompton 1G Ports</span><span class="val-output" id="bromptonPorts">-</span></div>
-            </div>
-        </div>
+        </aside>
 
     </div>
 
 <script>
-// Costanti Primeview Dix-Play
-const CAB_W = 600;
-const CAB_H = 337.5;
-const CAP_650 = 650000;
+// --- DATI PRODOTTI ---
+const pitches = {
+    indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5],
+    outdoor: [2.6, 2.9, 3.9, 4.8, 6.0]
+};
+
+const cabinets = {
+    '27': { w: 600, h: 337.5 },
+    '55': { w: 1200, h: 675 }
+};
+
 const CAP_590 = 590000;
-const CAP_5G = 5000000;
+const CAP_BROM = 524000;
 
-function manualInput(source) { runCalc(source); }
-function resetAll() { location.reload(); }
+// STATO APP
+let state = {
+    env: 'indoor',
+    cab: '27',
+    cols: 4,
+    rows: 4
+};
 
-function runCalc(source) {
-    const errorBox = document.getElementById('errorBox');
-    const ratioAdvisor = document.getElementById('ratioAdvisorCard');
-    const ratioVal = document.getElementById('ratio').value;
-    
-    let diag = parseFloat(document.getElementById('diag').value);
-    let pitch = parseFloat(document.getElementById('pitch').value);
-    let manualW = parseFloat(document.getElementById('manualW').value);
-    let manualH = parseFloat(document.getElementById('manualH').value);
-    let ratio;
+// INIZIALIZZAZIONE
+window.onload = () => {
+    populatePitches();
+    calculate();
+};
 
-    if (isNaN(diag) && isNaN(manualW) && isNaN(manualH)) return;
+function resetApp() { location.reload(); }
 
-    let wMm, hMm;
-
-    if (ratioVal === 'custom') {
-        if (source === 'diag') {
-            let currentW = manualW || 16;
-            let currentH = manualH || 9;
-            let currentRatio = currentW / currentH;
-            
-            hMm = (diag / Math.sqrt(Math.pow(currentRatio, 2) + 1)) * 25.4;
-            wMm = hMm * currentRatio;
-            
-            document.getElementById('manualW').value = Math.round(wMm);
-            document.getElementById('manualH').value = Math.round(hMm);
-        } else {
-            wMm = manualW;
-            hMm = manualH;
-            if (!isNaN(wMm) && !isNaN(hMm) && hMm !== 0) {
-                ratio = wMm / hMm;
-                diag = (Math.sqrt(Math.pow(wMm, 2) + Math.pow(hMm, 2))) / 25.4;
-                document.getElementById('diag').value = diag.toFixed(1);
-            }
-        }
-    } else {
-        ratio = parseFloat(ratioVal);
-        if (source === 'mm') {
-            wMm = manualW; 
-            hMm = manualW / ratio;
-            document.getElementById('manualH').value = Math.round(hMm);
-            diag = (Math.sqrt(Math.pow(wMm, 2) + Math.pow(hMm, 2))) / 25.4;
-            document.getElementById('diag').value = isNaN(diag) ? "" : diag.toFixed(1);
-        } else {
-            hMm = (diag / Math.sqrt(Math.pow(ratio, 2) + 1)) * 25.4;
-            wMm = hMm * ratio;
-            document.getElementById('manualW').value = Math.round(wMm);
-            document.getElementById('manualH').value = Math.round(hMm);
-        }
-    }
-
-    let finalRatio = wMm / hMm;
-    let ratioLabel = isNaN(finalRatio) ? "-" : finalRatio.toFixed(2) + ":1";
-    let is169 = Math.abs(finalRatio - 1.777) < 0.02;
-    let is219 = Math.abs(finalRatio - 2.333) < 0.02;
-    let is329 = Math.abs(finalRatio - 3.555) < 0.02;
-
-    if (is169) ratioLabel = "16:9";
-    if (is219) ratioLabel = "21:9";
-    if (is329) ratioLabel = "32:9";
-
-    if (ratioVal === 'custom') {
-        let advisorHTML = "";
-        if (!is169 && !isNaN(wMm)) advisorHTML += `To hit 16:9: Height ${Math.round(wMm / 1.777)}mm<br>`;
-        if (!is219 && !isNaN(wMm)) advisorHTML += `To hit 21:9: Height ${Math.round(wMm / 2.333)}mm<br>`;
-        if (!is329 && !isNaN(wMm)) advisorHTML += `To hit 32:9: Height ${Math.round(wMm / 3.555)}mm`;
-        
-        if (advisorHTML !== "") {
-            ratioAdvisor.style.display = 'block';
-            document.getElementById('ratioAdvisorContent').innerHTML = advisorHTML;
-        } else {
-            ratioAdvisor.style.display = 'none';
-        }
-    } else {
-        ratioAdvisor.style.display = 'none';
-    }
-
-    const cabsW = wMm / CAB_W;
-    const cabsH = hMm / CAB_H;
-    const isWValid = Math.abs(cabsW - Math.round(cabsW)) < 0.01;
-    const isHValid = Math.abs(cabsH - Math.round(cabsH)) < 0.01;
-
-    if ((!isWValid || !isHValid) && !isNaN(cabsW)) {
-        errorBox.style.display = 'block';
-        document.getElementById('errorSuggestions').innerHTML = `Try Width: ${Math.floor(cabsW)*CAB_W} or ${Math.ceil(cabsW)*CAB_W}mm<br>Try Height: ${Math.floor(cabsH)*CAB_H} or ${Math.ceil(cabsH)*CAB_H}mm`;
-    } else { 
-        errorBox.style.display = 'none'; 
-    }
-
-    const resW = Math.round(wMm / pitch);
-    const resH = Math.round(hMm / pitch);
-    document.getElementById('resW').value = isNaN(resW) ? "" : resW;
-    document.getElementById('resH').value = isNaN(resH) ? "" : resH;
-
-    const totalPx = resW * resH;
-    const reqPorts590 = Math.ceil(totalPx / CAP_590);
-
-    // OUTPUT UI DOM
-    document.getElementById('currentRatioOutput').innerText = ratioLabel;
-    document.getElementById('activeArea').innerText = isNaN(wMm) ? "-" : `${Math.round(wMm)} x ${Math.round(hMm)}mm (${diag.toFixed(1)}")`;
-    document.getElementById('cabLayout').innerText = isNaN(cabsW) ? "-" : `${Math.round(cabsW)}x${Math.round(cabsH)}`;
-    document.getElementById('totalCabs').innerText = isNaN(cabsW) ? "-" : Math.round(cabsW * cabsH);
-    document.getElementById('totalPx').innerText = isNaN(totalPx) ? "-" : totalPx.toLocaleString();
-    document.getElementById('ports650').innerText = isNaN(totalPx) ? "-" : Math.ceil(totalPx / CAP_650);
-    document.getElementById('ports5G').innerText = isNaN(totalPx) ? "-" : Math.ceil(totalPx / CAP_5G);
-    document.getElementById('bromptonPorts').innerText = isNaN(totalPx) ? "-" : Math.ceil(totalPx / 524000);
-    document.getElementById('novaProcessor').innerText = reqPorts590 <= 6 ? "VX600 Pro" : reqPorts590 <= 10 ? "VX1000 Pro" : reqPorts590 <= 20 ? "VX2000 Pro" : "H-Series";
-
-    // DRAW VISUALIZER (The "Maxhub" Effect)
-    drawVisualizer(Math.round(cabsW), Math.round(cabsH), wMm, hMm);
+function setEnvironment(env) {
+    state.env = env;
+    document.getElementById('btn-indoor').className = `segment-btn ${env === 'indoor' ? 'active' : ''}`;
+    document.getElementById('btn-outdoor').className = `segment-btn ${env === 'outdoor' ? 'active' : ''}`;
+    populatePitches();
+    calculate();
 }
 
-function drawVisualizer(cabsW, cabsH, wMm, hMm) {
-    const wallWrapper = document.getElementById('wallWrapper');
-    const ledGrid = document.getElementById('ledGrid');
-    const human = document.getElementById('humanScale');
-    
-    if (isNaN(cabsW) || isNaN(cabsH) || cabsW <= 0 || cabsH <= 0) {
-        wallWrapper.style.display = 'none';
-        human.style.display = 'none';
-        return;
-    }
+function setCabinet(cab) {
+    state.cab = cab;
+    document.getElementById('btn-cab27').className = `segment-btn ${cab === '27' ? 'active' : ''}`;
+    document.getElementById('btn-cab55').className = `segment-btn ${cab === '55' ? 'active' : ''}`;
+    calculate();
+}
 
-    wallWrapper.style.display = 'block';
-    human.style.display = 'block';
-    
-    // Set labels
-    document.getElementById('lblWidth').innerText = Math.round(wMm) + " mm";
-    document.getElementById('lblHeight').innerText = Math.round(hMm) + " mm";
+function populatePitches() {
+    const select = document.getElementById('pitchSelect');
+    select.innerHTML = '';
+    pitches[state.env].forEach((p, index) => {
+        let opt = document.createElement('option');
+        opt.value = p;
+        opt.innerText = p + " mm";
+        if (state.env === 'indoor' && p === 1.56) opt.selected = true;
+        if (state.env === 'outdoor' && p === 3.9) opt.selected = true;
+        select.appendChild(opt);
+    });
+}
 
-    // Clear previous grid
-    ledGrid.innerHTML = '';
-    
-    // Proportions for drawing
-    // We assume the max available height in the center is ~500px, width is ~800px
-    // Scale everything relative to a real human of 1800mm
-    const HUMAN_REAL_MM = 1800;
-    const PIXELS_PER_MM = 150 / HUMAN_REAL_MM; // L'SVG umano è alto circa 150px-180px nel DOM, fissiamo 150px per scala base
-
-    let drawW = wMm * PIXELS_PER_MM;
-    let drawH = hMm * PIXELS_PER_MM;
-
-    // Apply a downscale if the wall is bigger than the screen stage
-    const maxDrawW = window.innerWidth - 750; // Spazio tra le due sidebar
-    const maxDrawH = window.innerHeight - 200;
-
-    let scaleDown = 1;
-    if (drawW > maxDrawW || drawH > maxDrawH) {
-        const scaleW = maxDrawW / drawW;
-        const scaleH = maxDrawH / drawH;
-        scaleDown = Math.min(scaleW, scaleH);
-    }
-
-    drawW *= scaleDown;
-    drawH *= scaleDown;
-    
-    // Scale the human accordingly
-    const finalHumanHeight = (HUMAN_REAL_MM * PIXELS_PER_MM) * scaleDown;
-    human.style.height = `${finalHumanHeight}px`;
-
-    // Render Grid wrapper sizes
-    wallWrapper.style.width = `${drawW}px`;
-    wallWrapper.style.height = `${drawH}px`;
-    
-    ledGrid.style.gridTemplateColumns = `repeat(${cabsW}, 1fr)`;
-    ledGrid.style.gridTemplateRows = `repeat(${cabsH}, 1fr)`;
-
-    // Add cabinet squares
-    const totalBoxes = cabsW * cabsH;
-    // Limit DOM nodes if someone types 100000 to prevent crash
-    if(totalBoxes < 2000) {
-        for (let i = 0; i < totalBoxes; i++) {
-            const div = document.createElement('div');
-            div.className = 'cabinet';
-            ledGrid.appendChild(div);
-        }
+function updateCabinets(axis, delta) {
+    if (axis === 'col') {
+        state.cols = Math.max(1, state.cols + delta);
+        document.getElementById('colCount').value = state.cols;
     } else {
-        ledGrid.innerHTML = `<div style="color:white; display:flex; align-items:center; justify-content:center; height:100%; font-size:0.8rem;">Grid too large to render lines.</div>`;
+        state.rows = Math.max(1, state.rows + delta);
+        document.getElementById('rowCount').value = state.rows;
+    }
+    calculate();
+}
+
+// Se l'utente digita i millimetri manualmente, calcoliamo i cabinet più vicini
+function calculateFromMM() {
+    let tW = parseFloat(document.getElementById('targetW').value);
+    let tH = parseFloat(document.getElementById('targetH').value);
+    
+    let cabW = cabinets[state.cab].w;
+    let cabH = cabinets[state.cab].h;
+
+    if (!isNaN(tW) && tW > 0) {
+        state.cols = Math.max(1, Math.round(tW / cabW));
+        document.getElementById('colCount').value = state.cols;
+    }
+    if (!isNaN(tH) && tH > 0) {
+        state.rows = Math.max(1, Math.round(tH / cabH));
+        document.getElementById('rowCount').value = state.rows;
+    }
+    calculate();
+}
+
+function calculate() {
+    let cabW = cabinets[state.cab].w;
+    let cabH = cabinets[state.cab].h;
+    let pitch = parseFloat(document.getElementById('pitchSelect').value);
+
+    // Dimensioni fisiche
+    let totalW = state.cols * cabW;
+    let totalH = state.rows * cabH;
+    
+    // Aggiorno gli input manuali in base ai cabinet
+    document.getElementById('targetW').value = totalW;
+    document.getElementById('targetH').value = totalH;
+
+    // Diagonale e Ratio
+    let diagInches = (Math.sqrt(Math.pow(totalW, 2) + Math.pow(totalH, 2)) / 25.4).toFixed(1);
+    let ratioNum = totalW / totalH;
+    let ratioStr = ratioNum.toFixed(2) + ":1";
+    if (Math.abs(ratioNum - 1.777) < 0.05) ratioStr = "16:9";
+    if (Math.abs(ratioNum - 2.333) < 0.05) ratioStr = "21:9";
+    if (Math.abs(ratioNum - 3.555) < 0.05) ratioStr = "32:9";
+
+    // Risoluzione
+    let resW = Math.round(totalW / pitch);
+    let resH = Math.round(totalH / pitch);
+    let totalPx = resW * resH;
+
+    // Processori
+    let ports = Math.ceil(totalPx / CAP_590);
+    let brompton = Math.ceil(totalPx / CAP_BROM);
+    let novaUnit = ports <= 6 ? "VX600 Pro" : ports <= 10 ? "VX1000 Pro" : ports <= 20 ? "VX2000 Pro" : "H-Series";
+
+    // Aggiorna UI Destra
+    document.getElementById('res-cabs').innerText = `${state.cols * state.rows} (${state.cols}x${state.rows})`;
+    document.getElementById('res-size').innerText = `${totalW} x ${totalH} mm`;
+    document.getElementById('res-diag').innerText = `${diagInches}"`;
+    document.getElementById('res-ratio').innerText = ratioStr;
+    
+    document.getElementById('res-px-w').innerText = resW.toLocaleString();
+    document.getElementById('res-px-h').innerText = resH.toLocaleString();
+    document.getElementById('res-px-total').innerText = totalPx.toLocaleString();
+    
+    document.getElementById('res-nova').innerText = novaUnit;
+    document.getElementById('res-ports').innerText = ports;
+    document.getElementById('res-brompton').innerText = brompton;
+
+    drawVisualizer(state.cols, state.rows, totalW, totalH);
+}
+
+// Disegna la griglia in scala
+function drawVisualizer(cols, rows, totalW, totalH) {
+    const grid = document.getElementById('wallGrid');
+    const human = document.getElementById('humanSvg');
+    const stage = document.getElementById('stageContainer');
+    
+    document.getElementById('lbl-w').innerText = totalW + " mm";
+    document.getElementById('lbl-h').innerText = totalH + " mm";
+
+    grid.innerHTML = '';
+
+    // Scala rispetto alla figura umana (1.8m)
+    const REAL_HUMAN_MM = 1800;
+    const PIXELS_PER_MM = 160 / REAL_HUMAN_MM; 
+    
+    let drawW = totalW * PIXELS_PER_MM;
+    let drawH = totalH * PIXELS_PER_MM;
+
+    // Evita che esca dallo schermo
+    const padding = 150;
+    const maxW = stage.clientWidth - padding;
+    const maxH = stage.clientHeight - padding;
+    
+    let scale = 1;
+    if (drawW > maxW || drawH > maxH) {
+        scale = Math.min(maxW / drawW, maxH / drawH);
+    }
+
+    drawW *= scale;
+    drawH *= scale;
+    let humanHeight = (REAL_HUMAN_MM * PIXELS_PER_MM) * scale;
+
+    human.style.height = `${humanHeight}px`;
+    grid.style.width = `${drawW}px`;
+    grid.style.height = `${drawH}px`;
+    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+    let limit = Math.min(cols * rows, 1000); // Evita crash del browser
+    for (let i = 0; i < limit; i++) {
+        let cell = document.createElement('div');
+        cell.className = 'cabinet-cell';
+        grid.appendChild(cell);
     }
 }
 </script>
