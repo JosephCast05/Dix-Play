@@ -33,8 +33,8 @@
 
         /* LEFT SIDEBAR */
         .sidebar-left {
-            width: 330px; background: var(--pv-panel); border-right: 1px solid var(--pv-border); padding: 20px;
-            display: flex; flex-direction: column; gap: 18px; overflow-y: auto;
+            width: 340px; background: var(--pv-panel); border-right: 1px solid var(--pv-border); padding: 20px;
+            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
         }
 
         .control-group { display: flex; flex-direction: column; gap: 8px; }
@@ -50,63 +50,67 @@
         select:focus, input:focus { border-color: var(--pv-red); }
 
         .spinner { display: flex; align-items: center; background: #111; border: 1px solid var(--pv-border); border-radius: 4px; overflow: hidden; }
-        .spin-btn { width: 35px; height: 35px; background: #222; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        .spin-btn { width: 40px; height: 38px; background: #222; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
         .spin-btn:hover { background: var(--pv-red); }
-        .spin-val { flex: 1; text-align: center; border: none; background: transparent; pointer-events: none; color: #fff; font-weight: 600; }
+        .spin-val { flex: 1; text-align: center; border: none; background: transparent; pointer-events: none; color: #fff; font-weight: 700; font-size: 1rem; }
 
-        /* CENTER STAGE (VISUALIZER) */
+        /* TOGGLE SWITCH FOR RULERS */
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; background: #111; border: 1px solid var(--pv-border); padding: 10px; border-radius: 4px; cursor: pointer; }
+        .toggle-row:hover { border-color: #555; }
+        .toggle-label { font-size: 0.85rem; font-weight: 600; }
+        .toggle-switch { width: 40px; height: 20px; background: #333; border-radius: 10px; position: relative; transition: 0.3s; }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: 0.3s; }
+        .toggle-row.on .toggle-switch { background: var(--pv-red); }
+        .toggle-row.on .toggle-switch::after { transform: translateX(20px); }
+
+        /* CENTER STAGE */
         .stage {
             flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
-            background-color: #050505; background-size: cover; background-position: center; transition: background 0.5s ease;
+            background-color: #050505; background-size: cover; background-position: center; transition: background 0.3s ease;
         }
 
-        .stage-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 1; pointer-events: none; transition: background 0.3s; }
+        .stage-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 1; pointer-events: none; }
         .stage.has-bg .stage-overlay { background: rgba(0,0,0,0.5); }
 
         .res-badge {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10;
-            background: var(--pv-red); color: #fff; padding: 8px 25px; border-radius: 20px;
-            font-weight: 800; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            letter-spacing: 0.5px;
+            position: absolute; top: 25px; left: 50%; transform: translateX(-50%); z-index: 10;
+            background: var(--pv-red); color: #fff; padding: 10px 30px; border-radius: 30px;
+            font-weight: 800; font-size: 1.2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            letter-spacing: 1px;
         }
 
-        .visualizer-container { position: relative; z-index: 5; display: flex; align-items: flex-end; gap: 40px; }
-        .led-wall { position: relative; border: 2px solid #555; background: #000; box-shadow: 0 20px 60px rgba(0,0,0,0.9); overflow: hidden; transition: width 0.3s, height 0.3s; }
+        .visualizer-container { position: relative; z-index: 5; display: flex; align-items: flex-end; gap: 60px; }
         
+        .led-wall { position: relative; border: 2px solid #333; background: #000; box-shadow: 0 20px 60px rgba(0,0,0,0.9); transition: width 0.3s, height 0.3s; }
+        
+        /* CAD Rulers */
+        .ruler { position: absolute; border: 1px solid var(--pv-red); display: none; align-items: center; justify-content: center; z-index: 10; pointer-events: none; }
+        .ruler.visible { display: flex; }
+        .ruler-w { border-width: 0 2px 2px 2px; height: 15px; top: -25px; left: 0; width: 100%; }
+        .ruler-w span { transform: translateY(-20px); color: var(--pv-red); font-weight: 800; font-size: 0.9rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .ruler-h { border-width: 2px 2px 2px 0; width: 15px; right: -25px; top: 0; height: 100%; }
+        .ruler-h span { transform: translateX(30px) rotate(90deg); color: var(--pv-red); font-weight: 800; font-size: 0.9rem; white-space: nowrap; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+
         /* Media Layers */
         .media-content { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: none; z-index: 1; }
         .wall-grid { position: absolute; inset: 0; display: grid; z-index: 2; pointer-events: none; }
-        .cabinet-box { border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
-        .wall-grid.transparent .cabinet-box { background: transparent; border-color: rgba(255,255,255,0.35); }
+        .cabinet-box { border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.02); }
+        .wall-grid.transparent .cabinet-box { background: transparent; border-color: rgba(255,255,255,0.4); }
 
-        /* Measurements Labels */
-        .meas { position: absolute; color: #fff; font-size: 0.85rem; font-weight: 700; text-shadow: 0 2px 5px #000; white-space: nowrap; z-index: 4; }
-        .meas-top { top: -25px; left: 50%; transform: translateX(-50%); }
-        .meas-right { right: -65px; top: 50%; transform: translateY(-50%) rotate(90deg); }
-
-        .human { height: 180px; opacity: 0.85; transition: height 0.3s; z-index: 5; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+        .human { height: 180px; opacity: 0.9; transition: height 0.3s; z-index: 5; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); }
 
         /* RIGHT SIDEBAR */
         .sidebar-right {
-            width: 300px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); padding: 25px 20px;
+            width: 320px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); padding: 25px 20px;
             display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
         }
 
-        .result-box { background: #1a1a1a; padding: 15px; border-radius: 6px; border-left: 3px solid var(--pv-red); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .res-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .result-box { background: #1a1a1a; padding: 18px; border-radius: 6px; border-left: 4px solid var(--pv-red); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .res-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .res-row:last-child { margin-bottom: 0; }
-        .res-lbl { font-size: 0.75rem; color: var(--pv-text-muted); text-transform: uppercase; font-weight: 600; }
-        .res-val { font-weight: 700; font-size: 0.95rem; color: #fff; }
-        .res-highlight { color: var(--pv-red); font-size: 1.1rem; }
-
-        .download-btn {
-            background: #252525; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 6px;
-            cursor: pointer; text-align: left; display: flex; align-items: center; gap: 14px; transition: 0.2s; width: 100%;
-        }
-        .download-btn:hover { background: #2d2d2d; border-color: var(--pv-red); }
-        .download-btn-icon { color: var(--pv-red); font-size: 1.2rem; font-weight: bold; }
-        .download-btn-text strong { display: block; font-size: 0.85rem; margin-bottom: 2px; }
-        .download-btn-text span { font-size: 0.7rem; color: var(--pv-text-muted); }
+        .res-lbl { font-size: 0.75rem; color: var(--pv-text-muted); text-transform: uppercase; font-weight: 700; }
+        .res-val { font-weight: 800; font-size: 1rem; color: #fff; text-align: right; }
+        .res-highlight { color: var(--pv-red); font-size: 1.15rem; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--pv-bg-dark); }
@@ -169,7 +173,7 @@
                 <span class="group-label">5. Display Grid (Columns)</span>
                 <div class="spinner">
                     <button class="spin-btn" onclick="adj('cols', -1)">-</button>
-                    <input type="text" id="val-cols" class="spin-val" value="4">
+                    <input type="text" id="val-cols" class="spin-val" value="4" readonly>
                     <button class="spin-btn" onclick="adj('cols', 1)">+</button>
                 </div>
             </div>
@@ -178,25 +182,19 @@
                 <span class="group-label">6. Display Grid (Rows)</span>
                 <div class="spinner">
                     <button class="spin-btn" onclick="adj('rows', -1)">-</button>
-                    <input type="text" id="val-rows" class="spin-val" value="3">
+                    <input type="text" id="val-rows" class="spin-val" value="3" readonly>
                     <button class="spin-btn" onclick="adj('rows', 1)">+</button>
                 </div>
             </div>
 
             <div class="control-group">
-                <span class="group-label">7. Background Scenario</span>
+                <span class="group-label">7. Background Wall Surface</span>
                 <select id="scenario-select" onchange="setScenario(this.value)">
-                    <option value="none">None (Solid Dark)</option>
-                    <optgroup label="Indoor Backdrops">
-                        <option value="boardroom">Sala Riunioni (Boardroom)</option>
-                        <option value="auditorium">Auditorium / Teatro</option>
-                        <option value="lobby">Hall Albergo (Lobby)</option>
-                    </optgroup>
-                    <optgroup label="Outdoor Backdrops">
-                        <option value="pool">Zona Piscina (Pool Side)</option>
-                        <option value="building">Facciata Palazzo (Building)</option>
-                        <option value="billboard">Cartellone Pubblicitario</option>
-                    </optgroup>
+                    <option value="none">Solid Dark (No texture)</option>
+                    <option value="concrete">Dark Concrete Wall</option>
+                    <option value="brick">Industrial Brick Wall</option>
+                    <option value="plaster">Clean White Plaster</option>
+                    <option value="wood">Wood Paneling</option>
                 </select>
             </div>
 
@@ -204,9 +202,16 @@
                 <span class="group-label">8. Media Content Preview</span>
                 <select id="media-select" onchange="setMedia(this.value)">
                     <option value="none">Grid Only (No Content)</option>
-                    <option value="image">Show Image (example.png)</option>
+                    <option value="image">Show Image (example.jpg)</option>
                     <option value="video">Show Video (example.mp4)</option>
                 </select>
+            </div>
+
+            <div class="control-group" style="margin-top: 10px;">
+                <div class="toggle-row on" id="ruler-toggle" onclick="toggleRulers()">
+                    <span class="toggle-label">Display Rulers</span>
+                    <div class="toggle-switch"></div>
+                </div>
             </div>
 
         </aside>
@@ -218,16 +223,17 @@
 
             <div class="visualizer-container">
                 <div class="led-wall" id="led-wall">
-                    <div class="meas meas-top" id="meas-w">0 mm</div>
-                    <div class="meas meas-right" id="meas-h">0 mm</div>
                     
-                    <img id="prev-img" src="example.png" class="media-content" alt="Preview Image">
+                    <div class="ruler ruler-w visible" id="ruler-w"><span id="meas-w">0 mm</span></div>
+                    <div class="ruler ruler-h visible" id="ruler-h"><span id="meas-h">0 mm</span></div>
+                    
+                    <img id="prev-img" src="example.jpg" class="media-content" alt="Preview Image">
                     <video id="prev-vid" src="example.mp4" class="media-content" autoplay loop muted playsinline></video>
                     
                     <div class="wall-grid" id="wall-grid"></div>
                 </div>
 
-                <svg class="human" id="human-svg" viewBox="0 0 320 700" fill="#666" xmlns="http://www.w3.org/2000/svg">
+                <svg class="human" id="human-svg" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
                     <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
                 </svg>
             </div>
@@ -249,24 +255,6 @@
                 <div class="res-row"><span class="res-lbl">Max Power Draw</span><span class="res-val" id="out-power">0 W</span></div>
             </div>
 
-            <div class="group-label" style="margin-top: 10px;">Assets & Export</div>
-            
-            <button class="download-btn" onclick="downloadConfigReport()">
-                <span class="download-btn-icon">💾</span>
-                <div class="download-btn-text">
-                    <strong>Download Configuration</strong>
-                    <span>Export system specs as .txt</span>
-                </div>
-            </button>
-
-            <button class="download-btn" onclick="alert('Brochure system integration placeholder. File will be linked here.')">
-                <span class="download-btn-icon">📄</span>
-                <div class="download-btn-text">
-                    <strong>Download Brochures</strong>
-                    <span>Fusion & Platinum Tech Specs</span>
-                </div>
-            </button>
-
         </aside>
     </div>
 
@@ -281,14 +269,13 @@
         '55': { w: 1200, h: 675, power: 320 }  
     };
 
+    // Muri reali
     const scenarios = {
         none: '',
-        boardroom: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
-        auditorium: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80',
-        lobby: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
-        pool: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=80',
-        building: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
-        billboard: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80'
+        concrete: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?auto=format&fit=crop&w=1600&q=80',
+        brick: 'https://images.unsplash.com/photo-1512403754473-27835f7b9984?auto=format&fit=crop&w=1600&q=80',
+        plaster: 'https://images.unsplash.com/photo-1572085313466-6710de8d7ba3?auto=format&fit=crop&w=1600&q=80',
+        wood: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80'
     };
 
     let state = {
@@ -297,7 +284,8 @@
         orient: 'landscape', 
         cab: '27', 
         cols: 4, 
-        rows: 3
+        rows: 3,
+        showRulers: true
     };
 
     window.onload = () => {
@@ -305,35 +293,56 @@
         calc();
     };
 
-    function setUnit(u) { state.unit = u; updateActiveTabs(); calc(); }
-    function setOrient(o) { state.orient = o; updateActiveTabs(); calc(); }
-    function setCab(c) { state.cab = c; updateActiveTabs(); calc(); }
-    
+    // FUNZIONI DI GESTIONE PULSANTI RIPARATE
+    function setUnit(u) { 
+        state.unit = u; 
+        document.getElementById('unit-mm').classList.toggle('active', u === 'mm');
+        document.getElementById('unit-in').classList.toggle('active', u === 'in');
+        calc(); 
+    }
     function setEnv(e) { 
         state.env = e; 
-        updateActiveTabs(); 
+        document.getElementById('env-indoor').classList.toggle('active', e === 'indoor');
+        document.getElementById('env-outdoor').classList.toggle('active', e === 'outdoor');
         populatePitches(); 
         calc(); 
     }
+    function setOrient(o) { 
+        state.orient = o; 
+        document.getElementById('orient-land').classList.toggle('active', o === 'landscape');
+        document.getElementById('orient-port').classList.toggle('active', o === 'portrait');
+        calc(); 
+    }
+    function setCab(c) { 
+        state.cab = c; 
+        document.getElementById('cab-27').classList.toggle('active', c === '27');
+        document.getElementById('cab-55').classList.toggle('active', c === '55');
+        calc(); 
+    }
 
+    // SPINNER FUNZIONANTE
     function adj(axis, delta) { 
         state[axis] = Math.max(1, state[axis] + delta); 
         document.getElementById('val-' + axis).value = state[axis]; 
         calc(); 
     }
 
-    function updateActiveTabs() {
-        ['mm', 'in', 'indoor', 'outdoor', 'landscape', 'portrait', '27', '55'].forEach(id => {
-            let type = (id === 'mm' || id === 'in') ? 'unit-' : 
-                       (id === 'indoor' || id === 'outdoor') ? 'env-' : 
-                       (id === 'landscape' || id === 'portrait') ? 'orient-' : 'cab-';
-            const el = document.getElementById(type + id);
-            if(el) el.classList.remove('active');
-        });
-        document.getElementById('unit-' + state.unit).classList.add('active');
-        document.getElementById('env-' + state.env).classList.add('active');
-        document.getElementById('orient-' + state.orient).classList.add('active');
-        document.getElementById('cab-' + state.cab).classList.add('active');
+    // TOGGLE RULER
+    function toggleRulers() {
+        state.showRulers = !state.showRulers;
+        const toggleBtn = document.getElementById('ruler-toggle');
+        const rulerW = document.getElementById('ruler-w');
+        const rulerH = document.getElementById('ruler-h');
+        
+        if(state.showRulers) {
+            toggleBtn.classList.add('on');
+            rulerW.classList.add('visible');
+            rulerH.classList.add('visible');
+        } else {
+            toggleBtn.classList.remove('on');
+            rulerW.classList.remove('visible');
+            rulerH.classList.remove('visible');
+        }
     }
 
     function populatePitches() {
@@ -397,8 +406,14 @@
         let diag = (Math.sqrt(totalW_mm**2 + totalH_mm**2) / 25.4).toFixed(1);
         document.getElementById('out-diag').innerText = diag + '"';
         
-        let ratio = (totalW_mm / totalH_mm).toFixed(2);
-        document.getElementById('out-ratio').innerText = ratio + ':1';
+        // CALCOLO ASPECT RATIO CORRETTO
+        let ratioNum = totalW_mm / totalH_mm;
+        let ratioLabel = ratioNum.toFixed(2) + ":1";
+        if (Math.abs(ratioNum - 1.777) < 0.05) ratioLabel = "16:9";
+        if (Math.abs(ratioNum - 2.333) < 0.05) ratioLabel = "21:9";
+        if (Math.abs(ratioNum - 3.555) < 0.05) ratioLabel = "32:9";
+
+        document.getElementById('out-ratio').innerText = ratioLabel;
         document.getElementById('out-total-px').innerText = (resW * resH).toLocaleString();
         document.getElementById('out-power').innerText = (totalCabs * c.power).toLocaleString() + ' W';
 
@@ -411,9 +426,8 @@
         const human = document.getElementById('human-svg');
         const stage = document.getElementById('stage-bg');
         
-        // Evita valori negativi in caso di ridimensionamento eccessivo della finestra
-        const maxDrawW = Math.max(100, stage.clientWidth - 160);
-        const maxDrawH = Math.max(100, stage.clientHeight - 140);
+        const maxDrawW = Math.max(100, stage.clientWidth - 200);
+        const maxDrawH = Math.max(100, stage.clientHeight - 200);
         const PIXELS_PER_MM = 160 / 1800;
 
         let drawW = w_mm * PIXELS_PER_MM;
@@ -438,7 +452,6 @@
         grid.style.gridTemplateColumns = `repeat(${state.cols}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${state.rows}, 1fr)`;
         
-        // Limita il disegno a 1500 box per evitare il crash del browser
         let totalCells = state.cols * state.rows;
         if(totalCells < 1500) {
             for(let i = 0; i < totalCells; i++) {
@@ -446,30 +459,7 @@
                 box.className = 'cabinet-box';
                 grid.appendChild(box);
             }
-        } else {
-            grid.innerHTML = '<div style="color:#aaa; display:flex; align-items:center; justify-content:center; height:100%; grid-column: 1 / -1;">Grid too large to render individual cells. Specs calculated correctly.</div>';
         }
-    }
-
-    function downloadConfigReport() {
-        const reportText = `PRV DIX-PLAY CONFIGURATION REPORT\n` +
-                           `----------------------------------\n` +
-                           `Environment Setting : ${state.env.toUpperCase()}\n` +
-                           `Cabinet Module      : ${state.cab}" Stacking Series\n` +
-                           `Orientation Mode    : ${state.orient.toUpperCase()}\n` +
-                           `Grid Arrangement    : ${state.cols} Columns x ${state.rows} Rows\n` +
-                           `Total Modules Count : ${state.cols * state.rows} Cabinets\n` +
-                           `Total Physical Size : ${document.getElementById('out-size').innerText}\n` +
-                           `Calculated Diagonal : ${document.getElementById('out-diag').innerText}\n` +
-                           `Aspect Ratio        : ${document.getElementById('out-ratio').innerText}\n` +
-                           `Final Resolution    : ${document.getElementById('res-badge').innerText}\n` +
-                           `Total Max Power     : ${document.getElementById('out-power').innerText}\n`;
-                           
-        const blob = new Blob([reportText], {type: 'text/plain'});
-        const a = document.createElement('a');
-        a.download = 'PRV_LED_Wall_Configuration.txt';
-        a.href = window.URL.createObjectURL(blob);
-        a.click();
     }
 </script>
 
