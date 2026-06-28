@@ -3,108 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primeview Global | Dix-Play LED Configurator</title>
+    <title>Primeview Global | Dix-Play LED Configurator V2.0</title>
     <style>
         :root {
             --pv-red: #e31e24;
-            --pv-bg-dark: #141414;
-            --pv-panel: #1f1f1f;
+            --pv-bg-dark: #121212;
+            --pv-panel: #1e1e1e;
             --pv-border: #333;
             --pv-text: #e0e0e0;
             --pv-text-muted: #888;
-            --pv-accent-hover: #ff2a31;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background-color: var(--pv-bg-dark); color: var(--pv-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
         /* HEADER */
-        .header {
+        .navbar {
             height: 60px; background: var(--pv-panel); display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; border-bottom: 1px solid var(--pv-border); z-index: 10;
+            padding: 0 25px; border-bottom: 2px solid var(--pv-red); z-index: 100;
         }
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .header-left img { height: 35px; }
-        .header-title { font-size: 1.1rem; font-weight: 600; border-left: 1px solid var(--pv-border); padding-left: 20px; }
-        .header-actions button {
-            background: var(--pv-red); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.2s;
-        }
-        .header-actions button:hover { background: var(--pv-accent-hover); }
+        .navbar-brand { display: flex; align-items: center; gap: 15px; }
+        .navbar-brand img { height: 32px; }
+        .navbar-title { font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: 1px; border-left: 1px solid #444; padding-left: 15px; }
+        .nav-reset { background: transparent; border: 1px solid #555; color: #fff; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .nav-reset:hover { background: var(--pv-red); border-color: var(--pv-red); }
 
-        /* MAIN LAYOUT */
-        .main-container { display: flex; flex: 1; overflow: hidden; }
+        /* APP LAYOUT */
+        .app-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* LEFT PANEL (CONTROLS) */
-        .left-panel {
-            width: 340px; background: var(--pv-panel); border-right: 1px solid var(--pv-border); padding: 20px;
-            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+        /* LEFT SIDEBAR */
+        .sidebar-left {
+            width: 330px; background: var(--pv-panel); border-right: 1px solid var(--pv-border); padding: 20px;
+            display: flex; flex-direction: column; gap: 18px; overflow-y: auto;
         }
-        
+
         .control-group { display: flex; flex-direction: column; gap: 8px; }
-        .control-label { font-size: 0.85rem; font-weight: 600; color: var(--pv-text-muted); text-transform: uppercase; }
+        .group-label { font-size: 0.75rem; font-weight: 800; color: var(--pv-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .segmented-control { display: flex; background: var(--pv-bg-dark); border-radius: 6px; padding: 4px; border: 1px solid var(--pv-border); }
-        .segment-btn {
-            flex: 1; text-align: center; padding: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--pv-text-muted);
-            border-radius: 4px; transition: 0.3s;
+        .segmented { display: flex; background: #111; border-radius: 4px; padding: 3px; border: 1px solid var(--pv-border); }
+        .seg-btn { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; border-radius: 3px; color: #666; transition: 0.2s; }
+        .seg-btn.active { background: #2a2a2a; color: #fff; border: 1px solid var(--pv-red); }
+
+        select, input {
+            width: 100%; background: #111; color: #fff; border: 1px solid var(--pv-border); padding: 10px; border-radius: 4px; outline: none; font-size: 0.9rem;
         }
-        .segment-btn.active { background: var(--pv-panel); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 1px solid var(--pv-red); }
+        select:focus, input:focus { border-color: var(--pv-red); }
 
-        select {
-            width: 100%; background: var(--pv-bg-dark); color: white; border: 1px solid var(--pv-border); padding: 10px; border-radius: 6px; outline: none;
+        .spinner { display: flex; align-items: center; background: #111; border: 1px solid var(--pv-border); border-radius: 4px; overflow: hidden; }
+        .spin-btn { width: 35px; height: 35px; background: #222; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        .spin-btn:hover { background: var(--pv-red); }
+        .spin-val { flex: 1; text-align: center; border: none; background: transparent; pointer-events: none; color: #fff; font-weight: 600; }
+
+        /* CENTER STAGE (VISUALIZER) */
+        .stage {
+            flex: 1; position: relative; display: flex; align-items: center; justify-content: center;
+            background-color: #050505; background-size: cover; background-position: center; transition: background 0.5s ease;
         }
-        select:focus { border-color: var(--pv-red); }
 
-        .spinner-row { display: flex; justify-content: space-between; align-items: center; background: var(--pv-bg-dark); border: 1px solid var(--pv-border); border-radius: 6px; padding: 5px; }
-        .spinner-btn { width: 32px; height: 32px; background: var(--pv-panel); border: 1px solid var(--pv-border); color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .spinner-btn:hover { background: var(--pv-red); border-color: var(--pv-red); }
-        .spinner-val { font-size: 1rem; font-weight: 600; text-align: center; width: 50px; background: transparent; border: none; color: white; }
-
-        .dim-inputs { display: flex; gap: 10px; }
-        .dim-input-wrapper { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-        .dim-input-wrapper input { width: 100%; background: var(--pv-bg-dark); color: white; border: 1px solid var(--pv-border); padding: 10px; border-radius: 6px; }
-        .dim-input-wrapper span { font-size: 0.7rem; color: var(--pv-text-muted); text-align: right; }
-
-        /* CENTER STAGE */
-        .center-stage {
-            flex: 1; background: #0a0a0a; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
-            background-image: radial-gradient(circle at center, #222 0%, #0a0a0a 100%); flex-direction: column;
-        }
+        .stage-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 1; pointer-events: none; transition: background 0.3s; }
+        .stage.has-bg .stage-overlay { background: rgba(0,0,0,0.5); } /* Scurisce lo sfondo per far risaltare il led wall */
 
         .res-badge {
-            position: absolute; top: 30px; background: rgba(227, 30, 36, 0.9); color: white; padding: 10px 25px;
-            border-radius: 30px; font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            z-index: 5;
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10;
+            background: var(--pv-red); color: #fff; padding: 8px 25px; border-radius: 20px;
+            font-weight: 800; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            letter-spacing: 0.5px;
         }
 
-        .visualizer-wrapper { display: flex; align-items: flex-end; gap: 20px; position: relative; margin-top: 40px; }
-        
-        .wall-grid { 
-            position: relative; display: grid; background: #000; border: 2px solid #555; box-shadow: 0 10px 40px rgba(0,0,0,0.8); overflow: hidden;
-        }
+        .visualizer-container { position: relative; z-index: 5; display: flex; align-items: flex-end; gap: 40px; }
+        .led-wall { position: relative; border: 2px solid #555; background: #000; box-shadow: 0 20px 60px rgba(0,0,0,0.9); overflow: hidden; transition: width 0.3s, height 0.3s; }
         
         /* Media Layers */
-        .media-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 0; display: none; }
-        .wall-grid.has-media .media-layer { display: block; }
-        
-        /* Cabinet Cells */
-        .cabinet-cell { position: relative; z-index: 1; border: 1px solid rgba(255,255,255,0.15); background: rgba(30,30,30,0.9); transition: background 0.3s; }
-        .wall-grid.has-media .cabinet-cell { background: transparent; border: 1px solid rgba(255,255,255,0.4); }
+        .media-content { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: none; z-index: 1; }
+        .wall-grid { position: absolute; inset: 0; display: grid; z-index: 2; pointer-events: none; }
+        .cabinet-box { border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
+        .wall-grid.transparent .cabinet-box { background: transparent; border-color: rgba(255,255,255,0.35); }
 
-        .human-figure { opacity: 0.7; }
-        .meas-w { position: absolute; top: -30px; left: 0; width: 100%; text-align: center; color: #aaa; font-size: 0.85rem; font-weight: bold; }
-        .meas-h { position: absolute; right: -55px; top: 0; height: 100%; writing-mode: vertical-rl; text-align: center; color: #aaa; font-size: 0.85rem; font-weight: bold; transform: rotate(180deg); }
+        /* Measurements Labels */
+        .meas { position: absolute; color: #fff; font-size: 0.85rem; font-weight: 700; text-shadow: 0 2px 5px #000; white-space: nowrap; z-index: 4; }
+        .meas-top { top: -25px; left: 50%; transform: translateX(-50%); }
+        .meas-right { right: -65px; top: 50%; transform: translateY(-50%) rotate(90deg); }
 
-        /* RIGHT PANEL */
-        .right-panel { width: 300px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); display: flex; flex-direction: column; overflow-y: auto;}
-        .result-section { padding: 20px; border-bottom: 1px solid var(--pv-border); }
-        .result-title { font-size: 0.9rem; color: white; margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .result-title::before { content: ''; width: 4px; height: 14px; background: var(--pv-red); display: block; border-radius: 2px; }
-        .result-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; }
-        .result-label { color: var(--pv-text-muted); }
-        .result-val { font-weight: 700; color: white; }
-        .highlight-val { color: var(--pv-red); font-size: 1.1rem; }
+        .human { height: 180px; opacity: 0.85; transition: height 0.3s; z-index: 5; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+
+        /* RIGHT SIDEBAR */
+        .sidebar-right {
+            width: 300px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); padding: 25px 20px;
+            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+        }
+
+        .result-box { background: #1a1a1a; padding: 15px; border-radius: 6px; border-left: 3px solid var(--pv-red); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .res-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .res-row:last-child { margin-bottom: 0; }
+        .res-lbl { font-size: 0.75rem; color: var(--pv-text-muted); text-transform: uppercase; font-weight: 600; }
+        .res-val { font-weight: 700; font-size: 0.95rem; color: #fff; }
+        .res-highlight { color: var(--pv-red); font-size: 1.1rem; }
+
+        .download-btn {
+            background: #252525; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 6px;
+            cursor: pointer; text-align: left; display: flex; align-items: center; gap: 14px; transition: 0.2s; width: 100%;
+        }
+        .download-btn:hover { background: #2d2d2d; border-color: var(--pv-red); }
+        .download-btn-icon { color: var(--pv-red); font-size: 1.2rem; font-weight: bold; }
+        .download-btn-text strong { display: block; font-size: 0.85rem; margin-bottom: 2px; }
+        .download-btn-text span { font-size: 0.7rem; color: var(--pv-text-muted); }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--pv-bg-dark); }
@@ -114,86 +116,94 @@
 </head>
 <body>
 
-    <header class="header">
-        <div class="header-left">
-            <img src="logo.png" alt="Primeview" onerror="this.src='https://via.placeholder.com/150x40/1f1f1f/e31e24?text=PRIMEVIEW'">
-            <span class="header-title">Dix-Play LED Configurator</span>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="logo.png" alt="Primeview" onerror="this.src='https://via.placeholder.com/120x30/1e1e1e/e31e24?text=PRIMEVIEW'">
+            <span class="navbar-title">Dix-Play LED Configurator</span>
         </div>
-        <div class="header-actions">
-            <button onclick="resetApp()">Reset</button>
-        </div>
-    </header>
+        <button class="nav-reset" onclick="location.reload()">Reset All Fields</button>
+    </nav>
 
-    <div class="main-container">
-        <aside class="left-panel">
+    <div class="app-container">
+        
+        <aside class="sidebar-left">
             
             <div class="control-group">
-                <span class="control-label">Units</span>
-                <div class="segmented-control">
-                    <div class="segment-btn active" id="btn-mm" onclick="setUnit('mm')">MM</div>
-                    <div class="segment-btn" id="btn-in" onclick="setUnit('in')">INCHES</div>
+                <span class="group-label">Unit System</span>
+                <div class="segmented">
+                    <div class="seg-btn active" id="unit-mm" onclick="setUnit('mm')">MM</div>
+                    <div class="seg-btn" id="unit-in" onclick="setUnit('in')">INCHES</div>
                 </div>
             </div>
 
             <div class="control-group">
-                <span class="control-label">1. Environment</span>
-                <div class="segmented-control">
-                    <div class="segment-btn active" id="btn-indoor" onclick="setEnvironment('indoor')">Indoor</div>
-                    <div class="segment-btn" id="btn-outdoor" onclick="setEnvironment('outdoor')">Outdoor</div>
+                <span class="group-label">1. Environment</span>
+                <div class="segmented">
+                    <div class="seg-btn active" id="env-indoor" onclick="setEnv('indoor')">Indoor</div>
+                    <div class="seg-btn" id="env-outdoor" onclick="setEnv('outdoor')">Outdoor</div>
                 </div>
             </div>
 
             <div class="control-group">
-                <span class="control-label">2. Cabinet Type</span>
-                <div class="segmented-control">
-                    <div class="segment-btn active" id="btn-cab27" onclick="setCabinet('27')">27" (16:9)</div>
-                    <div class="segment-btn" id="btn-cab55" onclick="setCabinet('55')">55" (16:9)</div>
+                <span class="group-label">2. Orientation</span>
+                <div class="segmented">
+                    <div class="seg-btn active" id="orient-land" onclick="setOrient('landscape')">Landscape</div>
+                    <div class="seg-btn" id="orient-port" onclick="setOrient('portrait')">Portrait</div>
                 </div>
             </div>
 
             <div class="control-group">
-                <span class="control-label">3. Pixel Pitch</span>
-                <select id="pitchSelect" onchange="calculate()"></select>
-            </div>
-
-            <div class="control-group" style="margin-top: 5px;">
-                <span class="control-label">4. Layout (Cabinets)</span>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <span style="width:60px; font-size:0.8rem; color:#aaa;">Columns</span>
-                    <div class="spinner-row" style="flex:1;">
-                        <button class="spinner-btn" onclick="updateCabinets('col', -1)">-</button>
-                        <input type="number" id="colCount" class="spinner-val" value="4" readonly>
-                        <button class="spinner-btn" onclick="updateCabinets('col', 1)">+</button>
-                    </div>
-                </div>
-                <div style="display:flex; gap:10px; align-items:center; margin-top:5px;">
-                    <span style="width:60px; font-size:0.8rem; color:#aaa;">Rows</span>
-                    <div class="spinner-row" style="flex:1;">
-                        <button class="spinner-btn" onclick="updateCabinets('row', -1)">-</button>
-                        <input type="number" id="rowCount" class="spinner-val" value="4" readonly>
-                        <button class="spinner-btn" onclick="updateCabinets('row', 1)">+</button>
-                    </div>
+                <span class="group-label">3. Cabinet Size</span>
+                <div class="segmented">
+                    <div class="seg-btn active" id="cab-27" onclick="setCab('27')">27" Cabinet</div>
+                    <div class="seg-btn" id="cab-55" onclick="setCab('55')">55" Cabinet</div>
                 </div>
             </div>
 
-            <div class="control-group" style="margin-top: 5px;">
-                <span class="control-label">Physical Dimensions</span>
-                <div class="dim-inputs">
-                    <div class="dim-input-wrapper">
-                        <input type="number" id="targetW" onchange="calculateFromDim()">
-                        <span id="lbl-input-w">Width (mm)</span>
-                    </div>
-                    <div class="dim-input-wrapper">
-                        <input type="number" id="targetH" onchange="calculateFromDim()">
-                        <span id="lbl-input-h">Height (mm)</span>
-                    </div>
+            <div class="control-group">
+                <span class="group-label">4. Pixel Pitch</span>
+                <select id="pitch-select" onchange="calc()"></select>
+            </div>
+
+            <div class="control-group">
+                <span class="group-label">5. Display Grid (Columns)</span>
+                <div class="spinner">
+                    <button class="spin-btn" onclick="adj('cols', -1)">-</button>
+                    <input type="text" id="val-cols" class="spin-val" value="4">
+                    <button class="spin-btn" onclick="adj('cols', 1)">+</button>
                 </div>
             </div>
 
-            <div class="control-group" style="margin-top: 5px;">
-                <span class="control-label">Media Preview</span>
-                <select id="mediaSelect" onchange="setMedia(this.value)">
-                    <option value="none">Grid Only (No Media)</option>
+            <div class="control-group">
+                <span class="group-label">6. Display Grid (Rows)</span>
+                <div class="spinner">
+                    <button class="spin-btn" onclick="adj('rows', -1)">-</button>
+                    <input type="text" id="val-rows" class="spin-val" value="3">
+                    <button class="spin-btn" onclick="adj('rows', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <span class="group-label">7. Background Scenario</span>
+                <select id="scenario-select" onchange="setScenario(this.value)">
+                    <option value="none">None (Solid Dark)</option>
+                    <optgroup label="Indoor Backdrops">
+                        <option value="boardroom">Sala Riunioni (Boardroom)</option>
+                        <option value="auditorium">Auditorium / Teatro</option>
+                        <option value="lobby">Hall Albergo (Lobby)</option>
+                    </optgroup>
+                    <optgroup label="Outdoor Backdrops">
+                        <option value="pool">Zona Piscina (Pool Side)</option>
+                        <option value="building">Facciata Palazzo (Building)</option>
+                        <option value="billboard">Cartellone Pubblicitario</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <span class="group-label">8. Media Content Preview</span>
+                <select id="media-select" onchange="setMedia(this.value)">
+                    <option value="none">Grid Only (No Content)</option>
                     <option value="image">Show Image (example.jpg)</option>
                     <option value="video">Show Video (example.mp4)</option>
                 </select>
@@ -201,260 +211,273 @@
 
         </aside>
 
-        <main class="center-stage" id="stageContainer">
+        <main class="stage" id="stage-bg">
+            <div class="stage-overlay"></div>
             
-            <div class="res-badge" id="stage-res-badge">0 x 0 px</div>
+            <div class="res-badge" id="res-badge">0 x 0 PX</div>
 
-            <div class="visualizer-wrapper">
-                <div style="position:relative;">
-                    <div class="meas-w" id="lbl-w">0</div>
-                    <div class="meas-h" id="lbl-h">0</div>
+            <div class="visualizer-container">
+                <div class="led-wall" id="led-wall">
+                    <div class="meas meas-top" id="meas-w">0 mm</div>
+                    <div class="meas meas-right" id="meas-h">0 mm</div>
                     
-                    <div class="wall-grid" id="wallGrid">
-                        <img id="mediaImg" src="example.jpg" class="media-layer">
-                        <video id="mediaVid" src="example.mp4" class="media-layer" autoplay loop muted playsinline></video>
-                        </div>
+                    <img id="prev-img" src="example.jpg" class="media-content" alt="Preview Image">
+                    <video id="prev-vid" src="example.mp4" class="media-content" autoplay loop muted playsinline></video>
+                    
+                    <div class="wall-grid" id="wall-grid"></div>
                 </div>
-                
-                <svg class="human-figure" id="humanSvg" viewBox="0 0 320 700" fill="#777" xmlns="http://www.w3.org/2000/svg">
+
+                <svg class="human" id="human-svg" viewBox="0 0 320 700" fill="#666" xmlns="http://www.w3.org/2000/svg">
                     <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
                 </svg>
             </div>
         </main>
 
-        <aside class="right-panel">
-            <div class="result-section">
-                <div class="result-title">System Specs</div>
-                <div class="result-item"><span class="result-label">Total Cabinets</span><span class="result-val highlight-val" id="res-cabs">0</span></div>
-                <div class="result-item"><span class="result-label">Physical Size</span><span class="result-val" id="res-size">0 x 0</span></div>
-                <div class="result-item"><span class="result-label">Display Diagonal</span><span class="result-val" id="res-diag">0"</span></div>
-                <div class="result-item"><span class="result-label">Aspect Ratio</span><span class="result-val" id="res-ratio">-</span></div>
+        <aside class="sidebar-right">
+            <div class="group-label">Configuration Details</div>
+            
+            <div class="result-box">
+                <div class="res-row"><span class="res-lbl">Cabinet Layout</span><span class="res-val" id="out-layout">0 x 0</span></div>
+                <div class="res-row"><span class="res-lbl">Total Cabinets</span><span class="res-val res-highlight" id="out-cabs">0</span></div>
+                <div class="res-row"><span class="res-lbl">Physical Size</span><span class="res-val" id="out-size">0</span></div>
+                <div class="res-row"><span class="res-lbl">Display Diagonal</span><span class="res-val" id="out-diag">0"</span></div>
             </div>
 
-            <div class="result-section">
-                <div class="result-title">Pixel Resolution</div>
-                <div class="result-item"><span class="result-label">Horizontal</span><span class="result-val" id="res-px-w">0 px</span></div>
-                <div class="result-item"><span class="result-label">Vertical</span><span class="result-val" id="res-px-h">0 px</span></div>
-                <div class="result-item"><span class="result-label">Total Pixels</span><span class="result-val" id="res-px-total">0</span></div>
+            <div class="result-box" style="border-color: #555;">
+                <div class="res-row"><span class="res-lbl">Aspect Ratio</span><span class="res-val" id="out-ratio">-</span></div>
+                <div class="res-row"><span class="res-lbl">Total Pixels</span><span class="res-val" id="out-total-px">0</span></div>
+                <div class="res-row"><span class="res-lbl">Max Power Draw</span><span class="res-val" id="out-power">0 W</span></div>
             </div>
 
-            <div class="result-section" style="flex:1; background: #1a1a1a;">
-                <div class="result-title">Processing & Power</div>
-                <div class="result-item"><span class="result-label">Novastar Unit</span><span class="result-val highlight-val" id="res-nova">-</span></div>
-                <div class="result-item"><span class="result-label">Ports Used (1G)</span><span class="result-val" id="res-ports">0</span></div>
-                <div class="result-item"><span class="result-label">Brompton Ports</span><span class="result-val" id="res-brompton">0</span></div>
-            </div>
+            <div class="group-label" style="margin-top: 10px;">Assets & Export</div>
+            
+            <button class="download-btn" onclick="downloadConfigReport()">
+                <span class="download-btn-icon">💾</span>
+                <div class="download-btn-text">
+                    <strong>Download Configuration</strong>
+                    <span>Export system specs as .txt</span>
+                </div>
+            </button>
+
+            <button class="download-btn" onclick="alert('Brochure system integration placeholder. File will be linked here.')">
+                <span class="download-btn-icon">📄</span>
+                <div class="download-btn-text">
+                    <strong>Download Brochures</strong>
+                    <span>Fusion & Platinum Tech Specs</span>
+                </div>
+            </button>
+
         </aside>
-
     </div>
 
 <script>
-// DATI
-const pitches = {
-    indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5],
-    outdoor: [2.6, 2.9, 3.9, 4.8, 6.0]
-};
-
-const cabinets = {
-    '27': { w: 600, h: 337.5 },
-    '55': { w: 1200, h: 675 }
-};
-
-const CAP_590 = 590000;
-const CAP_BROM = 524000;
-
-// STATO
-let state = {
-    unit: 'mm',
-    env: 'indoor',
-    cab: '27',
-    cols: 4,
-    rows: 4
-};
-
-window.onload = () => {
-    populatePitches();
-    calculate();
-};
-
-function resetApp() { location.reload(); }
-
-function setUnit(u) {
-    state.unit = u;
-    document.getElementById('btn-mm').className = `segment-btn ${u === 'mm' ? 'active' : ''}`;
-    document.getElementById('btn-in').className = `segment-btn ${u === 'in' ? 'active' : ''}`;
+    // TECHNICAL PARAMETERS & SCHEDING DATA
+    const pitches = {
+        indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5],
+        outdoor: [2.6, 2.9, 3.9, 4.8, 6.0]
+    };
     
-    document.getElementById('lbl-input-w').innerText = `Width (${u})`;
-    document.getElementById('lbl-input-h').innerText = `Height (${u})`;
-    calculate();
-}
+    const cabinets = {
+        '27': { w: 600, h: 337.5, power: 80 }, // 27" Diag Series (16:9 natively)
+        '55': { w: 1200, h: 675, power: 320 }  // 55" Diag Series (16:9 natively)
+    };
 
-function setEnvironment(env) {
-    state.env = env;
-    document.getElementById('btn-indoor').className = `segment-btn ${env === 'indoor' ? 'active' : ''}`;
-    document.getElementById('btn-outdoor').className = `segment-btn ${env === 'outdoor' ? 'active' : ''}`;
-    populatePitches();
-    calculate();
-}
+    // Immagini di stock reali da Unsplash per simulare gli sfondi ambientali richiesti
+    const scenarios = {
+        none: '',
+        boardroom: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
+        auditorium: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80',
+        lobby: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+        pool: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=80',
+        building: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+        billboard: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80'
+    };
 
-function setCabinet(cab) {
-    state.cab = cab;
-    document.getElementById('btn-cab27').className = `segment-btn ${cab === '27' ? 'active' : ''}`;
-    document.getElementById('btn-cab55').className = `segment-btn ${cab === '55' ? 'active' : ''}`;
-    calculate();
-}
+    // APP GLOBAL STATE
+    let state = {
+        unit: 'mm', 
+        env: 'indoor', 
+        orient: 'landscape', 
+        cab: '27', 
+        cols: 4, 
+        rows: 3
+    };
 
-function setMedia(type) {
-    const grid = document.getElementById('wallGrid');
-    const img = document.getElementById('mediaImg');
-    const vid = document.getElementById('mediaVid');
+    window.onload = () => {
+        populatePitches();
+        calc();
+    };
+
+    function setUnit(u) { state.unit = u; updateActiveTabs(); calc(); }
+    function setOrient(o) { state.orient = o; updateActiveTabs(); calc(); }
+    function setCab(c) { state.cab = c; updateActiveTabs(); calc(); }
     
-    if(type === 'none') {
-        grid.classList.remove('has-media');
-        img.style.display = 'none';
-        vid.style.display = 'none';
-        vid.pause();
-    } else {
-        grid.classList.add('has-media');
-        if(type === 'image') {
-            img.style.display = 'block';
-            vid.style.display = 'none';
-            vid.pause();
-        } else if (type === 'video') {
-            img.style.display = 'none';
-            vid.style.display = 'block';
-            vid.play();
+    function setEnv(e) { 
+        state.env = e; 
+        updateActiveTabs(); 
+        populatePitches(); 
+        calc(); 
+    }
+
+    function adj(axis, delta) { 
+        state[axis] = Math.max(1, state[axis] + delta); 
+        document.getElementById('val-' + axis).value = state[axis]; 
+        calc(); 
+    }
+
+    function updateActiveTabs() {
+        ['mm', 'in', 'indoor', 'outdoor', 'landscape', 'portrait', '27', '55'].forEach(id => {
+            let type = (id === 'mm' || id === 'in') ? 'unit-' : 
+                       (id === 'indoor' || id === 'outdoor') ? 'env-' : 
+                       (id === 'landscape' || id === 'portrait') ? 'orient-' : 'cab-';
+            const el = document.getElementById(type + id);
+            if(el) el.classList.remove('active');
+        });
+        document.getElementById('unit-' + state.unit).classList.add('active');
+        document.getElementById('env-' + state.env).classList.add('active');
+        document.getElementById('orient-' + state.orient).classList.add('active');
+        document.getElementById('cab-' + state.cab).classList.add('active');
+    }
+
+    function populatePitches() {
+        const s = document.getElementById('pitch-select'); 
+        s.innerHTML = '';
+        pitches[state.env].forEach(p => {
+            const o = document.createElement('option'); 
+            o.value = p; 
+            o.text = p + ' mm';
+            if((state.env === 'indoor' && p === 1.56) || (state.env === 'outdoor' && p === 3.9)) o.selected = true;
+            s.add(o);
+        });
+    }
+
+    function setScenario(v) {
+        const stage = document.getElementById('stage-bg');
+        if(v === 'none') {
+            stage.style.backgroundImage = '';
+            stage.classList.remove('has-bg');
+        } else {
+            stage.style.backgroundImage = `url(${scenarios[v]})`;
+            stage.classList.add('has-bg');
         }
     }
-}
 
-function populatePitches() {
-    const select = document.getElementById('pitchSelect');
-    select.innerHTML = '';
-    pitches[state.env].forEach(p => {
-        let opt = document.createElement('option');
-        opt.value = p; opt.innerText = p + " mm";
-        if (state.env === 'indoor' && p === 1.56) opt.selected = true;
-        if (state.env === 'outdoor' && p === 3.9) opt.selected = true;
-        select.appendChild(opt);
-    });
-}
+    function setMedia(v) {
+        const img = document.getElementById('prev-img');
+        const vid = document.getElementById('prev-vid');
+        const grid = document.getElementById('wall-grid');
+        
+        img.style.display = 'none'; 
+        vid.style.display = 'none'; 
+        vid.pause();
+        grid.classList.remove('transparent');
 
-function updateCabinets(axis, delta) {
-    if (axis === 'col') {
-        state.cols = Math.max(1, state.cols + delta);
-        document.getElementById('colCount').value = state.cols;
-    } else {
-        state.rows = Math.max(1, state.rows + delta);
-        document.getElementById('rowCount').value = state.rows;
-    }
-    calculate();
-}
-
-function calculateFromDim() {
-    let tW = parseFloat(document.getElementById('targetW').value);
-    let tH = parseFloat(document.getElementById('targetH').value);
-    
-    if (state.unit === 'in') { tW *= 25.4; tH *= 25.4; } // convert to internal mm
-
-    let cabW = cabinets[state.cab].w;
-    let cabH = cabinets[state.cab].h;
-
-    if (!isNaN(tW) && tW > 0) { state.cols = Math.max(1, Math.round(tW / cabW)); document.getElementById('colCount').value = state.cols; }
-    if (!isNaN(tH) && tH > 0) { state.rows = Math.max(1, Math.round(tH / cabH)); document.getElementById('rowCount').value = state.rows; }
-    calculate();
-}
-
-function calculate() {
-    let cabW = cabinets[state.cab].w;
-    let cabH = cabinets[state.cab].h;
-    let pitch = parseFloat(document.getElementById('pitchSelect').value);
-
-    let totalW = state.cols * cabW; // Sempre in mm per la logica
-    let totalH = state.rows * cabH;
-
-    let dispW = state.unit === 'mm' ? totalW : (totalW / 25.4).toFixed(2);
-    let dispH = state.unit === 'mm' ? totalH : (totalH / 25.4).toFixed(2);
-    let unitLbl = state.unit;
-
-    document.getElementById('targetW').value = dispW;
-    document.getElementById('targetH').value = dispH;
-
-    let diagInches = (Math.sqrt(Math.pow(totalW, 2) + Math.pow(totalH, 2)) / 25.4).toFixed(1);
-    let ratioNum = totalW / totalH;
-    let ratioStr = ratioNum.toFixed(2) + ":1";
-    if (Math.abs(ratioNum - 1.777) < 0.05) ratioStr = "16:9";
-    if (Math.abs(ratioNum - 2.333) < 0.05) ratioStr = "21:9";
-    if (Math.abs(ratioNum - 3.555) < 0.05) ratioStr = "32:9";
-
-    let resW = Math.round(totalW / pitch);
-    let resH = Math.round(totalH / pitch);
-    let totalPx = resW * resH;
-
-    let ports = Math.ceil(totalPx / CAP_590);
-    let brompton = Math.ceil(totalPx / CAP_BROM);
-    let novaUnit = ports <= 6 ? "VX600 Pro" : ports <= 10 ? "VX1000 Pro" : ports <= 20 ? "VX2000 Pro" : "H-Series";
-
-    // Aggiornamento Badge Stage
-    document.getElementById('stage-res-badge').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} px`;
-
-    // Aggiornamento UI Destra
-    document.getElementById('res-cabs').innerText = `${state.cols * state.rows} (${state.cols}x${state.rows})`;
-    document.getElementById('res-size').innerText = `${dispW} x ${dispH} ${unitLbl}`;
-    document.getElementById('res-diag').innerText = `${diagInches}"`;
-    document.getElementById('res-ratio').innerText = ratioStr;
-    document.getElementById('res-px-w').innerText = resW.toLocaleString() + " px";
-    document.getElementById('res-px-h').innerText = resH.toLocaleString() + " px";
-    document.getElementById('res-px-total').innerText = totalPx.toLocaleString();
-    document.getElementById('res-nova').innerText = novaUnit;
-    document.getElementById('res-ports').innerText = ports;
-    document.getElementById('res-brompton').innerText = brompton;
-
-    drawVisualizer(state.cols, state.rows, totalW, totalH, dispW, dispH, unitLbl);
-}
-
-function drawVisualizer(cols, rows, totalW_mm, totalH_mm, dispW, dispH, unitLbl) {
-    const grid = document.getElementById('wallGrid');
-    const human = document.getElementById('humanSvg');
-    const stage = document.getElementById('stageContainer');
-    
-    document.getElementById('lbl-w').innerText = `${dispW} ${unitLbl}`;
-    document.getElementById('lbl-h').innerText = `${dispH} ${unitLbl}`;
-
-    // Rimuovo vecchie celle (tengo img e video in cima intatti)
-    const oldCells = grid.querySelectorAll('.cabinet-cell');
-    oldCells.forEach(c => c.remove());
-
-    const REAL_HUMAN_MM = 1800;
-    const PIXELS_PER_MM = 160 / REAL_HUMAN_MM; 
-    
-    let drawW = totalW_mm * PIXELS_PER_MM;
-    let drawH = totalH_mm * PIXELS_PER_MM;
-
-    const padding = 150;
-    const maxW = stage.clientWidth - padding;
-    const maxH = stage.clientHeight - padding;
-    
-    let scale = 1;
-    if (drawW > maxW || drawH > maxH) {
-        scale = Math.min(maxW / drawW, maxH / drawH);
+        if(v === 'image') { img.style.display = 'block'; grid.classList.add('transparent'); }
+        if(v === 'video') { vid.style.display = 'block'; vid.play(); grid.classList.add('transparent'); }
     }
 
-    drawW *= scale; drawH *= scale;
-    human.style.height = `${(REAL_HUMAN_MM * PIXELS_PER_MM) * scale}px`;
-    
-    grid.style.width = `${drawW}px`;
-    grid.style.height = `${drawH}px`;
-    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+    function calc() {
+        const c = cabinets[state.cab];
+        // Scambia larghezza e altezza in base all'orientamento portrait/landscape
+        let baseW = state.orient === 'landscape' ? c.w : c.h;
+        let baseH = state.orient === 'landscape' ? c.h : c.w;
+        let pitch = parseFloat(document.getElementById('pitch-select').value);
 
-    let limit = Math.min(cols * rows, 1000); 
-    for (let i = 0; i < limit; i++) {
-        let cell = document.createElement('div');
-        cell.className = 'cabinet-cell';
-        grid.appendChild(cell);
+        let totalW_mm = state.cols * baseW;
+        let totalH_mm = state.rows * baseH;
+        
+        let resW = Math.round(totalW_mm / pitch);
+        let resH = Math.round(totalH_mm / pitch);
+        let totalCabs = state.cols * state.rows;
+
+        // Formattazione per la visualizzazione dell'unità di misura
+        let dispW = state.unit === 'mm' ? totalW_mm : (totalW_mm / 25.4).toFixed(1);
+        let dispH = state.unit === 'mm' ? totalH_mm : (totalH_mm / 25.4).toFixed(1);
+
+        // Update della UI destra e dei badge
+        document.getElementById('res-badge').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} PX`;
+        document.getElementById('out-layout').innerText = `${state.cols} Columns x ${state.rows} Rows`;
+        document.getElementById('out-cabs').innerText = totalCabs;
+        document.getElementById('out-size').innerText = `${dispW} x ${dispH} ${state.unit.toUpperCase()}`;
+        
+        let diag = (Math.sqrt(totalW_mm**2 + totalH_mm**2) / 25.4).toFixed(1);
+        document.getElementById('out-diag').innerText = diag + '"';
+        
+        let ratio = (totalW_mm / totalH_mm).toFixed(2);
+        document.getElementById('out-ratio').innerText = ratio + ':1';
+        document.getElementById('out-total-px').innerText = (resW * resH).toLocaleString();
+        document.getElementById('out-power').innerText = (totalCabs * c.power).toLocaleString() + ' W';
+
+        drawStage(totalW_mm, totalH_mm, dispW, dispH);
     }
-}
+
+    function drawStage(w_mm, h_mm, dispW, dispH) {
+        const wall = document.getElementById('led-wall');
+        const grid = document.getElementById('wall-grid');
+        const human = document.getElementById('human-svg');
+        const stage = document.getElementById('stage-bg');
+        
+        // Fattore di scala grafico dinamico per far entrare il led wall nello stage
+        const maxDrawW = stage.clientWidth - 160;
+        const maxDrawH = stage.clientHeight - 140;
+        const PIXELS_PER_MM = 160 / 1800; // Scala base: l'omino da 1800mm è alto circa 160px
+
+        let drawW = w_mm * PIXELS_PER_MM;
+        let drawH = h_mm * PIXELS_PER_MM;
+
+        let scaleDown = 1;
+        if (drawW > maxDrawW || drawH > maxDrawH) {
+            scaleDown = Math.min(maxDrawW / drawW, maxDrawH / drawH);
+        }
+
+        drawW *= scaleDown;
+        drawH *= scaleDown;
+
+        // Renderizza dimensioni elementi grafici dello stage
+        wall.style.width = drawW + 'px';
+        wall.style.height = drawH + 'px';
+        human.style.height = ((1800 * PIXELS_PER_MM) * scaleDown) + 'px';
+
+        // Update etichette di misura grafiche
+        document.getElementById('meas-w').innerText = `${dispW} ${state.unit.toUpperCase()}`;
+        document.getElementById('meas-h').innerText = `${dispH} ${state.unit.toUpperCase()}`;
+
+        // Rigenerazione della griglia dei cabinet nel DOM
+        grid.innerHTML = '';
+        grid.style.gridTemplateColumns = `repeat(${state.cols}, 1fr)`;
+        grid.style.gridTemplateRows = `repeat(${state.rows}, 1fr)`;
+        
+        let totalCells = state.cols * state.rows;
+        if(totalCells < 1500) {
+            for(let i = 0; i < totalCells; i++) {
+                const box = document.createElement('div');
+                box.className = 'cabinet-box';
+                grid.appendChild(box);
+            }
+        }
+    }
+
+    function downloadConfigReport() {
+        const reportText = `PRV DIX-PLAY CONFIGURATION REPORT\n` +
+                           `----------------------------------\n` +
+                           `Environment Setting : ${state.env.toUpperCase()}\n` +
+                           `Cabinet Module      : ${state.cab}" Stacking Series\n` +
+                           `Orientation Mode    : ${state.orient.toUpperCase()}\n` +
+                           `Grid Arrangement    : ${state.cols} Columns x ${state.rows} Rows\n` +
+                           `Total Modules Count : ${state.cols * state.rows} Cabinets\n` +
+                           `Total Physical Size : ${document.getElementById('out-size').innerText}\n` +
+                           `Calculated Diagonal : ${document.getElementById('out-diag').innerText}\n` +
+                           `Aspect Ratio        : ${document.getElementById('out-ratio').innerText}\n` +
+                           `Final Resolution    : ${document.getElementById('res-badge').innerText}\n` +
+                           `Total Max Power     : ${document.getElementById('out-power').innerText}\n`;
+                           
+        const blob = new Blob([reportText], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.download = 'PRV_LED_Wall_Configuration.txt';
+        a.href = window.URL.createObjectURL(blob);
+        a.click();
+    }
 </script>
+
 </body>
 </html>
