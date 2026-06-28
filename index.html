@@ -56,12 +56,12 @@
 
         /* CENTER STAGE (VISUALIZER) */
         .stage {
-            flex: 1; position: relative; display: flex; align-items: center; justify-content: center;
+            flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
             background-color: #050505; background-size: cover; background-position: center; transition: background 0.5s ease;
         }
 
         .stage-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 1; pointer-events: none; transition: background 0.3s; }
-        .stage.has-bg .stage-overlay { background: rgba(0,0,0,0.5); } /* Scurisce lo sfondo per far risaltare il led wall */
+        .stage.has-bg .stage-overlay { background: rgba(0,0,0,0.5); }
 
         .res-badge {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10;
@@ -204,7 +204,7 @@
                 <span class="group-label">8. Media Content Preview</span>
                 <select id="media-select" onchange="setMedia(this.value)">
                     <option value="none">Grid Only (No Content)</option>
-                    <option value="image">Show Image (example.jpg)</option>
+                    <option value="image">Show Image (example.png)</option>
                     <option value="video">Show Video (example.mp4)</option>
                 </select>
             </div>
@@ -221,7 +221,7 @@
                     <div class="meas meas-top" id="meas-w">0 mm</div>
                     <div class="meas meas-right" id="meas-h">0 mm</div>
                     
-                    <img id="prev-img" src="example.jpg" class="media-content" alt="Preview Image">
+                    <img id="prev-img" src="example.png" class="media-content" alt="Preview Image">
                     <video id="prev-vid" src="example.mp4" class="media-content" autoplay loop muted playsinline></video>
                     
                     <div class="wall-grid" id="wall-grid"></div>
@@ -271,18 +271,16 @@
     </div>
 
 <script>
-    // TECHNICAL PARAMETERS & SCHEDING DATA
     const pitches = {
         indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5],
         outdoor: [2.6, 2.9, 3.9, 4.8, 6.0]
     };
     
     const cabinets = {
-        '27': { w: 600, h: 337.5, power: 80 }, // 27" Diag Series (16:9 natively)
-        '55': { w: 1200, h: 675, power: 320 }  // 55" Diag Series (16:9 natively)
+        '27': { w: 600, h: 337.5, power: 80 }, 
+        '55': { w: 1200, h: 675, power: 320 }  
     };
 
-    // Immagini di stock reali da Unsplash per simulare gli sfondi ambientali richiesti
     const scenarios = {
         none: '',
         boardroom: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
@@ -293,7 +291,6 @@
         billboard: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80'
     };
 
-    // APP GLOBAL STATE
     let state = {
         unit: 'mm', 
         env: 'indoor', 
@@ -378,7 +375,6 @@
 
     function calc() {
         const c = cabinets[state.cab];
-        // Scambia larghezza e altezza in base all'orientamento portrait/landscape
         let baseW = state.orient === 'landscape' ? c.w : c.h;
         let baseH = state.orient === 'landscape' ? c.h : c.w;
         let pitch = parseFloat(document.getElementById('pitch-select').value);
@@ -390,11 +386,9 @@
         let resH = Math.round(totalH_mm / pitch);
         let totalCabs = state.cols * state.rows;
 
-        // Formattazione per la visualizzazione dell'unità di misura
         let dispW = state.unit === 'mm' ? totalW_mm : (totalW_mm / 25.4).toFixed(1);
         let dispH = state.unit === 'mm' ? totalH_mm : (totalH_mm / 25.4).toFixed(1);
 
-        // Update della UI destra e dei badge
         document.getElementById('res-badge').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} PX`;
         document.getElementById('out-layout').innerText = `${state.cols} Columns x ${state.rows} Rows`;
         document.getElementById('out-cabs').innerText = totalCabs;
@@ -417,10 +411,10 @@
         const human = document.getElementById('human-svg');
         const stage = document.getElementById('stage-bg');
         
-        // Fattore di scala grafico dinamico per far entrare il led wall nello stage
-        const maxDrawW = stage.clientWidth - 160;
-        const maxDrawH = stage.clientHeight - 140;
-        const PIXELS_PER_MM = 160 / 1800; // Scala base: l'omino da 1800mm è alto circa 160px
+        // Evita valori negativi in caso di ridimensionamento eccessivo della finestra
+        const maxDrawW = Math.max(100, stage.clientWidth - 160);
+        const maxDrawH = Math.max(100, stage.clientHeight - 140);
+        const PIXELS_PER_MM = 160 / 1800;
 
         let drawW = w_mm * PIXELS_PER_MM;
         let drawH = h_mm * PIXELS_PER_MM;
@@ -433,20 +427,18 @@
         drawW *= scaleDown;
         drawH *= scaleDown;
 
-        // Renderizza dimensioni elementi grafici dello stage
         wall.style.width = drawW + 'px';
         wall.style.height = drawH + 'px';
         human.style.height = ((1800 * PIXELS_PER_MM) * scaleDown) + 'px';
 
-        // Update etichette di misura grafiche
         document.getElementById('meas-w').innerText = `${dispW} ${state.unit.toUpperCase()}`;
         document.getElementById('meas-h').innerText = `${dispH} ${state.unit.toUpperCase()}`;
 
-        // Rigenerazione della griglia dei cabinet nel DOM
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${state.cols}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${state.rows}, 1fr)`;
         
+        // Limita il disegno a 1500 box per evitare il crash del browser
         let totalCells = state.cols * state.rows;
         if(totalCells < 1500) {
             for(let i = 0; i < totalCells; i++) {
@@ -454,6 +446,8 @@
                 box.className = 'cabinet-box';
                 grid.appendChild(box);
             }
+        } else {
+            grid.innerHTML = '<div style="color:#aaa; display:flex; align-items:center; justify-content:center; height:100%; grid-column: 1 / -1;">Grid too large to render individual cells. Specs calculated correctly.</div>';
         }
     }
 
