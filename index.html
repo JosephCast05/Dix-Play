@@ -7,227 +7,407 @@
     <style>
         :root {
             --pv-red: #e31e24;
-            --pv-anthracite: #323232;
-            --pv-black: #1a1a1a;
-            --pv-dark: #0f0f0f;
+            --pv-anthracite: #2a2a2a;
+            --pv-black: #121212;
+            --pv-dark: #1e1e1e;
             --pv-white: #ffffff;
-            --pv-grey-text: #a0a0a0;
+            --pv-grey-text: #b0b0b0;
+            --border-color: #333;
         }
 
-        * { box-sizing: border-box; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--pv-black); 
             color: var(--pv-white); 
-            margin: 0; padding: 20px 10px;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .header-logo-container {
-            width: 100%;
-            max-width: 1150px;
-            background: var(--pv-white);
-            padding: 25px 40px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            border-bottom: 5px solid var(--pv-red);
+        /* HEADER */
+        .navbar {
+            background: var(--pv-dark);
+            height: 70px;
             display: flex;
-            justify-content: center; 
             align-items: center;
-            gap: 50px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            flex-wrap: wrap;
+            padding: 0 30px;
+            border-bottom: 2px solid var(--pv-red);
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 10;
         }
 
-        .header-logo-container img {
-            max-width: 320px; 
-            width: 100%;
-            height: auto;
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .logo-divider {
-            width: 2px;
-            height: 50px;
-            background-color: #ddd;
+        .navbar-brand img {
+            height: 40px;
+            object-fit: contain;
         }
 
-        @media (max-width: 768px) {
-            .logo-divider { display: none; }
-            .header-logo-container { flex-direction: column; gap: 20px; }
+        .navbar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--pv-grey-text);
+            border-left: 1px solid #444;
+            padding-left: 20px;
         }
 
-        .main-container {
-            width: 100%; max-width: 1150px;
-            border: 1px solid var(--pv-anthracite);
+        /* MAIN LAYOUT */
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* SIDEBARS */
+        .sidebar {
+            width: 350px;
             background: var(--pv-anthracite);
-            border-radius: 8px; overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            padding: 30px 25px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
         }
 
-        .content-grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: #444; }
-        @media (min-width: 900px) { .content-grid { grid-template-columns: 1fr 1.2fr; } }
-
-        .panel { padding: 30px; background: var(--pv-anthracite); }
-        .section-wrapper { width: 100%; max-width: 450px; margin: 0 auto; }
+        .sidebar.right {
+            border-right: none;
+            border-left: 1px solid var(--border-color);
+            background: var(--pv-dark);
+        }
 
         .section-title {
-            color: var(--pv-red); font-size: 0.85rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 20px;
-            display: block; border-left: 4px solid var(--pv-red); padding-left: 12px;
+            color: var(--pv-white);
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
         }
 
-        .input-pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; align-items: end; }
-        label { display: block; font-size: 0.65rem; color: var(--pv-grey-text); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 16px;
+            background: var(--pv-red);
+            border-radius: 2px;
+        }
+
+        /* FORM ELEMENTS */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+
+        label { 
+            font-size: 0.75rem; 
+            color: var(--pv-grey-text); 
+            text-transform: uppercase; 
+            font-weight: 600; 
+        }
 
         input, select {
-            width: 100%; background: var(--pv-dark); border: 1px solid #555;
-            color: var(--pv-white); padding: 12px; font-size: 0.95rem;
-            border-radius: 4px; height: 48px;
+            width: 100%; 
+            background: var(--pv-black); 
+            border: 1px solid #444;
+            color: var(--pv-white); 
+            padding: 12px 15px; 
+            font-size: 0.95rem;
+            border-radius: 6px; 
+            outline: none;
+            transition: border-color 0.3s;
         }
 
-        .error-overlay {
-            display: none; background: rgba(227, 30, 36, 0.15); border: 2px solid var(--pv-red);
-            padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 0.8rem;
+        input:focus, select:focus {
+            border-color: var(--pv-red);
+        }
+
+        input[readonly] {
+            background: #1a1a1a;
+            color: #777;
+            border-color: #333;
         }
 
         .btn-reset {
-            width: 100%; padding: 15px; background: transparent; border: 2px solid var(--pv-red);
-            color: var(--pv-white); text-transform: uppercase; font-weight: 800;
-            cursor: pointer; border-radius: 4px; margin-top: 10px;
+            padding: 15px; 
+            background: transparent; 
+            border: 1px solid var(--pv-red);
+            color: var(--pv-red); 
+            text-transform: uppercase; 
+            font-weight: 700;
+            cursor: pointer; 
+            border-radius: 6px; 
+            margin-top: 10px;
             transition: all 0.3s;
+            letter-spacing: 1px;
         }
-        .btn-reset:hover { background: var(--pv-red); color: white; }
+        
+        .btn-reset:hover { 
+            background: var(--pv-red); 
+            color: white; 
+        }
 
-        .result-card { background: var(--pv-dark); padding: 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #333; }
-        .result-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .val-label { font-size: 0.72rem; color: #999; text-transform: uppercase; }
-        .val-output { font-size: 1rem; font-weight: 700; }
+        /* ERRORS */
+        .error-overlay {
+            display: none; 
+            background: rgba(227, 30, 36, 0.1); 
+            border-left: 4px solid var(--pv-red);
+            padding: 15px; 
+            border-radius: 4px; 
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* CENTER STAGE (VISUALIZER) */
+        .stage {
+            flex: 1;
+            background: radial-gradient(circle at center, #2a2a2a 0%, #121212 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 40px;
+        }
+
+        .led-wall-container {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .led-grid-wrapper {
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border: 2px solid #555;
+            background: #000;
+        }
+
+        .led-grid {
+            display: grid;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cabinet {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(30, 30, 30, 0.8);
+            box-sizing: border-box;
+        }
+
+        .dimension-label {
+            position: absolute;
+            color: var(--pv-grey-text);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dim-w { top: -30px; left: 0; width: 100%; }
+        .dim-h { right: -60px; top: 0; height: 100%; writing-mode: vertical-rl; transform: rotate(180deg); }
+
+        .human-scale {
+            height: 180px; /* Rappresenta ~1.8m */
+            opacity: 0.6;
+        }
+
+        /* RESULTS CARDS */
+        .result-group {
+            background: var(--pv-anthracite);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-group.highlight {
+            border-color: var(--pv-red);
+            background: linear-gradient(145deg, var(--pv-anthracite) 0%, rgba(227, 30, 36, 0.05) 100%);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        .result-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .val-label { font-size: 0.8rem; color: var(--pv-grey-text); }
+        .val-output { font-size: 1.05rem; font-weight: 700; color: var(--pv-white); }
         .val-red { color: var(--pv-red); }
 
-        .footer { 
-            padding: 20px; 
-            text-align: center; 
-            font-size: 0.65rem; 
-            color: var(--pv-grey-text); 
-            background: var(--pv-dark); 
-            text-transform: uppercase; 
-            width: 100%; 
-            max-width: 1150px; 
-            margin-top: 1px; 
-            border-radius: 0 0 8px 8px; 
-        }
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--pv-black); }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--pv-red); }
     </style>
 </head>
 <body>
 
-    <div class="header-logo-container">
-        <img src="logo.png" alt="Primeview Global Logo">
-        <div class="logo-divider"></div>
-        <img src="Dixplay_logo.png" alt="Dix-Play Logo">
-    </div>
-
-    <div class="main-container">
-        <div class="content-grid">
-            <div class="panel">
-                <div class="section-wrapper">
-                    <div id="errorBox" class="error-overlay">
-                        <strong style="color:var(--pv-red)">CABINET ALIGNMENT ERROR</strong><br>
-                        Physical dimensions do not match whole cabinets. <br><br>
-                        <span id="errorSuggestions"></span>
-                    </div>
-
-                    <span class="section-title">Physical Specs</span>
-                    
-                    <div class="input-pair-grid">
-                        <div class="input-box">
-                            <label>Target Diagonal (Inches)</label>
-                            <input type="number" id="diag" placeholder="---" step="0.1" oninput="manualInput('diag')">
-                        </div>
-                        <div class="input-box">
-                            <label>Aspect Ratio</label>
-                            <select id="ratio" onchange="manualInput('ratio')">
-                                <option value="custom" selected>Custom (Free Input)</option>
-                                <option value="1.77777777778">16:9 (Standard)</option>
-                                <option value="2.33333333333">21:9 (Ultrawide)</option>
-                                <option value="3.55555555556">32:9 (Panoramic)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="input-pair-grid">
-                        <div class="input-box">
-                            <label>Width (mm)</label>
-                            <input type="number" id="manualW" placeholder="---" oninput="manualInput('mm')">
-                        </div>
-                        <div class="input-box">
-                            <label>Height (mm)</label>
-                            <input type="number" id="manualH" placeholder="---" oninput="manualInput('mm')">
-                        </div>
-                    </div>
-
-                    <span class="section-title" style="margin-top: 40px;">Pixel Specs</span>
-
-                    <div class="input-box" style="margin-bottom: 20px;">
-                        <label>Pixel Pitch (mm)</label>
-                        <select id="pitch" onchange="manualInput('pitch')">
-                            <option value="2.5">2.5 mm</option>
-                            <option value="2.1">2.1 mm</option>
-                            <option value="1.87">1.87 mm COB</option>
-                            <option value="1.56" selected>1.56 mm COB</option>
-                            <option value="1.25">1.25 mm COB</option>
-                            <option value="0.93">0.93 mm COB</option>
-                            <option value="0.7">0.7 mm COB</option>
-                        </select>
-                    </div>
-
-                    <div class="input-pair-grid">
-                        <div class="input-box">
-                            <label>Horizontal Res</label>
-                            <input type="number" id="resW" placeholder="---" readonly style="opacity:0.6">
-                        </div>
-                        <div class="input-box">
-                            <label>Vertical Res</label>
-                            <input type="number" id="resH" placeholder="---" readonly style="opacity:0.6">
-                        </div>
-                    </div>
-
-                    <button class="btn-reset" onclick="resetAll()">Reset All Fields</button>
-                </div>
-            </div>
-
-            <div class="panel" style="background: #282828;">
-                <span class="section-title">Results</span>
-                <div class="result-card">
-                    <div class="result-row"><span class="val-label">Current Aspect Ratio</span><span class="val-output val-red" id="currentRatioOutput">-</span></div>
-                    <div class="result-row"><span class="val-label">Active Area</span><span class="val-output" id="activeArea">-</span></div>
-                    <div class="result-row"><span class="val-label">Exact Layout</span><span class="val-output val-red" id="cabLayout">-</span></div>
-                    <div class="result-row"><span class="val-label">Cabinet Count</span><span class="val-output" id="totalCabs">-</span></div>
-                </div>
-
-                <div id="ratioAdvisorCard" class="result-card" style="display:none; border-left: 4px solid #aaa;">
-                    <span class="val-label" style="display:block; margin-bottom:10px;">Ratio Proximity Advisor</span>
-                    <div id="ratioAdvisorContent" style="font-size: 0.75rem; color:#bbb; line-height: 1.6;"></div>
-                </div>
-
-                <div class="result-card">
-                    <div class="result-row"><span class="val-label">Total Pixels</span><span class="val-output" id="totalPx">-</span></div>
-                    <div class="result-row"><span class="val-label">Stress per Port</span><span class="val-output" id="portStress">-</span></div>
-                    <div class="result-row"><span class="val-label">Ports (650k)</span><span class="val-output" id="ports650">-</span></div>
-                    <div class="result-row"><span class="val-label">Ports (5G)</span><span class="val-output" id="ports5G">-</span></div>
-                </div>
-
-                <div class="result-card" style="border-left: 4px solid var(--pv-red);">
-                    <div class="result-row"><span class="val-label">Novastar Unit</span><span class="val-output val-red" id="novaProcessor">-</span></div>
-                    <div class="result-row"><span class="val-label">Brompton 1G</span><span class="val-output" id="bromptonPorts">-</span></div>
-                </div>
-            </div>
+    <div class="navbar">
+        <div class="navbar-brand">
+            <img src="logo.png" alt="Primeview Logo" onerror="this.src='https://via.placeholder.com/150x40/121212/e31e24?text=PRIMEVIEW'">
+            <div class="navbar-title">Dix-Play LED Configurator</div>
         </div>
     </div>
-    
-    <div class="footer">PRIMEVIEW GLOBAL - DIX-PLAY - LED CALCULATOR</div>
+
+    <div class="app-container">
+        
+        <div class="sidebar">
+            
+            <div id="errorBox" class="error-overlay">
+                <strong style="color:var(--pv-red)">CABINET ALIGNMENT ERROR</strong><br>
+                Physical dimensions do not match whole cabinets (600x337.5mm).<br>
+                <span id="errorSuggestions" style="color:#aaa; display:block; margin-top:8px;"></span>
+            </div>
+
+            <div>
+                <div class="section-title">Physical Specs</div>
+                <div style="height: 15px;"></div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Target Diagonal (Inch)</label>
+                        <input type="number" id="diag" placeholder="e.g. 135" step="0.1" oninput="manualInput('diag')">
+                    </div>
+                    <div class="input-group">
+                        <label>Aspect Ratio</label>
+                        <select id="ratio" onchange="manualInput('ratio')">
+                            <option value="custom" selected>Custom / Free</option>
+                            <option value="1.77777777778">16:9 (Standard)</option>
+                            <option value="2.33333333333">21:9 (Ultrawide)</option>
+                            <option value="3.55555555556">32:9 (Panoramic)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="height: 15px;"></div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Width (mm)</label>
+                        <input type="number" id="manualW" placeholder="Width" oninput="manualInput('mm')">
+                    </div>
+                    <div class="input-group">
+                        <label>Height (mm)</label>
+                        <input type="number" id="manualH" placeholder="Height" oninput="manualInput('mm')">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">Pixel Specs</div>
+                <div style="height: 15px;"></div>
+
+                <div class="input-group">
+                    <label>Pixel Pitch (mm)</label>
+                    <select id="pitch" onchange="manualInput('pitch')">
+                        <option value="2.5">2.5 mm</option>
+                        <option value="2.1">2.1 mm</option>
+                        <option value="1.87">1.87 mm COB</option>
+                        <option value="1.56" selected>1.56 mm COB</option>
+                        <option value="1.25">1.25 mm COB</option>
+                        <option value="0.93">0.93 mm COB</option>
+                        <option value="0.7">0.7 mm COB</option>
+                    </select>
+                </div>
+
+                <div style="height: 15px;"></div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Horiz. Res</label>
+                        <input type="number" id="resW" placeholder="---" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>Vert. Res</label>
+                        <input type="number" id="resH" placeholder="---" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-reset" onclick="resetAll()">Reset Configurator</button>
+        </div>
+
+        <div class="stage">
+            <div class="led-wall-container">
+                <div class="led-grid-wrapper" id="wallWrapper" style="display:none;">
+                    <div class="dimension-label dim-w" id="lblWidth">0 mm</div>
+                    <div class="dimension-label dim-h" id="lblHeight">0 mm</div>
+                    <div class="led-grid" id="ledGrid"></div>
+                </div>
+                
+                <svg class="human-scale" id="humanScale" style="display:none;" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="sidebar right">
+            <div class="section-title">System Overview</div>
+            
+            <div class="result-group">
+                <div class="result-row"><span class="val-label">Layout (WxH Cabs)</span><span class="val-output val-red" id="cabLayout">-</span></div>
+                <div class="result-row"><span class="val-label">Total Cabinets</span><span class="val-output" id="totalCabs">-</span></div>
+                <div class="result-row"><span class="val-label">Active Area</span><span class="val-output" id="activeArea">-</span></div>
+                <div class="result-row"><span class="val-label">Aspect Ratio</span><span class="val-output val-red" id="currentRatioOutput">-</span></div>
+            </div>
+
+            <div class="result-group" id="ratioAdvisorCard" style="display:none; border-left: 3px solid #f39c12;">
+                <span class="val-label" style="display:block; margin-bottom:5px; color:#f39c12;">Ratio Advisor</span>
+                <div id="ratioAdvisorContent" style="font-size: 0.75rem; color:#ccc; line-height: 1.5;"></div>
+            </div>
+
+            <div class="result-group">
+                <div class="result-row"><span class="val-label">Total Pixels</span><span class="val-output" id="totalPx">-</span></div>
+                <div class="result-row"><span class="val-label">Novastar Ports (650k)</span><span class="val-output" id="ports650">-</span></div>
+                <div class="result-row"><span class="val-label">Novastar Ports (5G)</span><span class="val-output" id="ports5G">-</span></div>
+            </div>
+
+            <div class="result-group highlight">
+                <div class="result-row"><span class="val-label">Recommended Nova</span><span class="val-output val-red" id="novaProcessor">-</span></div>
+                <div class="result-row"><span class="val-label">Brompton 1G Ports</span><span class="val-output" id="bromptonPorts">-</span></div>
+            </div>
+        </div>
+
+    </div>
 
 <script>
+// Costanti Primeview Dix-Play
 const CAB_W = 600;
 const CAB_H = 337.5;
 const CAP_650 = 650000;
@@ -248,16 +428,12 @@ function runCalc(source) {
     let manualH = parseFloat(document.getElementById('manualH').value);
     let ratio;
 
-    // Se non abbiamo input sufficienti, usciamo
     if (isNaN(diag) && isNaN(manualW) && isNaN(manualH)) return;
 
     let wMm, hMm;
 
     if (ratioVal === 'custom') {
         if (source === 'diag') {
-            // Se l'utente cambia la diagonale in modalità custom, 
-            // calcoliamo il ratio basandoci sui valori correnti di W e H (se esistono)
-            // Altrimenti usiamo 16:9 come base di partenza.
             let currentW = manualW || 16;
             let currentH = manualH || 9;
             let currentRatio = currentW / currentH;
@@ -268,7 +444,6 @@ function runCalc(source) {
             document.getElementById('manualW').value = Math.round(wMm);
             document.getElementById('manualH').value = Math.round(hMm);
         } else {
-            // Se l'utente inserisce W o H manualmente
             wMm = manualW;
             hMm = manualH;
             if (!isNaN(wMm) && !isNaN(hMm) && hMm !== 0) {
@@ -278,7 +453,6 @@ function runCalc(source) {
             }
         }
     } else {
-        // Logica Standard (Ratio preimpostati)
         ratio = parseFloat(ratioVal);
         if (source === 'mm') {
             wMm = manualW; 
@@ -294,7 +468,6 @@ function runCalc(source) {
         }
     }
 
-    // Calcolo Ratio effettivo per i risultati
     let finalRatio = wMm / hMm;
     let ratioLabel = isNaN(finalRatio) ? "-" : finalRatio.toFixed(2) + ":1";
     let is169 = Math.abs(finalRatio - 1.777) < 0.02;
@@ -305,7 +478,6 @@ function runCalc(source) {
     if (is219) ratioLabel = "21:9";
     if (is329) ratioLabel = "32:9";
 
-    // Advisor logica custom
     if (ratioVal === 'custom') {
         let advisorHTML = "";
         if (!is169 && !isNaN(wMm)) advisorHTML += `To hit 16:9: Height ${Math.round(wMm / 1.777)}mm<br>`;
@@ -322,7 +494,6 @@ function runCalc(source) {
         ratioAdvisor.style.display = 'none';
     }
 
-    // Calcolo CABINET e ERRORI
     const cabsW = wMm / CAB_W;
     const cabsH = hMm / CAB_H;
     const isWValid = Math.abs(cabsW - Math.round(cabsW)) < 0.01;
@@ -330,10 +501,11 @@ function runCalc(source) {
 
     if ((!isWValid || !isHValid) && !isNaN(cabsW)) {
         errorBox.style.display = 'block';
-        document.getElementById('errorSuggestions').innerHTML = `Closest Valid Widths: ${Math.floor(cabsW)*CAB_W} or ${Math.ceil(cabsW)*CAB_W}mm<br>Closest Valid Heights: ${Math.floor(cabsH)*CAB_H} or ${Math.ceil(cabsH)*CAB_H}mm`;
-    } else { errorBox.style.display = 'none'; }
+        document.getElementById('errorSuggestions').innerHTML = `Try Width: ${Math.floor(cabsW)*CAB_W} or ${Math.ceil(cabsW)*CAB_W}mm<br>Try Height: ${Math.floor(cabsH)*CAB_H} or ${Math.ceil(cabsH)*CAB_H}mm`;
+    } else { 
+        errorBox.style.display = 'none'; 
+    }
 
-    // RISOLUZIONE PIXEL
     const resW = Math.round(wMm / pitch);
     const resH = Math.round(hMm / pitch);
     document.getElementById('resW').value = isNaN(resW) ? "" : resW;
@@ -341,22 +513,90 @@ function runCalc(source) {
 
     const totalPx = resW * resH;
     const reqPorts590 = Math.ceil(totalPx / CAP_590);
-    const pxPerPort = reqPorts590 > 0 ? Math.round(totalPx / reqPorts590) : 0;
 
-    // OUTPUT FINALI
+    // OUTPUT UI DOM
     document.getElementById('currentRatioOutput').innerText = ratioLabel;
-    document.getElementById('activeArea').innerText = isNaN(wMm) ? "-" : `${Math.round(wMm)}x${Math.round(hMm)}mm (${diag.toFixed(1)}")`;
-    document.getElementById('cabLayout').innerText = isNaN(cabsW) ? "-" : `${cabsW.toFixed(2)}x${cabsH.toFixed(2)}`;
-    document.getElementById('totalCabs').innerText = isNaN(cabsW) ? "-" : (cabsW * cabsH).toFixed(2);
+    document.getElementById('activeArea').innerText = isNaN(wMm) ? "-" : `${Math.round(wMm)} x ${Math.round(hMm)}mm (${diag.toFixed(1)}")`;
+    document.getElementById('cabLayout').innerText = isNaN(cabsW) ? "-" : `${Math.round(cabsW)}x${Math.round(cabsH)}`;
+    document.getElementById('totalCabs').innerText = isNaN(cabsW) ? "-" : Math.round(cabsW * cabsH);
     document.getElementById('totalPx').innerText = isNaN(totalPx) ? "-" : totalPx.toLocaleString();
-    document.getElementById('portStress').innerText = pxPerPort > 0 ? `${pxPerPort.toLocaleString()} px/port` : "-";
     document.getElementById('ports650').innerText = isNaN(totalPx) ? "-" : Math.ceil(totalPx / CAP_650);
     document.getElementById('ports5G').innerText = isNaN(totalPx) ? "-" : Math.ceil(totalPx / CAP_5G);
-    document.getElementById('bromptonPorts').innerText = isNaN(totalPx) ? "-" : Math.ceil(totalPx / 524000) + " Ports";
+    document.getElementById('bromptonPorts').innerText = isNaN(totalPx) ? "-" : Math.ceil(totalPx / 524000);
     document.getElementById('novaProcessor').innerText = reqPorts590 <= 6 ? "VX600 Pro" : reqPorts590 <= 10 ? "VX1000 Pro" : reqPorts590 <= 20 ? "VX2000 Pro" : "H-Series";
+
+    // DRAW VISUALIZER (The "Maxhub" Effect)
+    drawVisualizer(Math.round(cabsW), Math.round(cabsH), wMm, hMm);
+}
+
+function drawVisualizer(cabsW, cabsH, wMm, hMm) {
+    const wallWrapper = document.getElementById('wallWrapper');
+    const ledGrid = document.getElementById('ledGrid');
+    const human = document.getElementById('humanScale');
+    
+    if (isNaN(cabsW) || isNaN(cabsH) || cabsW <= 0 || cabsH <= 0) {
+        wallWrapper.style.display = 'none';
+        human.style.display = 'none';
+        return;
+    }
+
+    wallWrapper.style.display = 'block';
+    human.style.display = 'block';
+    
+    // Set labels
+    document.getElementById('lblWidth').innerText = Math.round(wMm) + " mm";
+    document.getElementById('lblHeight').innerText = Math.round(hMm) + " mm";
+
+    // Clear previous grid
+    ledGrid.innerHTML = '';
+    
+    // Proportions for drawing
+    // We assume the max available height in the center is ~500px, width is ~800px
+    // Scale everything relative to a real human of 1800mm
+    const HUMAN_REAL_MM = 1800;
+    const PIXELS_PER_MM = 150 / HUMAN_REAL_MM; // L'SVG umano è alto circa 150px-180px nel DOM, fissiamo 150px per scala base
+
+    let drawW = wMm * PIXELS_PER_MM;
+    let drawH = hMm * PIXELS_PER_MM;
+
+    // Apply a downscale if the wall is bigger than the screen stage
+    const maxDrawW = window.innerWidth - 750; // Spazio tra le due sidebar
+    const maxDrawH = window.innerHeight - 200;
+
+    let scaleDown = 1;
+    if (drawW > maxDrawW || drawH > maxDrawH) {
+        const scaleW = maxDrawW / drawW;
+        const scaleH = maxDrawH / drawH;
+        scaleDown = Math.min(scaleW, scaleH);
+    }
+
+    drawW *= scaleDown;
+    drawH *= scaleDown;
+    
+    // Scale the human accordingly
+    const finalHumanHeight = (HUMAN_REAL_MM * PIXELS_PER_MM) * scaleDown;
+    human.style.height = `${finalHumanHeight}px`;
+
+    // Render Grid wrapper sizes
+    wallWrapper.style.width = `${drawW}px`;
+    wallWrapper.style.height = `${drawH}px`;
+    
+    ledGrid.style.gridTemplateColumns = `repeat(${cabsW}, 1fr)`;
+    ledGrid.style.gridTemplateRows = `repeat(${cabsH}, 1fr)`;
+
+    // Add cabinet squares
+    const totalBoxes = cabsW * cabsH;
+    // Limit DOM nodes if someone types 100000 to prevent crash
+    if(totalBoxes < 2000) {
+        for (let i = 0; i < totalBoxes; i++) {
+            const div = document.createElement('div');
+            div.className = 'cabinet';
+            ledGrid.appendChild(div);
+        }
+    } else {
+        ledGrid.innerHTML = `<div style="color:white; display:flex; align-items:center; justify-content:center; height:100%; font-size:0.8rem;">Grid too large to render lines.</div>`;
+    }
 }
 </script>
 </body>
 </html>
-
-
