@@ -54,15 +54,15 @@
         select:focus, input:focus { border-color: var(--pv-red); }
 
         /* Spinners */
-        .grid-spinners { display: flex; flex-direction: column; gap: 12px; } /* Modificato per impilarli verticalmente */
+        .grid-spinners { display: flex; flex-direction: column; gap: 12px; }
         .spinner-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .spinner { display: flex; align-items: center; background: #000; border: 1px solid var(--pv-border); border-radius: 6px; overflow: hidden; }
         .spin-btn { width: 44px; height: 36px; background: #1a1a1a; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.2rem; transition: 0.2s; }
         .spin-btn:hover { background: var(--pv-red); }
         .spin-val { flex: 1; text-align: center; border: none; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; }
 
-        /* Target Dimension Inputs */
-        .dim-inputs { display: flex; flex-direction: column; gap: 12px; } /* Modificato per impilarli verticalmente */
+        /* Dimension Inputs */
+        .dim-inputs { display: flex; flex-direction: column; gap: 12px; }
         .dim-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .dim-wrapper input { text-align: right; }
 
@@ -82,14 +82,20 @@
         .stage.has-texture .stage-overlay { background: rgba(0,0,0,0.6); }
 
         .resolution-badge {
-            position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 20;
+            position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 30;
             background: var(--pv-red); color: #fff; padding: 10px 32px; border-radius: 30px;
             font-weight: 800; font-size: 1.25rem; box-shadow: 0 8px 24px rgba(227,30,36,0.3); letter-spacing: 1px;
         }
 
-        .render-area { position: relative; z-index: 10; display: flex; align-items: flex-end; gap: 60px; }
+        .render-area { position: relative; z-index: 10; display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 100%; }
         
-        .led-wall-container { position: relative; background: #000; box-shadow: 0 20px 80px rgba(0,0,0,0.8); transition: width 0.3s, height 0.3s; }
+        /* The Mount Wall / Background Wall */
+        .mounting-wall { position: absolute; border: 2px dashed #666; background: rgba(255,255,255,0.03); display: none; z-index: 5; align-items: center; justify-content: center; transition: width 0.3s, height 0.3s; }
+        .mounting-wall.active { display: flex; }
+        .wall-lbl-w { position: absolute; top: -25px; color: #888; font-size: 0.8rem; font-weight: 700; }
+        .wall-lbl-h { position: absolute; right: -45px; color: #888; font-size: 0.8rem; font-weight: 700; transform: rotate(90deg); }
+        
+        .led-wall-container { position: absolute; background: #000; box-shadow: 0 20px 60px rgba(0,0,0,0.9); z-index: 15; transition: width 0.3s, height 0.3s; }
         
         /* Media & Grid */
         .media-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: none; z-index: 1; }
@@ -97,15 +103,15 @@
         .cabinet-cell { border: 1px solid rgba(255,255,255,0.1); background: rgba(10,10,10,0.9); }
         .grid-layer.transparent .cabinet-cell { background: transparent; border-color: rgba(255,255,255,0.3); }
 
-        /* CAD Rulers */
-        .ruler { position: absolute; border: 1px solid var(--pv-red); display: none; align-items: center; justify-content: center; z-index: 10; pointer-events: none; }
+        /* CAD Rulers (LED Wall) */
+        .ruler { position: absolute; border: 1px solid var(--pv-red); display: none; align-items: center; justify-content: center; z-index: 20; pointer-events: none; }
         .ruler.active { display: flex; }
         .ruler-w { border-width: 0 1px 1px 1px; height: 16px; top: -30px; left: 0; width: 100%; }
         .ruler-w span { transform: translateY(-22px); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
         .ruler-h { border-width: 1px 1px 1px 0; width: 16px; right: -30px; top: 0; height: 100%; }
         .ruler-h span { transform: translateX(35px) rotate(90deg); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; white-space: nowrap; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
 
-        .human-scale { height: 180px; opacity: 0.8; z-index: 5; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); transition: height 0.3s; }
+        .human-scale { position: absolute; bottom: 50px; right: 50px; opacity: 0.8; z-index: 20; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); transition: height 0.3s; }
 
         /* --- RIGHT PANEL: RESULTS --- */
         .panel-right {
@@ -201,15 +207,27 @@
                     </div>
                 </div>
 
-                <div class="control-label">Target Dimensions (Auto-Fit)</div>
-                <div class="dim-inputs">
+                <div class="control-label">Target LED Dimensions (Auto-Fit)</div>
+                <div class="dim-inputs" style="margin-bottom: 12px;">
                     <div class="dim-wrapper">
-                        <span id="lbl-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Width (mm)</span>
+                        <span id="lbl-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Width (mm)</span>
                         <input type="number" id="target-w" placeholder="Target Width" onchange="calculateFromDimensions()">
                     </div>
                     <div class="dim-wrapper">
-                        <span id="lbl-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Height (mm)</span>
+                        <span id="lbl-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Height (mm)</span>
                         <input type="number" id="target-h" placeholder="Target Height" onchange="calculateFromDimensions()">
+                    </div>
+                </div>
+
+                <div class="control-label">Mounting Wall Surface (Optional)</div>
+                <div class="dim-inputs">
+                    <div class="dim-wrapper">
+                        <span id="lbl-wall-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Width (mm)</span>
+                        <input type="number" id="wall-w" placeholder="Wall Width" onchange="updateWallInput()">
+                    </div>
+                    <div class="dim-wrapper">
+                        <span id="lbl-wall-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Height (mm)</span>
+                        <input type="number" id="wall-h" placeholder="Wall Height" onchange="updateWallInput()">
                     </div>
                 </div>
             </div>
@@ -217,7 +235,7 @@
             <div class="control-group">
                 <div class="section-title">4. Visualizer Tools</div>
                 
-                <div class="control-label">Installation Environment (Background)</div>
+                <div class="control-label">Installation Environment (Texture)</div>
                 <select id="bg-select" onchange="setBackground(this.value)" style="margin-bottom: 8px;">
                     <option value="none">Studio Black (Default)</option>
                     <option value="concrete">Concrete Wall (Indoor/Outdoor)</option>
@@ -243,12 +261,16 @@
 
         <main class="stage" id="stage-area">
             <div class="stage-overlay"></div>
-            
             <div class="resolution-badge" id="badge-resolution">0 x 0 px</div>
 
             <div class="render-area">
+                
+                <div class="mounting-wall" id="mounting-wall">
+                    <span class="wall-lbl-w" id="lbl-wall-w">0</span>
+                    <span class="wall-lbl-h" id="lbl-wall-h">0</span>
+                </div>
+
                 <div class="led-wall-container" id="wall-container">
-                    
                     <div class="ruler ruler-w active" id="ruler-top"><span id="ruler-val-w">0 mm</span></div>
                     <div class="ruler ruler-h active" id="ruler-right"><span id="ruler-val-h">0 mm</span></div>
                     
@@ -278,7 +300,7 @@
             <div class="section-title" style="margin-top: 8px;">Optical & Electrical</div>
 
             <div class="data-card">
-                <div class="data-row"><span class="data-lbl">Aspect Ratio</span><span class="data-val" id="res-ratio">-</span></div>
+                <div class="data-row"><span class="data-lbl">Aspect Ratio (Exact)</span><span class="data-val" id="res-ratio">-</span></div>
                 <div class="data-row"><span class="data-lbl">Total Pixels</span><span class="data-val" id="res-px">0</span></div>
                 <div class="data-row"><span class="data-lbl">Max Power Draw</span><span class="data-val" id="res-power-max">0 kW</span></div>
                 <div class="data-row"><span class="data-lbl">Avg Power Draw</span><span class="data-val" id="res-power-avg">0 kW</span></div>
@@ -326,7 +348,6 @@
         wood: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80'
     };
     
-    // Processor Capacities
     const CAP_NOVA_1G = 650000;
     const CAP_NOVA_5G = 5000000;
     const CAP_BROM = 524000;
@@ -338,8 +359,14 @@
         cab: '27',
         cols: 4,
         rows: 3,
+        wallW: 0,
+        wallH: 0,
         showRulers: true
     };
+
+    // --- MATH HELPERS ---
+    // Funzione Matematica per ottenere Numeri Interi perfetti sull'Aspect Ratio (Massimo Comune Divisore)
+    function getGCD(a, b) { return b === 0 ? a : getGCD(b, a % b); }
 
     // --- INITIALIZATION ---
     window.onload = () => {
@@ -352,8 +379,17 @@
         state.unit = u;
         document.getElementById('btn-unit-mm').classList.toggle('active', u === 'mm');
         document.getElementById('btn-unit-in').classList.toggle('active', u === 'in');
-        document.getElementById('lbl-w-unit').innerText = `Width (${u})`;
-        document.getElementById('lbl-h-unit').innerText = `Height (${u})`;
+        
+        let unitTxt = `(${u})`;
+        document.getElementById('lbl-w-unit').innerText = `LED Width ${unitTxt}`;
+        document.getElementById('lbl-h-unit').innerText = `LED Height ${unitTxt}`;
+        document.getElementById('lbl-wall-w-unit').innerText = `Wall Width ${unitTxt}`;
+        document.getElementById('lbl-wall-h-unit').innerText = `Wall Height ${unitTxt}`;
+        
+        // Converti i valori input del muro a schermo
+        if(state.wallW > 0) document.getElementById('wall-w').value = (u === 'mm') ? Math.round(state.wallW) : (state.wallW / 25.4).toFixed(1);
+        if(state.wallH > 0) document.getElementById('wall-h').value = (u === 'mm') ? Math.round(state.wallH) : (state.wallH / 25.4).toFixed(1);
+
         calculateAll();
     }
 
@@ -426,12 +462,11 @@
         calculateAll();
     }
 
-    // Maxhub bidirectional sizing logic
     function calculateFromDimensions() {
         let inW = parseFloat(document.getElementById('target-w').value);
         let inH = parseFloat(document.getElementById('target-h').value);
         
-        if (state.unit === 'in') { inW *= 25.4; inH *= 25.4; } // Convert input to mm for math
+        if (state.unit === 'in') { inW *= 25.4; inH *= 25.4; } // Convert to mm internal
         
         let cabW = DB_CAB[state.cab].w;
         let cabH = DB_CAB[state.cab].h;
@@ -441,6 +476,16 @@
         
         document.getElementById('grid-cols').value = state.cols;
         document.getElementById('grid-rows').value = state.rows;
+        
+        calculateAll();
+    }
+
+    function updateWallInput() {
+        let inWallW = parseFloat(document.getElementById('wall-w').value) || 0;
+        let inWallH = parseFloat(document.getElementById('wall-h').value) || 0;
+        
+        state.wallW = state.unit === 'in' ? inWallW * 25.4 : inWallW;
+        state.wallH = state.unit === 'in' ? inWallH * 25.4 : inWallH;
         
         calculateAll();
     }
@@ -479,12 +524,11 @@
         let diagInch = (Math.sqrt(totalW_mm**2 + totalH_mm**2) / 25.4).toFixed(1);
         document.getElementById('res-diag').innerText = diagInch + '"';
 
-        let ratioNum = totalW_mm / totalH_mm;
-        let ratioLabel = ratioNum.toFixed(2) + ":1";
-        if (Math.abs(ratioNum - 1.777) < 0.05) ratioLabel = "16:9";
-        if (Math.abs(ratioNum - 2.333) < 0.05) ratioLabel = "21:9";
-        if (Math.abs(ratioNum - 3.555) < 0.05) ratioLabel = "32:9";
-        document.getElementById('res-ratio').innerText = ratioLabel;
+        // ASPECT RATIO - Numeri interi esatti
+        let ratioW = state.cols * 16;
+        let ratioH = state.rows * 9;
+        let divisor = getGCD(ratioW, ratioH);
+        document.getElementById('res-ratio').innerText = `${ratioW/divisor}:${ratioH/divisor}`;
 
         document.getElementById('res-px').innerText = totalPx.toLocaleString();
         document.getElementById('res-power-max').innerText = ((totalCabs * cab.powerMax) / 1000).toFixed(2) + ' kW';
@@ -502,32 +546,48 @@
         drawStage(totalW_mm, totalH_mm, dispW, dispH);
     }
 
-    function drawStage(w_mm, h_mm, dispW, dispH) {
-        const wall = document.getElementById('wall-container');
+    function drawStage(ledW_mm, ledH_mm, dispW, dispH) {
+        const wallContainer = document.getElementById('wall-container');
+        const bgWall = document.getElementById('mounting-wall');
         const grid = document.getElementById('wall-grid');
         const human = document.getElementById('human-svg');
         const stage = document.getElementById('stage-area');
         
-        // Calculate dynamic scale to fit stage
-        const maxDrawW = Math.max(100, stage.clientWidth - 200);
-        const maxDrawH = Math.max(100, stage.clientHeight - 200);
-        const BASE_SCALE = 160 / 1800; // Human is 1.8m (1800mm) = ~160px on screen natively
+        // Establish the max bounding box required (either the LED or the physical Wall)
+        let maxRenderW = Math.max(ledW_mm, state.wallW);
+        let maxRenderH = Math.max(ledH_mm, state.wallH);
 
-        let drawW = w_mm * BASE_SCALE;
-        let drawH = h_mm * BASE_SCALE;
+        const stageMaxW = Math.max(100, stage.clientWidth - 200);
+        const stageMaxH = Math.max(100, stage.clientHeight - 200);
+        const BASE_SCALE = 160 / 1800; // Human base scale factor
 
-        let scaleMultiplier = 1;
-        if (drawW > maxDrawW || drawH > maxDrawH) {
-            scaleMultiplier = Math.min(maxDrawW / drawW, maxDrawH / drawH);
+        let preScaleW = maxRenderW * BASE_SCALE;
+        let preScaleH = maxRenderH * BASE_SCALE;
+
+        let finalScale = 1;
+        if (preScaleW > stageMaxW || preScaleH > stageMaxH) {
+            finalScale = Math.min(stageMaxW / preScaleW, stageMaxH / preScaleH);
         }
 
-        drawW *= scaleMultiplier;
-        drawH *= scaleMultiplier;
+        // Apply scale to LED Wall
+        wallContainer.style.width = (ledW_mm * BASE_SCALE * finalScale) + 'px';
+        wallContainer.style.height = (ledH_mm * BASE_SCALE * finalScale) + 'px';
+        
+        // Apply scale to Mounting Background Wall
+        if (state.wallW > 0 && state.wallH > 0) {
+            bgWall.style.width = (state.wallW * BASE_SCALE * finalScale) + 'px';
+            bgWall.style.height = (state.wallH * BASE_SCALE * finalScale) + 'px';
+            bgWall.classList.add('active');
+            
+            let wallUnitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
+            let wallUnitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
+            document.getElementById('lbl-wall-w').innerText = `${wallUnitW} ${state.unit.toUpperCase()}`;
+            document.getElementById('lbl-wall-h').innerText = `${wallUnitH} ${state.unit.toUpperCase()}`;
+        } else {
+            bgWall.classList.remove('active');
+        }
 
-        // Apply CSS Dimensions
-        wall.style.width = drawW + 'px';
-        wall.style.height = drawH + 'px';
-        human.style.height = ((1800 * BASE_SCALE) * scaleMultiplier) + 'px';
+        human.style.height = ((1800 * BASE_SCALE) * finalScale) + 'px';
 
         // Update Ruler Texts
         let unitTxt = state.unit.toUpperCase();
@@ -556,11 +616,13 @@
                   `Grid Layout  : ${state.cols} Columns x ${state.rows} Rows\n` +
                   `Total Modules: ${state.cols * state.rows} Cabinets\n` +
                   `Dimensions   : ${document.getElementById('target-w').value} x ${document.getElementById('target-h').value} ${state.unit}\n` +
+                  `Mount Wall   : ${state.wallW > 0 ? document.getElementById('wall-w').value + ' x ' + document.getElementById('wall-h').value + ' ' + state.unit : 'Not Specified'}\n` +
                   `Display Area : ${document.getElementById('res-area').innerText}\n` +
                   `Total Weight : ${document.getElementById('res-weight').innerText}\n` +
                   `Aspect Ratio : ${document.getElementById('res-ratio').innerText}\n` +
                   `Resolution   : ${document.getElementById('badge-resolution').innerText}\n` +
                   `Max Power    : ${document.getElementById('res-power-max').innerText}\n` +
+                  `Avg Power    : ${document.getElementById('res-power-avg').innerText}\n` +
                   `Controller   : ${document.getElementById('res-nova').innerText}\n`;
                            
         const blob = new Blob([t], {type: 'text/plain'});
