@@ -3,463 +3,571 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primeview Global | Dix-Play LED Configurator V2.0</title>
+    <title>Primeview Global | Dix-Play LED Configurator</title>
     <style>
         :root {
             --pv-red: #e31e24;
-            --pv-bg-dark: #121212;
-            --pv-panel: #1e1e1e;
-            --pv-border: #333;
+            --pv-bg-main: #0a0a0a;
+            --pv-panel: #141414;
+            --pv-border: #2a2a2a;
             --pv-text: #e0e0e0;
             --pv-text-muted: #888;
+            --pv-highlight: #ffffff;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: var(--pv-bg-dark); color: var(--pv-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--pv-bg-main); color: var(--pv-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* HEADER */
+        /* --- NAVBAR --- */
         .navbar {
-            height: 60px; background: var(--pv-panel); display: flex; align-items: center; justify-content: space-between;
-            padding: 0 25px; border-bottom: 2px solid var(--pv-red); z-index: 100;
+            height: 64px; background: var(--pv-panel); display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; border-bottom: 2px solid var(--pv-red); z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
-        .navbar-brand { display: flex; align-items: center; gap: 15px; }
-        .navbar-brand img { height: 32px; }
-        .navbar-title { font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: 1px; border-left: 1px solid #444; padding-left: 15px; }
-        .nav-reset { background: transparent; border: 1px solid #555; color: #fff; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
-        .nav-reset:hover { background: var(--pv-red); border-color: var(--pv-red); }
+        .nav-brand { display: flex; align-items: center; gap: 16px; }
+        .nav-brand img { height: 32px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; color: var(--pv-highlight); letter-spacing: 1px; border-left: 1px solid #333; padding-left: 16px; text-transform: uppercase; }
+        .nav-actions { display: flex; gap: 12px; }
+        .btn-outline { background: transparent; border: 1px solid #555; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
+        .btn-outline:hover { background: var(--pv-red); border-color: var(--pv-red); }
 
-        /* APP LAYOUT */
-        .app-container { display: flex; flex: 1; overflow: hidden; }
+        /* --- LAYOUT --- */
+        .app-layout { display: flex; flex: 1; overflow: hidden; }
 
-        /* LEFT SIDEBAR */
-        .sidebar-left {
-            width: 340px; background: var(--pv-panel); border-right: 1px solid var(--pv-border); padding: 20px;
-            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+        /* --- LEFT PANEL: CONTROLS --- */
+        .panel-left {
+            width: 380px; background: var(--pv-panel); border-right: 1px solid var(--pv-border); padding: 24px;
+            display: flex; flex-direction: column; gap: 24px; overflow-y: auto;
         }
 
+        .section-title { font-size: 0.8rem; font-weight: 800; color: var(--pv-text-muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--pv-border); padding-bottom: 8px; margin-bottom: 8px; }
+        
         .control-group { display: flex; flex-direction: column; gap: 8px; }
-        .group-label { font-size: 0.75rem; font-weight: 800; color: var(--pv-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .control-label { font-size: 0.8rem; font-weight: 600; color: #bbb; }
 
-        .segmented { display: flex; background: #111; border-radius: 4px; padding: 3px; border: 1px solid var(--pv-border); }
-        .seg-btn { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; border-radius: 3px; color: #666; transition: 0.2s; }
-        .seg-btn.active { background: #2a2a2a; color: #fff; border: 1px solid var(--pv-red); }
+        /* Segmented Buttons */
+        .segmented-control { display: flex; background: #000; border-radius: 6px; padding: 4px; border: 1px solid var(--pv-border); }
+        .seg-btn { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; border-radius: 4px; color: #777; transition: 0.2s; }
+        .seg-btn.active { background: #222; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.5); border: 1px solid var(--pv-red); }
 
-        select, input {
-            width: 100%; background: #111; color: #fff; border: 1px solid var(--pv-border); padding: 10px; border-radius: 4px; outline: none; font-size: 0.9rem;
-        }
+        /* Inputs & Selects */
+        select, input[type="number"] { width: 100%; background: #000; color: #fff; border: 1px solid var(--pv-border); padding: 10px 12px; border-radius: 6px; outline: none; font-size: 0.95rem; }
         select:focus, input:focus { border-color: var(--pv-red); }
 
-        .spinner { display: flex; align-items: center; background: #111; border: 1px solid var(--pv-border); border-radius: 4px; overflow: hidden; }
-        .spin-btn { width: 40px; height: 38px; background: #222; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
+        /* Spinners */
+        .grid-spinners { display: flex; gap: 16px; }
+        .spinner-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .spinner { display: flex; align-items: center; background: #000; border: 1px solid var(--pv-border); border-radius: 6px; overflow: hidden; }
+        .spin-btn { width: 36px; height: 36px; background: #1a1a1a; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.2rem; transition: 0.2s; }
         .spin-btn:hover { background: var(--pv-red); }
-        .spin-val { flex: 1; text-align: center; border: none; background: transparent; pointer-events: none; color: #fff; font-weight: 700; font-size: 1rem; }
+        .spin-val { flex: 1; text-align: center; border: none; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; }
 
-        /* TOGGLE SWITCH FOR RULERS */
-        .toggle-row { display: flex; align-items: center; justify-content: space-between; background: #111; border: 1px solid var(--pv-border); padding: 10px; border-radius: 4px; cursor: pointer; }
-        .toggle-row:hover { border-color: #555; }
-        .toggle-label { font-size: 0.85rem; font-weight: 600; }
-        .toggle-switch { width: 40px; height: 20px; background: #333; border-radius: 10px; position: relative; transition: 0.3s; }
-        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: 0.3s; }
-        .toggle-row.on .toggle-switch { background: var(--pv-red); }
-        .toggle-row.on .toggle-switch::after { transform: translateX(20px); }
+        /* Target Dimension Inputs */
+        .dim-inputs { display: flex; gap: 16px; }
+        .dim-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .dim-wrapper input { text-align: right; }
 
-        /* CENTER STAGE */
+        /* Toggles */
+        .toggle-container { display: flex; align-items: center; justify-content: space-between; background: #000; border: 1px solid var(--pv-border); padding: 12px; border-radius: 6px; cursor: pointer; }
+        .toggle-switch { width: 44px; height: 22px; background: #333; border-radius: 11px; position: relative; transition: 0.3s; }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.3s; }
+        .toggle-container.active .toggle-switch { background: var(--pv-red); }
+        .toggle-container.active .toggle-switch::after { transform: translateX(22px); }
+
+        /* --- CENTER STAGE --- */
         .stage {
             flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
             background-color: #050505; background-size: cover; background-position: center; transition: background 0.3s ease;
         }
+        .stage-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.1); pointer-events: none; transition: background 0.3s; }
+        .stage.has-texture .stage-overlay { background: rgba(0,0,0,0.6); }
 
-        .stage-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 1; pointer-events: none; }
-        .stage.has-bg .stage-overlay { background: rgba(0,0,0,0.5); }
-
-        .res-badge {
-            position: absolute; top: 25px; left: 50%; transform: translateX(-50%); z-index: 10;
-            background: var(--pv-red); color: #fff; padding: 10px 30px; border-radius: 30px;
-            font-weight: 800; font-size: 1.2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-            letter-spacing: 1px;
+        .resolution-badge {
+            position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 20;
+            background: var(--pv-red); color: #fff; padding: 10px 32px; border-radius: 30px;
+            font-weight: 800; font-size: 1.25rem; box-shadow: 0 8px 24px rgba(227,30,36,0.3); letter-spacing: 1px;
         }
 
-        .visualizer-container { position: relative; z-index: 5; display: flex; align-items: flex-end; gap: 60px; }
+        .render-area { position: relative; z-index: 10; display: flex; align-items: flex-end; gap: 60px; }
         
-        .led-wall { position: relative; border: 2px solid #333; background: #000; box-shadow: 0 20px 60px rgba(0,0,0,0.9); transition: width 0.3s, height 0.3s; }
+        .led-wall-container { position: relative; background: #000; box-shadow: 0 20px 80px rgba(0,0,0,0.8); transition: width 0.3s, height 0.3s; }
         
+        /* Media & Grid */
+        .media-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: none; z-index: 1; }
+        .grid-layer { position: absolute; inset: 0; display: grid; z-index: 2; border: 2px solid #444; }
+        .cabinet-cell { border: 1px solid rgba(255,255,255,0.1); background: rgba(10,10,10,0.9); }
+        .grid-layer.transparent .cabinet-cell { background: transparent; border-color: rgba(255,255,255,0.3); }
+
         /* CAD Rulers */
         .ruler { position: absolute; border: 1px solid var(--pv-red); display: none; align-items: center; justify-content: center; z-index: 10; pointer-events: none; }
-        .ruler.visible { display: flex; }
-        .ruler-w { border-width: 0 2px 2px 2px; height: 15px; top: -25px; left: 0; width: 100%; }
-        .ruler-w span { transform: translateY(-20px); color: var(--pv-red); font-weight: 800; font-size: 0.9rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .ruler-h { border-width: 2px 2px 2px 0; width: 15px; right: -25px; top: 0; height: 100%; }
-        .ruler-h span { transform: translateX(30px) rotate(90deg); color: var(--pv-red); font-weight: 800; font-size: 0.9rem; white-space: nowrap; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .ruler.active { display: flex; }
+        .ruler-w { border-width: 0 1px 1px 1px; height: 16px; top: -30px; left: 0; width: 100%; }
+        .ruler-w span { transform: translateY(-22px); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
+        .ruler-h { border-width: 1px 1px 1px 0; width: 16px; right: -30px; top: 0; height: 100%; }
+        .ruler-h span { transform: translateX(35px) rotate(90deg); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; white-space: nowrap; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
 
-        /* Media Layers */
-        .media-content { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: none; z-index: 1; }
-        .wall-grid { position: absolute; inset: 0; display: grid; z-index: 2; pointer-events: none; }
-        .cabinet-box { border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.02); }
-        .wall-grid.transparent .cabinet-box { background: transparent; border-color: rgba(255,255,255,0.4); }
+        .human-scale { height: 180px; opacity: 0.8; z-index: 5; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); transition: height 0.3s; }
 
-        .human { height: 180px; opacity: 0.9; transition: height 0.3s; z-index: 5; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); }
-
-        /* RIGHT SIDEBAR */
-        .sidebar-right {
-            width: 320px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); padding: 25px 20px;
-            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+        /* --- RIGHT PANEL: RESULTS --- */
+        .panel-right {
+            width: 360px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); padding: 24px;
+            display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
         }
 
-        .result-box { background: #1a1a1a; padding: 18px; border-radius: 6px; border-left: 4px solid var(--pv-red); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .res-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .res-row:last-child { margin-bottom: 0; }
-        .res-lbl { font-size: 0.75rem; color: var(--pv-text-muted); text-transform: uppercase; font-weight: 700; }
-        .res-val { font-weight: 800; font-size: 1rem; color: #fff; text-align: right; }
-        .res-highlight { color: var(--pv-red); font-size: 1.15rem; }
+        .data-card { background: #000; padding: 16px; border-radius: 8px; border: 1px solid var(--pv-border); }
+        .data-card.highlight { border-left: 4px solid var(--pv-red); }
+        
+        .data-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #222; }
+        .data-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .data-lbl { font-size: 0.8rem; color: #aaa; font-weight: 600; }
+        .data-val { font-weight: 700; font-size: 0.95rem; color: var(--pv-highlight); }
+        .val-red { color: var(--pv-red); font-size: 1.1rem; }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--pv-bg-dark); }
-        ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        /* Action Buttons */
+        .btn-action {
+            background: #111; border: 1px solid var(--pv-border); color: #fff; padding: 16px; border-radius: 8px;
+            cursor: pointer; text-align: left; display: flex; align-items: center; gap: 16px; transition: 0.2s; width: 100%;
+        }
+        .btn-action:hover { background: #1a1a1a; border-color: var(--pv-red); }
+        .btn-icon { color: var(--pv-red); font-size: 1.5rem; font-weight: bold; }
+        .btn-text h4 { font-size: 0.9rem; margin-bottom: 4px; color: var(--pv-highlight); }
+        .btn-text p { font-size: 0.75rem; color: var(--pv-text-muted); }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--pv-bg-main); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--pv-red); }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <div class="navbar-brand">
-            <img src="logo.png" alt="Primeview" onerror="this.src='https://via.placeholder.com/120x30/1e1e1e/e31e24?text=PRIMEVIEW'">
-            <span class="navbar-title">Dix-Play LED Configurator</span>
+        <div class="nav-brand">
+            <img src="logo.png" alt="Primeview Logo" onerror="this.src='https://via.placeholder.com/150x30/141414/e31e24?text=PRIMEVIEW'">
+            <span class="nav-title">Dix-Play LED Configurator</span>
         </div>
-        <button class="nav-reset" onclick="location.reload()">Reset All Fields</button>
+        <div class="nav-actions">
+            <button class="btn-outline" onclick="location.reload()">Reset Configuration</button>
+        </div>
     </nav>
 
-    <div class="app-container">
+    <div class="app-layout">
         
-        <aside class="sidebar-left">
+        <aside class="panel-left">
             
             <div class="control-group">
-                <span class="group-label">Unit System</span>
-                <div class="segmented">
-                    <div class="seg-btn active" id="unit-mm" onclick="setUnit('mm')">MM</div>
-                    <div class="seg-btn" id="unit-in" onclick="setUnit('in')">INCHES</div>
+                <div class="section-title">1. Product Series</div>
+                <div class="segmented-control" style="margin-bottom: 8px;">
+                    <div class="seg-btn active" id="btn-env-indoor" onclick="setEnv('indoor')">Indoor Series</div>
+                    <div class="seg-btn" id="btn-env-outdoor" onclick="setEnv('outdoor')">Outdoor Series</div>
+                </div>
+                <div class="segmented-control">
+                    <div class="seg-btn active" id="btn-cab-27" onclick="setCab('27')">27" Cabinet (16:9)</div>
+                    <div class="seg-btn" id="btn-cab-55" onclick="setCab('55')">55" Cabinet (16:9)</div>
                 </div>
             </div>
 
             <div class="control-group">
-                <span class="group-label">1. Environment</span>
-                <div class="segmented">
-                    <div class="seg-btn active" id="env-indoor" onclick="setEnv('indoor')">Indoor</div>
-                    <div class="seg-btn" id="env-outdoor" onclick="setEnv('outdoor')">Outdoor</div>
+                <div class="section-title">2. Screen Parameters</div>
+                <div class="control-label">Pixel Pitch (Resolution)</div>
+                <select id="pitch-select" onchange="calculateAll()"></select>
+            </div>
+
+            <div class="control-group">
+                <div class="section-title">3. Display Size Definition</div>
+                
+                <div class="control-label">Unit of Measurement</div>
+                <div class="segmented-control" style="margin-bottom: 12px;">
+                    <div class="seg-btn active" id="btn-unit-mm" onclick="setUnit('mm')">Millimeters (mm)</div>
+                    <div class="seg-btn" id="btn-unit-in" onclick="setUnit('in')">Inches (in)</div>
+                </div>
+
+                <div class="control-label">Array Configuration (Cabinets)</div>
+                <div class="grid-spinners" style="margin-bottom: 12px;">
+                    <div class="spinner-wrapper">
+                        <span style="font-size: 0.75rem; color: #888;">Columns</span>
+                        <div class="spinner">
+                            <button class="spin-btn" onclick="adjustGrid('cols', -1)">-</button>
+                            <input type="text" id="grid-cols" class="spin-val" value="4" readonly>
+                            <button class="spin-btn" onclick="adjustGrid('cols', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="spinner-wrapper">
+                        <span style="font-size: 0.75rem; color: #888;">Rows</span>
+                        <div class="spinner">
+                            <button class="spin-btn" onclick="adjustGrid('rows', -1)">-</button>
+                            <input type="text" id="grid-rows" class="spin-val" value="3" readonly>
+                            <button class="spin-btn" onclick="adjustGrid('rows', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-label">Target Dimensions (Auto-Fit)</div>
+                <div class="dim-inputs">
+                    <div class="dim-wrapper">
+                        <input type="number" id="target-w" placeholder="Width" onchange="calculateFromDimensions()">
+                        <span id="lbl-w-unit" style="font-size: 0.7rem; color: #777; text-align: right;">Width (mm)</span>
+                    </div>
+                    <div class="dim-wrapper">
+                        <input type="number" id="target-h" placeholder="Height" onchange="calculateFromDimensions()">
+                        <span id="lbl-h-unit" style="font-size: 0.7rem; color: #777; text-align: right;">Height (mm)</span>
+                    </div>
                 </div>
             </div>
 
             <div class="control-group">
-                <span class="group-label">2. Orientation</span>
-                <div class="segmented">
-                    <div class="seg-btn active" id="orient-land" onclick="setOrient('landscape')">Landscape</div>
-                    <div class="seg-btn" id="orient-port" onclick="setOrient('portrait')">Portrait</div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <span class="group-label">3. Cabinet Size</span>
-                <div class="segmented">
-                    <div class="seg-btn active" id="cab-27" onclick="setCab('27')">27" Cabinet</div>
-                    <div class="seg-btn" id="cab-55" onclick="setCab('55')">55" Cabinet</div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <span class="group-label">4. Pixel Pitch</span>
-                <select id="pitch-select" onchange="calc()"></select>
-            </div>
-
-            <div class="control-group">
-                <span class="group-label">5. Display Grid (Columns)</span>
-                <div class="spinner">
-                    <button class="spin-btn" onclick="adj('cols', -1)">-</button>
-                    <input type="text" id="val-cols" class="spin-val" value="4" readonly>
-                    <button class="spin-btn" onclick="adj('cols', 1)">+</button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <span class="group-label">6. Display Grid (Rows)</span>
-                <div class="spinner">
-                    <button class="spin-btn" onclick="adj('rows', -1)">-</button>
-                    <input type="text" id="val-rows" class="spin-val" value="3" readonly>
-                    <button class="spin-btn" onclick="adj('rows', 1)">+</button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <span class="group-label">7. Background Wall Surface</span>
-                <select id="scenario-select" onchange="setScenario(this.value)">
-                    <option value="none">Solid Dark (No texture)</option>
-                    <option value="concrete">Dark Concrete Wall</option>
+                <div class="section-title">4. Visualizer Tools</div>
+                
+                <div class="control-label">Installation Environment (Background)</div>
+                <select id="bg-select" onchange="setBackground(this.value)" style="margin-bottom: 8px;">
+                    <option value="none">Studio Black (Default)</option>
+                    <option value="concrete">Concrete Wall (Indoor/Outdoor)</option>
                     <option value="brick">Industrial Brick Wall</option>
-                    <option value="plaster">Clean White Plaster</option>
-                    <option value="wood">Wood Paneling</option>
+                    <option value="plaster">White Plaster Gallery</option>
+                    <option value="wood">Premium Wood Paneling</option>
                 </select>
-            </div>
 
-            <div class="control-group">
-                <span class="group-label">8. Media Content Preview</span>
-                <select id="media-select" onchange="setMedia(this.value)">
-                    <option value="none">Grid Only (No Content)</option>
-                    <option value="image">Show Image (example.jpg)</option>
-                    <option value="video">Show Video (example.mp4)</option>
+                <div class="control-label">Content Preview</div>
+                <select id="media-select" onchange="setMedia(this.value)" style="margin-bottom: 12px;">
+                    <option value="none">Grid Wireframe Only</option>
+                    <option value="image">Test Image (example.jpg)</option>
+                    <option value="video">Test Video (example.mp4)</option>
                 </select>
-            </div>
 
-            <div class="control-group" style="margin-top: 10px;">
-                <div class="toggle-row on" id="ruler-toggle" onclick="toggleRulers()">
-                    <span class="toggle-label">Display Rulers</span>
+                <div class="toggle-container active" id="ruler-toggle" onclick="toggleRulers()">
+                    <span class="control-label" style="color: #fff; margin: 0;">Show Dimensions (CAD Rulers)</span>
                     <div class="toggle-switch"></div>
                 </div>
             </div>
 
         </aside>
 
-        <main class="stage" id="stage-bg">
+        <main class="stage" id="stage-area">
             <div class="stage-overlay"></div>
             
-            <div class="res-badge" id="res-badge">0 x 0 PX</div>
+            <div class="resolution-badge" id="badge-resolution">0 x 0 px</div>
 
-            <div class="visualizer-container">
-                <div class="led-wall" id="led-wall">
+            <div class="render-area">
+                <div class="led-wall-container" id="wall-container">
                     
-                    <div class="ruler ruler-w visible" id="ruler-w"><span id="meas-w">0 mm</span></div>
-                    <div class="ruler ruler-h visible" id="ruler-h"><span id="meas-h">0 mm</span></div>
+                    <div class="ruler ruler-w active" id="ruler-top"><span id="ruler-val-w">0 mm</span></div>
+                    <div class="ruler ruler-h active" id="ruler-right"><span id="ruler-val-h">0 mm</span></div>
                     
-                    <img id="prev-img" src="example.jpg" class="media-content" alt="Preview Image">
-                    <video id="prev-vid" src="example.mp4" class="media-content" autoplay loop muted playsinline></video>
+                    <img id="media-img" src="example.jpg" class="media-layer" alt="Preview">
+                    <video id="media-vid" src="example.mp4" class="media-layer" autoplay loop muted playsinline></video>
                     
-                    <div class="wall-grid" id="wall-grid"></div>
+                    <div class="grid-layer" id="wall-grid"></div>
                 </div>
 
-                <svg class="human" id="human-svg" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
+                <svg class="human-scale" id="human-svg" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
                     <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
                 </svg>
             </div>
         </main>
 
-        <aside class="sidebar-right">
-            <div class="group-label">Configuration Details</div>
+        <aside class="panel-right">
+            <div class="section-title">Physical Specifications</div>
             
-            <div class="result-box">
-                <div class="res-row"><span class="res-lbl">Cabinet Layout</span><span class="res-val" id="out-layout">0 x 0</span></div>
-                <div class="res-row"><span class="res-lbl">Total Cabinets</span><span class="res-val res-highlight" id="out-cabs">0</span></div>
-                <div class="res-row"><span class="res-lbl">Physical Size</span><span class="res-val" id="out-size">0</span></div>
-                <div class="res-row"><span class="res-lbl">Display Diagonal</span><span class="res-val" id="out-diag">0"</span></div>
+            <div class="data-card highlight">
+                <div class="data-row"><span class="data-lbl">Cabinet Layout</span><span class="data-val" id="res-layout">0x0</span></div>
+                <div class="data-row"><span class="data-lbl">Total Cabinets</span><span class="data-val val-red" id="res-total-cabs">0</span></div>
+                <div class="data-row"><span class="data-lbl">Display Area</span><span class="data-val" id="res-area">0 sqm</span></div>
+                <div class="data-row"><span class="data-lbl">Total Weight</span><span class="data-val" id="res-weight">0 kg</span></div>
+                <div class="data-row"><span class="data-lbl">Diagonal</span><span class="data-val" id="res-diag">0"</span></div>
             </div>
 
-            <div class="result-box" style="border-color: #555;">
-                <div class="res-row"><span class="res-lbl">Aspect Ratio</span><span class="res-val" id="out-ratio">-</span></div>
-                <div class="res-row"><span class="res-lbl">Total Pixels</span><span class="res-val" id="out-total-px">0</span></div>
-                <div class="res-row"><span class="res-lbl">Max Power Draw</span><span class="res-val" id="out-power">0 W</span></div>
+            <div class="section-title" style="margin-top: 8px;">Optical & Electrical</div>
+
+            <div class="data-card">
+                <div class="data-row"><span class="data-lbl">Aspect Ratio</span><span class="data-val" id="res-ratio">-</span></div>
+                <div class="data-row"><span class="data-lbl">Total Pixels</span><span class="data-val" id="res-px">0</span></div>
+                <div class="data-row"><span class="data-lbl">Max Power Draw</span><span class="data-val" id="res-power-max">0 kW</span></div>
+                <div class="data-row"><span class="data-lbl">Avg Power Draw</span><span class="data-val" id="res-power-avg">0 kW</span></div>
             </div>
+
+            <div class="section-title" style="margin-top: 8px;">Processing Details</div>
+
+            <div class="data-card">
+                <div class="data-row"><span class="data-lbl">Novastar Unit</span><span class="data-val val-red" id="res-nova">-</span></div>
+                <div class="data-row"><span class="data-lbl">Nova Ports (5G)</span><span class="data-val" id="res-nova-ports">0</span></div>
+                <div class="data-row"><span class="data-lbl">Brompton Ports</span><span class="data-val" id="res-brompton">0</span></div>
+            </div>
+
+            <div style="flex: 1;"></div> <button class="btn-action" onclick="exportConfiguration()">
+                <span class="btn-icon">⬇</span>
+                <div class="btn-text">
+                    <h4>Download Config</h4>
+                    <p>Export system specs to TXT file</p>
+                </div>
+            </button>
+            
+            <button class="btn-action" onclick="alert('Brochure PDF library will be linked here.')">
+                <span class="btn-icon">📄</span>
+                <div class="btn-text">
+                    <h4>Download Brochure</h4>
+                    <p>Get Primeview tech specs PDF</p>
+                </div>
+            </button>
 
         </aside>
     </div>
 
 <script>
-    const pitches = {
-        indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5],
-        outdoor: [2.6, 2.9, 3.9, 4.8, 6.0]
+    // --- DATABASE ---
+    const DB_PITCH = { indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5], outdoor: [2.6, 2.9, 3.9, 4.8, 6.0] };
+    const DB_CAB = {
+        '27': { w: 600, h: 337.5, weight: 4.8, powerMax: 80, powerAvg: 27 },
+        '55': { w: 1200, h: 675, weight: 12.5, powerMax: 320, powerAvg: 110 }
     };
-    
-    const cabinets = {
-        '27': { w: 600, h: 337.5, power: 80 }, 
-        '55': { w: 1200, h: 675, power: 320 }  
-    };
-
-    // Muri reali
-    const scenarios = {
+    const DB_WALLS = {
         none: '',
         concrete: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?auto=format&fit=crop&w=1600&q=80',
         brick: 'https://images.unsplash.com/photo-1512403754473-27835f7b9984?auto=format&fit=crop&w=1600&q=80',
         plaster: 'https://images.unsplash.com/photo-1572085313466-6710de8d7ba3?auto=format&fit=crop&w=1600&q=80',
         wood: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80'
     };
+    
+    // Processor Capacities
+    const CAP_NOVA_1G = 650000;
+    const CAP_NOVA_5G = 5000000;
+    const CAP_BROM = 524000;
 
+    // --- STATE ---
     let state = {
-        unit: 'mm', 
-        env: 'indoor', 
-        orient: 'landscape', 
-        cab: '27', 
-        cols: 4, 
+        unit: 'mm',
+        env: 'indoor',
+        cab: '27',
+        cols: 4,
         rows: 3,
         showRulers: true
     };
 
+    // --- INITIALIZATION ---
     window.onload = () => {
-        populatePitches();
-        calc();
+        updatePitchDropdown();
+        calculateAll();
     };
 
-    // FUNZIONI DI GESTIONE PULSANTI RIPARATE
-    function setUnit(u) { 
-        state.unit = u; 
-        document.getElementById('unit-mm').classList.toggle('active', u === 'mm');
-        document.getElementById('unit-in').classList.toggle('active', u === 'in');
-        calc(); 
-    }
-    function setEnv(e) { 
-        state.env = e; 
-        document.getElementById('env-indoor').classList.toggle('active', e === 'indoor');
-        document.getElementById('env-outdoor').classList.toggle('active', e === 'outdoor');
-        populatePitches(); 
-        calc(); 
-    }
-    function setOrient(o) { 
-        state.orient = o; 
-        document.getElementById('orient-land').classList.toggle('active', o === 'landscape');
-        document.getElementById('orient-port').classList.toggle('active', o === 'portrait');
-        calc(); 
-    }
-    function setCab(c) { 
-        state.cab = c; 
-        document.getElementById('cab-27').classList.toggle('active', c === '27');
-        document.getElementById('cab-55').classList.toggle('active', c === '55');
-        calc(); 
+    // --- UI INTERACTION FUNCTIONS ---
+    function setUnit(u) {
+        state.unit = u;
+        document.getElementById('btn-unit-mm').classList.toggle('active', u === 'mm');
+        document.getElementById('btn-unit-in').classList.toggle('active', u === 'in');
+        document.getElementById('lbl-w-unit').innerText = `Width (${u})`;
+        document.getElementById('lbl-h-unit').innerText = `Height (${u})`;
+        calculateAll();
     }
 
-    // SPINNER FUNZIONANTE
-    function adj(axis, delta) { 
-        state[axis] = Math.max(1, state[axis] + delta); 
-        document.getElementById('val-' + axis).value = state[axis]; 
-        calc(); 
+    function setEnv(e) {
+        state.env = e;
+        document.getElementById('btn-env-indoor').classList.toggle('active', e === 'indoor');
+        document.getElementById('btn-env-outdoor').classList.toggle('active', e === 'outdoor');
+        updatePitchDropdown();
+        calculateAll();
     }
 
-    // TOGGLE RULER
-    function toggleRulers() {
-        state.showRulers = !state.showRulers;
-        const toggleBtn = document.getElementById('ruler-toggle');
-        const rulerW = document.getElementById('ruler-w');
-        const rulerH = document.getElementById('ruler-h');
-        
-        if(state.showRulers) {
-            toggleBtn.classList.add('on');
-            rulerW.classList.add('visible');
-            rulerH.classList.add('visible');
-        } else {
-            toggleBtn.classList.remove('on');
-            rulerW.classList.remove('visible');
-            rulerH.classList.remove('visible');
-        }
+    function setCab(c) {
+        state.cab = c;
+        document.getElementById('btn-cab-27').classList.toggle('active', c === '27');
+        document.getElementById('btn-cab-55').classList.toggle('active', c === '55');
+        calculateAll();
     }
 
-    function populatePitches() {
-        const s = document.getElementById('pitch-select'); 
-        s.innerHTML = '';
-        pitches[state.env].forEach(p => {
-            const o = document.createElement('option'); 
-            o.value = p; 
-            o.text = p + ' mm';
-            if((state.env === 'indoor' && p === 1.56) || (state.env === 'outdoor' && p === 3.9)) o.selected = true;
-            s.add(o);
+    function updatePitchDropdown() {
+        const select = document.getElementById('pitch-select');
+        select.innerHTML = '';
+        DB_PITCH[state.env].forEach(p => {
+            let opt = document.createElement('option');
+            opt.value = p; opt.text = p + ' mm';
+            if ((state.env === 'indoor' && p === 1.56) || (state.env === 'outdoor' && p === 3.9)) opt.selected = true;
+            select.appendChild(opt);
         });
     }
 
-    function setScenario(v) {
-        const stage = document.getElementById('stage-bg');
-        if(v === 'none') {
+    function setBackground(val) {
+        const stage = document.getElementById('stage-area');
+        if (val === 'none') {
             stage.style.backgroundImage = '';
-            stage.classList.remove('has-bg');
+            stage.classList.remove('has-texture');
         } else {
-            stage.style.backgroundImage = `url(${scenarios[v]})`;
-            stage.classList.add('has-bg');
+            stage.style.backgroundImage = `url(${DB_WALLS[val]})`;
+            stage.classList.add('has-texture');
         }
     }
 
-    function setMedia(v) {
-        const img = document.getElementById('prev-img');
-        const vid = document.getElementById('prev-vid');
+    function setMedia(val) {
+        const img = document.getElementById('media-img');
+        const vid = document.getElementById('media-vid');
         const grid = document.getElementById('wall-grid');
         
-        img.style.display = 'none'; 
-        vid.style.display = 'none'; 
-        vid.pause();
+        img.style.display = 'none'; vid.style.display = 'none'; vid.pause();
         grid.classList.remove('transparent');
 
-        if(v === 'image') { img.style.display = 'block'; grid.classList.add('transparent'); }
-        if(v === 'video') { vid.style.display = 'block'; vid.play(); grid.classList.add('transparent'); }
+        if (val === 'image') { img.style.display = 'block'; grid.classList.add('transparent'); }
+        if (val === 'video') { vid.style.display = 'block'; vid.play(); grid.classList.add('transparent'); }
     }
 
-    function calc() {
-        const c = cabinets[state.cab];
-        let baseW = state.orient === 'landscape' ? c.w : c.h;
-        let baseH = state.orient === 'landscape' ? c.h : c.w;
-        let pitch = parseFloat(document.getElementById('pitch-select').value);
+    function toggleRulers() {
+        state.showRulers = !state.showRulers;
+        const toggle = document.getElementById('ruler-toggle');
+        const rw = document.getElementById('ruler-top');
+        const rh = document.getElementById('ruler-right');
+        
+        if (state.showRulers) {
+            toggle.classList.add('active'); rw.classList.add('active'); rh.classList.add('active');
+        } else {
+            toggle.classList.remove('active'); rw.classList.remove('active'); rh.classList.remove('active');
+        }
+    }
 
-        let totalW_mm = state.cols * baseW;
-        let totalH_mm = state.rows * baseH;
+    // --- CORE LOGIC ---
+    function adjustGrid(axis, delta) {
+        state[axis] = Math.max(1, state[axis] + delta);
+        document.getElementById('grid-' + axis).value = state[axis];
+        calculateAll();
+    }
+
+    // Maxhub bidirectional sizing logic
+    function calculateFromDimensions() {
+        let inW = parseFloat(document.getElementById('target-w').value);
+        let inH = parseFloat(document.getElementById('target-h').value);
+        
+        if (state.unit === 'in') { inW *= 25.4; inH *= 25.4; } // Convert input to mm for math
+        
+        let cabW = DB_CAB[state.cab].w;
+        let cabH = DB_CAB[state.cab].h;
+
+        if (!isNaN(inW) && inW > 0) state.cols = Math.max(1, Math.round(inW / cabW));
+        if (!isNaN(inH) && inH > 0) state.rows = Math.max(1, Math.round(inH / cabH));
+        
+        document.getElementById('grid-cols').value = state.cols;
+        document.getElementById('grid-rows').value = state.rows;
+        
+        calculateAll();
+    }
+
+    function calculateAll() {
+        const cab = DB_CAB[state.cab];
+        const pitch = parseFloat(document.getElementById('pitch-select').value);
+
+        // 1. Math Data (Always in MM internally)
+        let totalW_mm = state.cols * cab.w;
+        let totalH_mm = state.rows * cab.h;
+        let totalCabs = state.cols * state.rows;
         
         let resW = Math.round(totalW_mm / pitch);
         let resH = Math.round(totalH_mm / pitch);
-        let totalCabs = state.cols * state.rows;
+        let totalPx = resW * resH;
 
+        let weightKg = totalCabs * cab.weight;
+        let areaSqm = (totalW_mm / 1000) * (totalH_mm / 1000);
+        
+        // 2. Display Formatting
         let dispW = state.unit === 'mm' ? totalW_mm : (totalW_mm / 25.4).toFixed(1);
         let dispH = state.unit === 'mm' ? totalH_mm : (totalH_mm / 25.4).toFixed(1);
+        let dispWeight = state.unit === 'mm' ? `${weightKg.toFixed(1)} kg` : `${(weightKg * 2.20462).toFixed(1)} lbs`;
+        
+        document.getElementById('target-w').value = dispW;
+        document.getElementById('target-h').value = dispH;
 
-        document.getElementById('res-badge').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} PX`;
-        document.getElementById('out-layout').innerText = `${state.cols} Columns x ${state.rows} Rows`;
-        document.getElementById('out-cabs').innerText = totalCabs;
-        document.getElementById('out-size').innerText = `${dispW} x ${dispH} ${state.unit.toUpperCase()}`;
+        // 3. UI Updates
+        document.getElementById('badge-resolution').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} PX`;
+        document.getElementById('res-layout').innerText = `${state.cols} (W) x ${state.rows} (H)`;
+        document.getElementById('res-total-cabs').innerText = totalCabs;
+        document.getElementById('res-area').innerText = `${areaSqm.toFixed(2)} sqm`;
+        document.getElementById('res-weight').innerText = dispWeight;
         
-        let diag = (Math.sqrt(totalW_mm**2 + totalH_mm**2) / 25.4).toFixed(1);
-        document.getElementById('out-diag').innerText = diag + '"';
-        
-        // CALCOLO ASPECT RATIO CORRETTO
+        let diagInch = (Math.sqrt(totalW_mm**2 + totalH_mm**2) / 25.4).toFixed(1);
+        document.getElementById('res-diag').innerText = diagInch + '"';
+
         let ratioNum = totalW_mm / totalH_mm;
         let ratioLabel = ratioNum.toFixed(2) + ":1";
         if (Math.abs(ratioNum - 1.777) < 0.05) ratioLabel = "16:9";
         if (Math.abs(ratioNum - 2.333) < 0.05) ratioLabel = "21:9";
         if (Math.abs(ratioNum - 3.555) < 0.05) ratioLabel = "32:9";
+        document.getElementById('res-ratio').innerText = ratioLabel;
 
-        document.getElementById('out-ratio').innerText = ratioLabel;
-        document.getElementById('out-total-px').innerText = (resW * resH).toLocaleString();
-        document.getElementById('out-power').innerText = (totalCabs * c.power).toLocaleString() + ' W';
+        document.getElementById('res-px').innerText = totalPx.toLocaleString();
+        document.getElementById('res-power-max').innerText = ((totalCabs * cab.powerMax) / 1000).toFixed(2) + ' kW';
+        document.getElementById('res-power-avg').innerText = ((totalCabs * cab.powerAvg) / 1000).toFixed(2) + ' kW';
 
+        // Processors
+        let ports1G = Math.ceil(totalPx / CAP_NOVA_1G);
+        document.getElementById('res-nova-ports').innerText = Math.ceil(totalPx / CAP_NOVA_5G);
+        document.getElementById('res-brompton').innerText = Math.ceil(totalPx / CAP_BROM);
+        
+        let novaModel = ports1G <= 6 ? "VX600 Pro" : ports1G <= 10 ? "VX1000 Pro" : ports1G <= 20 ? "VX2000 Pro" : "H-Series";
+        document.getElementById('res-nova').innerText = novaModel;
+
+        // 4. Render Graphics
         drawStage(totalW_mm, totalH_mm, dispW, dispH);
     }
 
     function drawStage(w_mm, h_mm, dispW, dispH) {
-        const wall = document.getElementById('led-wall');
+        const wall = document.getElementById('wall-container');
         const grid = document.getElementById('wall-grid');
         const human = document.getElementById('human-svg');
-        const stage = document.getElementById('stage-bg');
+        const stage = document.getElementById('stage-area');
         
+        // Calculate dynamic scale to fit stage
         const maxDrawW = Math.max(100, stage.clientWidth - 200);
         const maxDrawH = Math.max(100, stage.clientHeight - 200);
-        const PIXELS_PER_MM = 160 / 1800;
+        const BASE_SCALE = 160 / 1800; // Human is 1.8m (1800mm) = ~160px on screen natively
 
-        let drawW = w_mm * PIXELS_PER_MM;
-        let drawH = h_mm * PIXELS_PER_MM;
+        let drawW = w_mm * BASE_SCALE;
+        let drawH = h_mm * BASE_SCALE;
 
-        let scaleDown = 1;
+        let scaleMultiplier = 1;
         if (drawW > maxDrawW || drawH > maxDrawH) {
-            scaleDown = Math.min(maxDrawW / drawW, maxDrawH / drawH);
+            scaleMultiplier = Math.min(maxDrawW / drawW, maxDrawH / drawH);
         }
 
-        drawW *= scaleDown;
-        drawH *= scaleDown;
+        drawW *= scaleMultiplier;
+        drawH *= scaleMultiplier;
 
+        // Apply CSS Dimensions
         wall.style.width = drawW + 'px';
         wall.style.height = drawH + 'px';
-        human.style.height = ((1800 * PIXELS_PER_MM) * scaleDown) + 'px';
+        human.style.height = ((1800 * BASE_SCALE) * scaleMultiplier) + 'px';
 
-        document.getElementById('meas-w').innerText = `${dispW} ${state.unit.toUpperCase()}`;
-        document.getElementById('meas-h').innerText = `${dispH} ${state.unit.toUpperCase()}`;
+        // Update Ruler Texts
+        let unitTxt = state.unit.toUpperCase();
+        document.getElementById('ruler-val-w').innerText = `${dispW} ${unitTxt}`;
+        document.getElementById('ruler-val-h').innerText = `${dispH} ${unitTxt}`;
 
+        // Draw Grid Cells
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${state.cols}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${state.rows}, 1fr)`;
         
         let totalCells = state.cols * state.rows;
-        if(totalCells < 1500) {
+        if(totalCells < 2000) {
             for(let i = 0; i < totalCells; i++) {
                 const box = document.createElement('div');
-                box.className = 'cabinet-box';
+                box.className = 'cabinet-cell';
                 grid.appendChild(box);
             }
         }
+    }
+
+    function exportConfiguration() {
+        const t = `PRIME-VIEW DIX-PLAY CONFIGURATION EXPORT\n` +
+                  `----------------------------------------\n` +
+                  `Series       : ${state.env.toUpperCase()} (${state.cab}" Cabinet)\n` +
+                  `Grid Layout  : ${state.cols} Columns x ${state.rows} Rows\n` +
+                  `Total Modules: ${state.cols * state.rows} Cabinets\n` +
+                  `Dimensions   : ${document.getElementById('target-w').value} x ${document.getElementById('target-h').value} ${state.unit}\n` +
+                  `Display Area : ${document.getElementById('res-area').innerText}\n` +
+                  `Total Weight : ${document.getElementById('res-weight').innerText}\n` +
+                  `Aspect Ratio : ${document.getElementById('res-ratio').innerText}\n` +
+                  `Resolution   : ${document.getElementById('badge-resolution').innerText}\n` +
+                  `Max Power    : ${document.getElementById('res-power-max').innerText}\n` +
+                  `Controller   : ${document.getElementById('res-nova').innerText}\n`;
+                           
+        const blob = new Blob([t], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.download = 'Primeview_LED_Configuration.txt';
+        a.href = window.URL.createObjectURL(blob);
+        a.click();
     }
 </script>
 
