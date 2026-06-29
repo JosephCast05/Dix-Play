@@ -54,16 +54,16 @@
         select:focus, input:focus { border-color: var(--pv-red); }
 
         /* Spinners */
-        .grid-spinners { display: flex; gap: 16px; }
-        .spinner-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .grid-spinners { display: flex; flex-direction: column; gap: 12px; } /* Modificato per impilarli verticalmente */
+        .spinner-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .spinner { display: flex; align-items: center; background: #000; border: 1px solid var(--pv-border); border-radius: 6px; overflow: hidden; }
-        .spin-btn { width: 36px; height: 36px; background: #1a1a1a; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.2rem; transition: 0.2s; }
+        .spin-btn { width: 44px; height: 36px; background: #1a1a1a; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.2rem; transition: 0.2s; }
         .spin-btn:hover { background: var(--pv-red); }
         .spin-val { flex: 1; text-align: center; border: none; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; }
 
         /* Target Dimension Inputs */
-        .dim-inputs { display: flex; gap: 16px; }
-        .dim-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .dim-inputs { display: flex; flex-direction: column; gap: 12px; } /* Modificato per impilarli verticalmente */
+        .dim-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .dim-wrapper input { text-align: right; }
 
         /* Toggles */
@@ -184,15 +184,15 @@
                 <div class="control-label">Array Configuration (Cabinets)</div>
                 <div class="grid-spinners" style="margin-bottom: 12px;">
                     <div class="spinner-wrapper">
-                        <span style="font-size: 0.75rem; color: #888;">Columns</span>
+                        <span style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Columns (Width)</span>
                         <div class="spinner">
                             <button class="spin-btn" onclick="adjustGrid('cols', -1)">-</button>
                             <input type="text" id="grid-cols" class="spin-val" value="4" readonly>
                             <button class="spin-btn" onclick="adjustGrid('cols', 1)">+</button>
-                        </div><br>
+                        </div>
                     </div>
                     <div class="spinner-wrapper">
-                        <span style="font-size: 0.75rem; color: #888;">Rows</span>
+                        <span style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Rows (Height)</span>
                         <div class="spinner">
                             <button class="spin-btn" onclick="adjustGrid('rows', -1)">-</button>
                             <input type="text" id="grid-rows" class="spin-val" value="3" readonly>
@@ -204,12 +204,12 @@
                 <div class="control-label">Target Dimensions (Auto-Fit)</div>
                 <div class="dim-inputs">
                     <div class="dim-wrapper">
-                        <input type="number" id="target-w" placeholder="Width" onchange="calculateFromDimensions()">
-                        <span id="lbl-w-unit" style="font-size: 0.7rem; color: #777; text-align: right;">Width (mm)</span>
+                        <span id="lbl-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Width (mm)</span>
+                        <input type="number" id="target-w" placeholder="Target Width" onchange="calculateFromDimensions()">
                     </div>
                     <div class="dim-wrapper">
-                        <input type="number" id="target-h" placeholder="Height" onchange="calculateFromDimensions()">
-                        <span id="lbl-h-unit" style="font-size: 0.7rem; color: #777; text-align: right;">Height (mm)</span>
+                        <span id="lbl-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Height (mm)</span>
+                        <input type="number" id="target-h" placeholder="Target Height" onchange="calculateFromDimensions()">
                     </div>
                 </div>
             </div>
