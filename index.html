@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primeview Global | Dix-Play LED Configurator V2.2</title>
+    <title>Primeview Global | Dix-Play LED Configurator V3.0</title>
     <style>
         :root {
             --pv-red: #e31e24;
@@ -30,6 +30,12 @@
         .btn-outline { background: transparent; border: 1px solid #555; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
         .btn-outline:hover { background: var(--pv-red); border-color: var(--pv-red); }
 
+        .nav-unit-toggle { display: flex; background: #000; border: 1px solid #555; border-radius: 4px; overflow: hidden; }
+        .nav-unit-btn { padding: 8px 16px; background: transparent; border: none; color: #888; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border-right: 1px solid #333; }
+        .nav-unit-btn:last-child { border-right: none; }
+        .nav-unit-btn.active { background: var(--pv-red); color: #fff; }
+        .nav-unit-btn:hover:not(.active) { color: #fff; background: #222; }
+
         /* --- LAYOUT --- */
         .app-layout { display: flex; flex: 1; overflow: hidden; }
 
@@ -40,7 +46,7 @@
         }
 
         .section-title { font-size: 0.8rem; font-weight: 800; color: var(--pv-text-muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--pv-border); padding-bottom: 8px; margin-bottom: 8px; }
-        
+
         .control-group { display: flex; flex-direction: column; gap: 8px; }
         .control-label { font-size: 0.8rem; font-weight: 600; color: #bbb; }
 
@@ -48,8 +54,12 @@
         .seg-btn { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; border-radius: 4px; color: #777; transition: 0.2s; }
         .seg-btn.active { background: #222; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.5); border: 1px solid var(--pv-red); }
 
-        select, input[type="number"] { width: 100%; background: #000; color: #fff; border: 1px solid var(--pv-border); padding: 10px 12px; border-radius: 6px; outline: none; font-size: 0.95rem; }
-        select:focus, input:focus { border-color: var(--pv-red); }
+        select, input[type="number"], textarea { width: 100%; background: #000; color: #fff; border: 1px solid var(--pv-border); padding: 10px 12px; border-radius: 6px; outline: none; font-size: 0.95rem; font-family: inherit; }
+        select:focus, input:focus, textarea:focus { border-color: var(--pv-red); }
+        textarea { resize: vertical; min-height: 72px; font-size: 0.85rem; }
+
+        .model-desc { font-size: 0.72rem; color: #888; line-height: 1.5; margin-top: 2px; }
+        .model-desc b { color: var(--pv-red); display: block; font-size: 0.78rem; margin-bottom: 2px; }
 
         .grid-spinners { display: flex; flex-direction: column; gap: 12px; }
         .spinner-wrapper { display: flex; flex-direction: column; gap: 4px; }
@@ -61,6 +71,13 @@
         .dim-inputs { display: flex; flex-direction: column; gap: 12px; }
         .dim-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .dim-wrapper input { text-align: right; }
+
+        .quick-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .preset-card { background: #000; border: 1px solid var(--pv-border); border-radius: 6px; padding: 10px; cursor: pointer; text-align: center; transition: 0.2s; }
+        .preset-card:hover { border-color: var(--pv-red); }
+        .preset-card.active { border-color: var(--pv-red); background: #1a0808; }
+        .preset-card h5 { font-size: 0.82rem; color: #fff; margin-bottom: 4px; }
+        .preset-card span { display: block; font-size: 0.68rem; color: #888; line-height: 1.4; }
 
         .toggle-container { display: flex; align-items: center; justify-content: space-between; background: #000; border: 1px solid var(--pv-border); padding: 12px; border-radius: 6px; cursor: pointer; }
         .toggle-switch { width: 44px; height: 22px; background: #333; border-radius: 11px; position: relative; transition: 0.3s; }
@@ -74,29 +91,32 @@
             background-color: #050505;
         }
 
-        .resolution-badge {
+        .top-info-bar {
             position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 30;
-            background: var(--pv-red); color: #fff; padding: 10px 32px; border-radius: 30px;
-            font-weight: 800; font-size: 1.25rem; box-shadow: 0 8px 24px rgba(227,30,36,0.3); letter-spacing: 1px;
+            display: flex; background: var(--pv-red); border-radius: 30px; box-shadow: 0 8px 24px rgba(227,30,36,0.3); overflow: hidden;
         }
+        .info-seg { padding: 8px 22px; text-align: center; border-right: 1px solid rgba(255,255,255,0.3); }
+        .info-seg:last-child { border-right: none; }
+        .info-seg small { display: block; font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.8); letter-spacing: 1px; }
+        .info-seg span { display: block; font-weight: 800; font-size: 1.1rem; color: #fff; white-space: nowrap; }
 
         .render-area { position: relative; z-index: 10; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        
+
         .stage-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
-        
-        .mounting-wall { 
-            position: absolute; 
-            background: rgba(255,255,255,0.03); 
-            display: none; 
-            z-index: 5; 
+
+        .mounting-wall {
+            position: absolute;
+            background: rgba(255,255,255,0.03);
+            display: none;
+            z-index: 5;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
-        
+
         .wall-lbl-w { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
         .wall-lbl-h { position: absolute; right: -50px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
-        
+
         .led-wall-container { position: absolute; background: #000; box-shadow: 0 20px 80px rgba(0,0,0,0.9); z-index: 15; }
-        
+
         .media-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: none; z-index: 1; }
         .grid-layer { position: absolute; inset: 0; display: grid; z-index: 2; border: 2px solid #444; }
         .cabinet-cell { border: 1px solid rgba(255,255,255,0.1); background: rgba(10,10,10,0.9); }
@@ -109,17 +129,25 @@
         .ruler-h { border-width: 1px 1px 1px 0; width: 16px; right: -30px; top: 0; height: 100%; }
         .ruler-h span { transform: translateX(35px) rotate(90deg); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; white-space: nowrap; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
 
-        /* OMINO SPOSTATO A SINISTRA E VICINO AL MURO */
-        .human-scale { 
-            position: absolute; 
-            bottom: 0; 
-            left: -110px; /* Sta a sinistra della struttura per non coprire i dati a destra */
-            opacity: 0.8; 
-            z-index: 50; 
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); 
-            transition: height 0.3s; 
-            pointer-events: none; 
+        .human-scale {
+            position: absolute;
+            bottom: 0;
+            left: -110px;
+            opacity: 0.8;
+            z-index: 50;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
+            transition: height 0.3s;
+            pointer-events: none;
         }
+
+        .viewing-label {
+            position: absolute; bottom: 4px; left: -300px; width: 140px; z-index: 51;
+            background: rgba(0,0,0,0.78); border: 1px solid var(--pv-red); border-radius: 6px;
+            padding: 8px 10px; text-align: center; pointer-events: none;
+        }
+        .viewing-label b { display: block; color: #fff; font-size: 0.95rem; font-weight: 800; margin-bottom: 2px; }
+        .viewing-label span { display: block; color: #aaa; font-size: 0.65rem; line-height: 1.4; }
+        .viewing-label .vd-label-title { color: var(--pv-red); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 
         /* --- POPUP MODAL --- */
         .modal-overlay {
@@ -132,8 +160,9 @@
             border: 2px solid var(--pv-red); box-shadow: 0 20px 60px rgba(0,0,0,0.9);
             text-align: center; display: flex; flex-direction: column; gap: 20px;
         }
+        .modal-card.wide { width: 620px; max-height: 80vh; overflow-y: auto; text-align: left; }
         .modal-icon { font-size: 4rem; color: var(--pv-red); }
-        .modal-title { font-size: 1.5rem; font-weight: 800; color: var(--pv-highlight); }
+        .modal-title { font-size: 1.5rem; font-weight: 800; color: var(--pv-highlight); text-align: center; }
         .modal-text { font-size: 0.95rem; line-height: 1.6; color: #aaa; }
         .modal-actions { display: flex; gap: 15px; margin-top: 10px; }
         .modal-btn {
@@ -145,6 +174,10 @@
         .btn-expand { background: var(--pv-red); color: #fff; }
         .btn-expand:hover { background: #c11216; }
 
+        .vd-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 8px; }
+        .vd-table th, .vd-table td { padding: 8px 6px; border-bottom: 1px solid var(--pv-border); text-align: left; color: #ddd; }
+        .vd-table th { color: var(--pv-red); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.5px; }
+
         /* --- RIGHT PANEL: RESULTS --- */
         .panel-right {
             width: 360px; background: var(--pv-panel); border-left: 1px solid var(--pv-border); padding: 24px;
@@ -153,7 +186,7 @@
 
         .data-card { background: #000; padding: 16px; border-radius: 8px; border: 1px solid var(--pv-border); }
         .data-card.highlight { border-left: 4px solid var(--pv-red); }
-        
+
         .data-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #222; }
         .data-row:last-child { border-bottom: none; padding-bottom: 0; }
         .data-lbl { font-size: 0.8rem; color: #aaa; font-weight: 600; }
@@ -169,6 +202,12 @@
         .btn-text h4 { font-size: 0.9rem; margin-bottom: 4px; color: var(--pv-highlight); }
         .btn-text p { font-size: 0.75rem; color: var(--pv-text-muted); }
 
+        .btn-action-primary { background: var(--pv-red); border-color: var(--pv-red); }
+        .btn-action-primary:hover { background: #c11216; }
+        .btn-action-primary .btn-icon { color: #fff; }
+        .btn-action-primary .btn-text h4 { color: #fff; }
+        .btn-action-primary .btn-text p { color: rgba(255,255,255,0.8); }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--pv-bg-main); }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
@@ -183,14 +222,18 @@
             <span class="nav-title">Dix-Play LED Configurator</span>
         </div>
         <div class="nav-actions">
+            <div class="nav-unit-toggle">
+                <button class="nav-unit-btn active" id="nav-unit-mm" onclick="setUnit('mm')" title="Millimeters">mm</button>
+                <button class="nav-unit-btn" id="nav-unit-in" onclick="setUnit('in')" title="Inches">″</button>
+            </div>
             <button class="btn-outline" onclick="location.reload()">Reset Configuration</button>
         </div>
     </nav>
 
     <div class="app-layout">
-        
+
         <aside class="panel-left">
-            
+
             <div class="control-group">
                 <div class="section-title">1. Product Series</div>
                 <div class="segmented-control" style="margin-bottom: 8px;">
@@ -204,49 +247,60 @@
             </div>
 
             <div class="control-group">
-                <div class="section-title">2. Screen Parameters</div>
-                <div class="control-label">Pixel Pitch (Resolution)</div>
-                <select id="pitch-select" onchange="calculateAll()"></select>
+                <div class="section-title">2. Display Model</div>
+                <div class="control-label">Pixel Pitch / Model</div>
+                <select id="model-select" onchange="onModelChange()"></select>
+                <div class="model-desc" id="model-desc"></div>
             </div>
 
             <div class="control-group">
                 <div class="section-title">3. Display Size Definition</div>
-                
+
                 <div class="control-label">Unit of Measurement</div>
                 <div class="segmented-control" style="margin-bottom: 12px;">
                     <div class="seg-btn active" id="btn-unit-mm" onclick="setUnit('mm')">Millimeters (mm)</div>
                     <div class="seg-btn" id="btn-unit-in" onclick="setUnit('in')">Inches (in)</div>
                 </div>
 
-                <div class="control-label">Array Configuration (Cabinets)</div>
-                <div class="grid-spinners" style="margin-bottom: 12px;">
-                    <div class="spinner-wrapper">
-                        <span style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Columns (Width)</span>
-                        <div class="spinner">
-                            <button class="spin-btn" onclick="adjustGrid('cols', -1)">-</button>
-                            <input type="text" id="grid-cols" class="spin-val" value="4" readonly>
-                            <button class="spin-btn" onclick="adjustGrid('cols', 1)">+</button>
+                <div class="control-label">Configuration Mode</div>
+                <div class="segmented-control" style="margin-bottom: 12px;">
+                    <div class="seg-btn active" id="btn-mode-custom" onclick="setConfigMode('custom')">Custom Wall</div>
+                    <div class="seg-btn" id="btn-mode-quick" onclick="setConfigMode('quick')">Quick Configuration</div>
+                </div>
+
+                <div id="custom-grid-wrap" style="display:flex; flex-direction:column; gap:8px; margin-bottom: 12px;">
+                    <span class="control-label">Array Configuration (Cabinets)</span>
+                    <div class="grid-spinners">
+                        <div class="spinner-wrapper">
+                            <span style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Columns (Width)</span>
+                            <div class="spinner">
+                                <button class="spin-btn" onclick="adjustGrid('cols', -1)">-</button>
+                                <input type="text" id="grid-cols" class="spin-val" value="4" readonly>
+                                <button class="spin-btn" onclick="adjustGrid('cols', 1)">+</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="spinner-wrapper">
-                        <span style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Rows (Height)</span>
-                        <div class="spinner">
-                            <button class="spin-btn" onclick="adjustGrid('rows', -1)">-</button>
-                            <input type="text" id="grid-rows" class="spin-val" value="3" readonly>
-                            <button class="spin-btn" onclick="adjustGrid('rows', 1)">+</button>
+                        <div class="spinner-wrapper">
+                            <span style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Rows (Height)</span>
+                            <div class="spinner">
+                                <button class="spin-btn" onclick="adjustGrid('rows', -1)">-</button>
+                                <input type="text" id="grid-rows" class="spin-val" value="3" readonly>
+                                <button class="spin-btn" onclick="adjustGrid('rows', 1)">+</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div id="quick-presets-wrap" class="quick-presets" style="display:none; margin-bottom: 12px;"></div>
 
                 <div class="control-label">Target LED Dimensions (Auto-Fit)</div>
                 <div class="dim-inputs" style="margin-bottom: 12px;">
                     <div class="dim-wrapper">
                         <span id="lbl-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Width (mm)</span>
-                        <input type="number" id="target-w" placeholder="Target Width" oninput="calculateFromDimensions()">
+                        <input type="number" id="target-w" placeholder="Target Width" onchange="calculateFromDimensions()">
                     </div>
                     <div class="dim-wrapper">
                         <span id="lbl-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Height (mm)</span>
-                        <input type="number" id="target-h" placeholder="Target Height" oninput="calculateFromDimensions()">
+                        <input type="number" id="target-h" placeholder="Target Height" onchange="calculateFromDimensions()">
                     </div>
                 </div>
 
@@ -265,7 +319,7 @@
 
             <div class="control-group">
                 <div class="section-title">4. Visualizer Tools</div>
-                
+
                 <div class="control-label">Installation Environment (Texture)</div>
                 <select id="bg-select" onchange="setBackground(this.value)" style="margin-bottom: 8px;">
                     <option value="none">Studio Black (Default)</option>
@@ -276,11 +330,11 @@
                 </select>
 
                 <div class="control-label">Content Preview</div>
-                <select id="media-select" onchange="setMedia(this.value)" style="margin-bottom: 12px;">
-                    <option value="none">Grid Wireframe Only</option>
-                    <option value="image">Test Image (example.jpg)</option>
-                    <option value="video">Test Video (example.mp4)</option>
-                </select>
+                <div class="segmented-control" style="margin-bottom: 12px;">
+                    <div class="seg-btn active" id="btn-media-none" onclick="setMedia('none')">Wireframe</div>
+                    <div class="seg-btn" id="btn-media-image" onclick="setMedia('image')">Sample Image</div>
+                    <div class="seg-btn" id="btn-media-video" onclick="setMedia('video')">Sample Video</div>
+                </div>
 
                 <div class="toggle-container active" id="ruler-toggle" onclick="toggleRulers()">
                     <span class="control-label" style="color: #fff; margin: 0;">Show Dimensions (CAD Rulers)</span>
@@ -288,14 +342,39 @@
                 </div>
             </div>
 
+            <div class="control-group">
+                <div class="section-title">5. Controller Requirement</div>
+                <div class="control-label">Does the project require a video processor / controller?</div>
+                <div class="segmented-control">
+                    <div class="seg-btn active" id="btn-ctrl-yes" onclick="setController(true)">Yes</div>
+                    <div class="seg-btn" id="btn-ctrl-no" onclick="setController(false)">No</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="section-title">6. Special Requirements</div>
+                <div class="control-label">Any custom requirements for this project?</div>
+                <div class="segmented-control" style="margin-bottom: 10px;">
+                    <div class="seg-btn active" id="btn-spec-no" onclick="setSpecialReq(false)">No</div>
+                    <div class="seg-btn" id="btn-spec-yes" onclick="setSpecialReq(true)">Yes</div>
+                </div>
+                <div id="specialreq-wrap" style="display:none;">
+                    <textarea id="specialreq-text" placeholder="e.g. curved installation, custom service access, specific brightness requirements..." oninput="state.specialNotes = this.value"></textarea>
+                </div>
+            </div>
+
         </aside>
 
         <main class="stage" id="stage-area">
-            <div class="resolution-badge" id="badge-resolution">0 x 0 px</div>
+            <div class="top-info-bar">
+                <div class="info-seg"><small>DIAGONAL</small><span id="badge-diagonal">0"</span></div>
+                <div class="info-seg"><small>RESOLUTION</small><span id="badge-resolution">0 × 0 px</span></div>
+                <div class="info-seg"><small>ASPECT RATIO</small><span id="badge-ratio">-</span></div>
+            </div>
 
             <div class="render-area">
                 <div class="stage-wrapper" id="stage-wrapper">
-                    
+
                     <div class="mounting-wall" id="mounting-wall">
                         <span class="wall-lbl-w" id="lbl-wall-w">0</span>
                         <span class="wall-lbl-h" id="lbl-wall-h">0</span>
@@ -304,29 +383,36 @@
                     <div class="led-wall-container" id="wall-container">
                         <div class="ruler ruler-w active" id="ruler-top"><span id="ruler-val-w">0 mm</span></div>
                         <div class="ruler ruler-h active" id="ruler-right"><span id="ruler-val-h">0 mm</span></div>
-                        
+
                         <img id="media-img" src="example.jpg" class="media-layer" alt="Preview">
                         <video id="media-vid" src="example.mp4" class="media-layer" autoplay loop muted playsinline></video>
-                        
+
                         <div class="grid-layer" id="wall-grid"></div>
                     </div>
 
                     <svg class="human-scale" id="human-svg" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
                         <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
                     </svg>
+
+                    <div class="viewing-label" id="viewing-label">
+                        <div class="vd-label-title">Best Viewing Distance</div>
+                        <b id="vd-text-main">0–0 m</b>
+                        <span id="vd-text-sub">Min. 0 m</span>
+                    </div>
                 </div>
             </div>
         </main>
 
         <aside class="panel-right">
             <div class="section-title">Physical Specifications</div>
-            
+
             <div class="data-card highlight">
                 <div class="data-row"><span class="data-lbl">Cabinet Layout</span><span class="data-val" id="res-layout">0x0</span></div>
                 <div class="data-row"><span class="data-lbl">Total Cabinets</span><span class="data-val val-red" id="res-total-cabs">0</span></div>
                 <div class="data-row"><span class="data-lbl">Display Area</span><span class="data-val" id="res-area">0 sqm</span></div>
                 <div class="data-row"><span class="data-lbl">Total Weight</span><span class="data-val" id="res-weight">0 kg</span></div>
                 <div class="data-row"><span class="data-lbl">Diagonal</span><span class="data-val" id="res-diag">0"</span></div>
+                <div class="data-row"><span class="data-lbl">Best Viewing Distance</span><span class="data-val" id="res-vd">0 m</span></div>
             </div>
 
             <div class="section-title" style="margin-top: 8px;">Optical & Electrical</div>
@@ -338,15 +424,33 @@
                 <div class="data-row"><span class="data-lbl">Avg Power Draw</span><span class="data-val" id="res-power-avg">0 kW</span></div>
             </div>
 
-            <div class="section-title" style="margin-top: 8px;">Processing Details</div>
+            <div id="processing-card">
+                <div class="section-title" style="margin-top: 8px;">Processing Details</div>
+                <div class="data-card">
+                    <div class="data-row"><span class="data-lbl">Novastar Unit</span><span class="data-val val-red" id="res-nova">-</span></div>
+                    <div class="data-row"><span class="data-lbl">Nova Ports (5G)</span><span class="data-val" id="res-nova-ports">0</span></div>
+                    <div class="data-row"><span class="data-lbl">Brompton Ports</span><span class="data-val" id="res-brompton">0</span></div>
+                </div>
+            </div>
 
-            <div class="data-card">
-                <div class="data-row"><span class="data-lbl">Novastar Unit</span><span class="data-val val-red" id="res-nova">-</span></div>
-                <div class="data-row"><span class="data-lbl">Nova Ports (5G)</span><span class="data-val" id="res-nova-ports">0</span></div>
-                <div class="data-row"><span class="data-lbl">Brompton Ports</span><span class="data-val" id="res-brompton">0</span></div>
+            <div id="hardware-card">
+                <div class="section-title" style="margin-top: 8px;">Installation Hardware</div>
+                <div class="data-card">
+                    <div class="data-row"><span class="data-lbl">Sending Cards</span><span class="data-val" id="res-sending">0</span></div>
+                    <div class="data-row"><span class="data-lbl">Receiving Cards</span><span class="data-val" id="res-receiving">0</span></div>
+                    <div class="data-row"><span class="data-lbl">Mounting Brackets</span><span class="data-val" id="res-bracket">1 SET</span></div>
+                </div>
             </div>
 
             <div style="flex: 1;"></div>
+
+            <button class="btn-action btn-action-primary" onclick="exportPDF()">
+                <span class="btn-icon">⬇</span>
+                <div class="btn-text">
+                    <h4>Export to PDF</h4>
+                    <p>Full configuration summary, ready to send</p>
+                </div>
+            </button>
 
             <button class="btn-action" onclick="exportConfiguration()">
                 <span class="btn-icon">⬇</span>
@@ -355,7 +459,15 @@
                     <p>Export system specs to TXT file</p>
                 </div>
             </button>
-            
+
+            <button class="btn-action" onclick="openVDModal()">
+                <span class="btn-icon">📏</span>
+                <div class="btn-text">
+                    <h4>Viewing Distance Guide</h4>
+                    <p>Reference table for all Dix-Play models</p>
+                </div>
+            </button>
+
             <button class="btn-action" onclick="alert('Brochure PDF library will be linked here.')">
                 <span class="btn-icon">📄</span>
                 <div class="btn-text">
@@ -381,8 +493,26 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="vd-modal">
+        <div class="modal-card wide">
+            <div class="modal-title">📏 Viewing Distance Guide</div>
+            <div class="modal-text">Reference distances for every Dix-Play pixel pitch, indoor and outdoor. Based on the industry rule of thumb of approximately 1 meter of minimum distance per 1mm of pixel pitch.</div>
+            <table class="vd-table">
+                <thead><tr><th>Model</th><th>Pitch</th><th>Min. Distance</th><th>Comfortable Distance</th></tr></thead>
+                <tbody id="vd-table-body"></tbody>
+            </table>
+            <div class="modal-actions">
+                <button class="modal-btn btn-expand" style="flex:1;" onclick="closeVDModal()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-    const DB_PITCH = { indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5], outdoor: [2.6, 2.9, 3.9, 4.8, 6.0] };
+    /* ===========================================================
+       DATA
+    =========================================================== */
+    const DB_MODELS = { indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5], outdoor: [2.6, 2.9, 3.9, 4.8, 6.0] };
     const DB_CAB = {
         '27': { w: 600, h: 337.5, weight: 4.8, powerMax: 80, powerAvg: 27 },
         '55': { w: 1200, h: 675, weight: 12.5, powerMax: 320, powerAvg: 110 }
@@ -394,7 +524,14 @@
         plaster: 'https://images.unsplash.com/photo-1572085313466-6710de8d7ba3?auto=format&fit=crop&w=1600&q=80',
         wood: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80'
     };
-    
+
+    const QUICK_PRESETS = [
+        { key: 's', label: 'Small', cols: 2, rows: 2 },
+        { key: 'm', label: 'Medium', cols: 4, rows: 3 },
+        { key: 'l', label: 'Large', cols: 6, rows: 4 },
+        { key: 'xl', label: 'XL', cols: 8, rows: 5 }
+    ];
+
     const CAP_NOVA_1G = 650000;
     const CAP_NOVA_5G = 5000000;
     const CAP_BROM = 524000;
@@ -409,29 +546,56 @@
         wallH: 0,
         bgTexture: 'none',
         showRulers: true,
-        modalActive: false // Flag to prevent recursion
+        configMode: 'custom',
+        requireController: true,
+        specialRequirements: false,
+        specialNotes: '',
+        modalActive: false // Prevents recursive calculateAll() calls while a modal is open
     };
+
+    let resizeTimer = null;
 
     function getGCD(a, b) { return b === 0 ? a : getGCD(b, a % b); }
 
+    function modelName(env, pitch) {
+        const prefix = env === 'indoor' ? 'IN' : 'OUT';
+        return `Dix-Play ${prefix} P${pitch}`;
+    }
+
+    // Industry rule-of-thumb approximation: ~1m minimum distance per 1mm pitch,
+    // comfortable viewing distance roughly 2.5x-3x the minimum.
+    function getViewingDistance(pitchMm) {
+        return { min: pitchMm * 1, comfMin: pitchMm * 2.5, comfMax: pitchMm * 3.0 };
+    }
+
     window.onload = () => {
-        updatePitchDropdown();
+        updateModelDropdown();
         calculateAll();
     };
 
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => { if (!state.modalActive) calculateAll(); }, 150);
+    });
+
+    /* ===========================================================
+       SECTION 1-2: SERIES / MODEL
+    =========================================================== */
     function setUnit(u) {
         state.unit = u;
         document.getElementById('btn-unit-mm').classList.toggle('active', u === 'mm');
         document.getElementById('btn-unit-in').classList.toggle('active', u === 'in');
-        
+        document.getElementById('nav-unit-mm').classList.toggle('active', u === 'mm');
+        document.getElementById('nav-unit-in').classList.toggle('active', u === 'in');
+
         let unitTxt = `(${u})`;
         document.getElementById('lbl-w-unit').innerText = `LED Width ${unitTxt}`;
         document.getElementById('lbl-h-unit').innerText = `LED Height ${unitTxt}`;
         document.getElementById('lbl-wall-w-unit').innerText = `Wall Width ${unitTxt}`;
         document.getElementById('lbl-wall-h-unit').innerText = `Wall Height ${unitTxt}`;
-        
-        if(state.wallW > 0) document.getElementById('wall-w').value = (u === 'mm') ? Math.round(state.wallW) : (state.wallW / 25.4).toFixed(1);
-        if(state.wallH > 0) document.getElementById('wall-h').value = (u === 'mm') ? Math.round(state.wallH) : (state.wallH / 25.4).toFixed(1);
+
+        if (state.wallW > 0) document.getElementById('wall-w').value = (u === 'mm') ? Math.round(state.wallW) : (state.wallW / 25.4).toFixed(1);
+        if (state.wallH > 0) document.getElementById('wall-h').value = (u === 'mm') ? Math.round(state.wallH) : (state.wallH / 25.4).toFixed(1);
 
         calculateAll();
     }
@@ -440,7 +604,7 @@
         state.env = e;
         document.getElementById('btn-env-indoor').classList.toggle('active', e === 'indoor');
         document.getElementById('btn-env-outdoor').classList.toggle('active', e === 'outdoor');
-        updatePitchDropdown();
+        updateModelDropdown();
         calculateAll();
     }
 
@@ -451,45 +615,64 @@
         calculateAll();
     }
 
-    function updatePitchDropdown() {
-        const select = document.getElementById('pitch-select');
+    function updateModelDropdown() {
+        const select = document.getElementById('model-select');
         select.innerHTML = '';
-        DB_PITCH[state.env].forEach(p => {
+        DB_MODELS[state.env].forEach(p => {
             let opt = document.createElement('option');
-            opt.value = p; opt.text = p + ' mm';
+            opt.value = p;
+            opt.text = `${modelName(state.env, p)} — ${p}mm pitch`;
             if ((state.env === 'indoor' && p === 1.56) || (state.env === 'outdoor' && p === 3.9)) opt.selected = true;
             select.appendChild(opt);
         });
+        updateModelDesc();
     }
 
-    function setBackground(val) {
-        state.bgTexture = val;
+    function onModelChange() {
+        updateModelDesc();
         calculateAll();
     }
 
-    function setMedia(val) {
-        const img = document.getElementById('media-img');
-        const vid = document.getElementById('media-vid');
-        const grid = document.getElementById('wall-grid');
-        
-        img.style.display = 'none'; vid.style.display = 'none'; vid.pause();
-        grid.classList.remove('transparent');
-
-        if (val === 'image') { img.style.display = 'block'; grid.classList.add('transparent'); }
-        if (val === 'video') { vid.style.display = 'block'; vid.play(); grid.classList.add('transparent'); }
+    function updateModelDesc() {
+        const pitch = parseFloat(document.getElementById('model-select').value);
+        const vd = getViewingDistance(pitch);
+        document.getElementById('model-desc').innerHTML =
+            `<b>${modelName(state.env, pitch)}</b>Min. viewing distance: ${vd.min.toFixed(1)}m · Comfortable: ${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)}m`;
     }
 
-    function toggleRulers() {
-        state.showRulers = !state.showRulers;
-        const toggle = document.getElementById('ruler-toggle');
-        const rw = document.getElementById('ruler-top');
-        const rh = document.getElementById('ruler-right');
-        
-        if (state.showRulers) {
-            toggle.classList.add('active'); rw.classList.add('active'); rh.classList.add('active');
-        } else {
-            toggle.classList.remove('active'); rw.classList.remove('active'); rh.classList.remove('active');
-        }
+    /* ===========================================================
+       SECTION 3: SIZE / CONFIG MODE
+    =========================================================== */
+    function setConfigMode(mode) {
+        state.configMode = mode;
+        document.getElementById('btn-mode-custom').classList.toggle('active', mode === 'custom');
+        document.getElementById('btn-mode-quick').classList.toggle('active', mode === 'quick');
+        document.getElementById('custom-grid-wrap').style.display = mode === 'custom' ? 'flex' : 'none';
+        document.getElementById('quick-presets-wrap').style.display = mode === 'quick' ? 'grid' : 'none';
+        if (mode === 'quick') renderQuickPresets();
+    }
+
+    function renderQuickPresets() {
+        const cab = DB_CAB[state.cab];
+        const wrap = document.getElementById('quick-presets-wrap');
+        wrap.innerHTML = '';
+        QUICK_PRESETS.forEach(p => {
+            const w = state.unit === 'mm' ? Math.round(p.cols * cab.w) : (p.cols * cab.w / 25.4).toFixed(1);
+            const h = state.unit === 'mm' ? Math.round(p.rows * cab.h) : (p.rows * cab.h / 25.4).toFixed(1);
+            const div = document.createElement('div');
+            div.className = 'preset-card' + ((state.cols === p.cols && state.rows === p.rows) ? ' active' : '');
+            div.onclick = () => applyQuickPreset(p.cols, p.rows);
+            div.innerHTML = `<h5>${p.label}</h5><span>${p.cols}×${p.rows} (${p.cols * p.rows} cabs)</span><span>${w}×${h} ${state.unit}</span>`;
+            wrap.appendChild(div);
+        });
+    }
+
+    function applyQuickPreset(cols, rows) {
+        state.cols = cols;
+        state.rows = rows;
+        document.getElementById('grid-cols').value = cols;
+        document.getElementById('grid-rows').value = rows;
+        calculateAll();
     }
 
     function adjustGrid(axis, delta) {
@@ -501,32 +684,93 @@
     function calculateFromDimensions() {
         let inW = parseFloat(document.getElementById('target-w').value);
         let inH = parseFloat(document.getElementById('target-h').value);
-        
+
         if (state.unit === 'in') { inW *= 25.4; inH *= 25.4; }
-        
+
         let cabW = DB_CAB[state.cab].w;
         let cabH = DB_CAB[state.cab].h;
 
         if (!isNaN(inW) && inW > 0) state.cols = Math.max(1, Math.round(inW / cabW));
         if (!isNaN(inH) && inH > 0) state.rows = Math.max(1, Math.round(inH / cabH));
-        
+
         document.getElementById('grid-cols').value = state.cols;
         document.getElementById('grid-rows').value = state.rows;
-        
+
         calculateAll();
     }
 
     function updateWallInput() {
         let inWallW = parseFloat(document.getElementById('wall-w').value) || 0;
         let inWallH = parseFloat(document.getElementById('wall-h').value) || 0;
-        
+
         state.wallW = state.unit === 'in' ? inWallW * 25.4 : inWallW;
         state.wallH = state.unit === 'in' ? inWallH * 25.4 : inWallH;
-        
+
         calculateAll();
     }
 
-    // MODAL HANDLING LOGIC
+    /* ===========================================================
+       SECTION 4: VISUALIZER TOOLS
+    =========================================================== */
+    function setBackground(val) {
+        state.bgTexture = val;
+        calculateAll();
+    }
+
+    function setMedia(val) {
+        const img = document.getElementById('media-img');
+        const vid = document.getElementById('media-vid');
+        const grid = document.getElementById('wall-grid');
+
+        img.style.display = 'none'; vid.style.display = 'none'; vid.pause();
+        grid.classList.remove('transparent');
+
+        document.getElementById('btn-media-none').classList.toggle('active', val === 'none');
+        document.getElementById('btn-media-image').classList.toggle('active', val === 'image');
+        document.getElementById('btn-media-video').classList.toggle('active', val === 'video');
+
+        if (val === 'image') { img.style.display = 'block'; grid.classList.add('transparent'); }
+        if (val === 'video') { vid.style.display = 'block'; vid.play(); grid.classList.add('transparent'); }
+    }
+
+    function toggleRulers() {
+        state.showRulers = !state.showRulers;
+        const toggle = document.getElementById('ruler-toggle');
+        const rw = document.getElementById('ruler-top');
+        const rh = document.getElementById('ruler-right');
+
+        if (state.showRulers) {
+            toggle.classList.add('active'); rw.classList.add('active'); rh.classList.add('active');
+        } else {
+            toggle.classList.remove('active'); rw.classList.remove('active'); rh.classList.remove('active');
+        }
+    }
+
+    /* ===========================================================
+       SECTION 5-6: CONTROLLER / SPECIAL REQUIREMENTS
+    =========================================================== */
+    function setController(val) {
+        state.requireController = val;
+        document.getElementById('btn-ctrl-yes').classList.toggle('active', val === true);
+        document.getElementById('btn-ctrl-no').classList.toggle('active', val === false);
+        document.getElementById('processing-card').style.display = val ? 'block' : 'none';
+        document.getElementById('hardware-card').style.display = val ? 'block' : 'none';
+    }
+
+    function setSpecialReq(val) {
+        state.specialRequirements = val;
+        document.getElementById('btn-spec-yes').classList.toggle('active', val === true);
+        document.getElementById('btn-spec-no').classList.toggle('active', val === false);
+        document.getElementById('specialreq-wrap').style.display = val ? 'block' : 'none';
+        if (!val) {
+            state.specialNotes = '';
+            document.getElementById('specialreq-text').value = '';
+        }
+    }
+
+    /* ===========================================================
+       WALL-EXCEEDED MODAL HANDLING
+    =========================================================== */
     function showModal() {
         document.getElementById('warning-modal').classList.add('active');
         state.modalActive = true;
@@ -541,117 +785,172 @@
         const cab = DB_CAB[state.cab];
         const hasCustomWall = state.wallW > 0 && state.wallH > 0;
         const hasTexture = state.bgTexture !== 'none';
-        
-        // Always work with effectively specified wall dimensions for modal scaling
+
         let effectiveWallW = hasCustomWall ? state.wallW : (hasTexture ? (state.cols * cab.w) + 2000 : 0);
         let effectiveWallH = hasCustomWall ? state.wallH : (hasTexture ? (state.rows * cab.h) + 1500 : 0);
 
         if (action === 'scale') {
-            // SCALE DOWN DISPLAY: Reduce cols and rows to fit wall
-            state.cols = Math.floor(effectiveWallW / cab.w);
-            state.rows = Math.floor(effectiveWallH / cab.h);
+            // SCALE DOWN DISPLAY: reduce cols/rows to fit the wall, always keeping at least 1x1
+            state.cols = Math.max(1, Math.floor(effectiveWallW / cab.w));
+            state.rows = Math.max(1, Math.floor(effectiveWallH / cab.h));
+
+            // Edge case: even a single cabinet is bigger than the specified wall.
+            // Auto-expand the wall instead of re-triggering the modal forever.
+            if (state.cols * cab.w > effectiveWallW || state.rows * cab.h > effectiveWallH) {
+                state.wallW = state.cols * cab.w;
+                state.wallH = state.rows * cab.h;
+                let unitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
+                let unitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
+                document.getElementById('wall-w').value = unitW;
+                document.getElementById('wall-h').value = unitH;
+            }
+
             document.getElementById('grid-cols').value = state.cols;
             document.getElementById('grid-rows').value = state.rows;
         } else if (action === 'expand') {
-            // AUTO-EXPAND WALL: Match LED size
+            // AUTO-EXPAND WALL: match the LED array size exactly
             state.wallW = state.cols * cab.w;
             state.wallH = state.rows * cab.h;
-            
+
             let unitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
             let unitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
             document.getElementById('wall-w').value = unitW;
             document.getElementById('wall-h').value = unitH;
         }
-        
+
         closeModal();
         calculateAll();
     }
 
+    /* ===========================================================
+       VIEWING DISTANCE GUIDE MODAL
+    =========================================================== */
+    function openVDModal() {
+        const body = document.getElementById('vd-table-body');
+        body.innerHTML = '';
+        ['indoor', 'outdoor'].forEach(env => {
+            DB_MODELS[env].forEach(p => {
+                const vd = getViewingDistance(p);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${modelName(env, p)}</td><td>${p} mm</td><td>${vd.min.toFixed(2)} m</td><td>${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m</td>`;
+                body.appendChild(tr);
+            });
+        });
+        document.getElementById('vd-modal').classList.add('active');
+    }
+
+    function closeVDModal() {
+        document.getElementById('vd-modal').classList.remove('active');
+    }
+
+    /* ===========================================================
+       MAIN CALCULATION
+    =========================================================== */
     function calculateAll() {
-        // Prevent recursive calls while modal is active
-        if (state.modalActive) return;
+        if (state.modalActive) return; // Prevent recursive calls while modal is active
 
         const cab = DB_CAB[state.cab];
-        const pitch = parseFloat(document.getElementById('pitch-select').value);
+        const pitch = parseFloat(document.getElementById('model-select').value);
 
         let totalW_mm = state.cols * cab.w;
         let totalH_mm = state.rows * cab.h;
+
+        // Wall-fit check runs FIRST, before any UI is touched, so the panels
+        // never show numbers for a configuration the user hasn't confirmed yet.
+        if (state.wallW > 0 && state.wallH > 0 && (totalW_mm > state.wallW || totalH_mm > state.wallH)) {
+            showModal();
+            return;
+        }
+
         let totalCabs = state.cols * state.rows;
-        
         let resW = Math.round(totalW_mm / pitch);
         let resH = Math.round(totalH_mm / pitch);
         let totalPx = resW * resH;
 
         let weightKg = totalCabs * cab.weight;
         let areaSqm = (totalW_mm / 1000) * (totalH_mm / 1000);
-        
+
         let dispW = state.unit === 'mm' ? totalW_mm : (totalW_mm / 25.4).toFixed(1);
         let dispH = state.unit === 'mm' ? totalH_mm : (totalH_mm / 25.4).toFixed(1);
         let dispWeight = state.unit === 'mm' ? `${weightKg.toFixed(1)} kg` : `${(weightKg * 2.20462).toFixed(1)} lbs`;
-        
+        let dispArea = state.unit === 'mm' ? `${areaSqm.toFixed(2)} sqm` : `${(areaSqm * 10.7639).toFixed(2)} sqft`;
+
         document.getElementById('target-w').value = dispW;
         document.getElementById('target-h').value = dispH;
+        document.getElementById('grid-cols').value = state.cols;
+        document.getElementById('grid-rows').value = state.rows;
 
-        // UI Updates
-        document.getElementById('badge-resolution').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} PX`;
-        document.getElementById('res-layout').innerText = `${state.cols} (W) x ${state.rows} (H)`;
-        document.getElementById('res-total-cabs').innerText = totalCabs;
-        document.getElementById('res-area').innerText = `${areaSqm.toFixed(2)} sqm`;
-        document.getElementById('res-weight').innerText = dispWeight;
-        
-        let diagInch = (Math.sqrt(totalW_mm**2 + totalH_mm**2) / 25.4).toFixed(1);
-        document.getElementById('res-diag').innerText = diagInch + '"';
+        let diagInch = (Math.sqrt(totalW_mm ** 2 + totalH_mm ** 2) / 25.4).toFixed(1);
 
         let ratioW = state.cols * 16;
         let ratioH = state.rows * 9;
         let divisor = getGCD(ratioW, ratioH);
-        document.getElementById('res-ratio').innerText = `${ratioW/divisor}:${ratioH/divisor}`;
+        let ratioTxt = `${ratioW / divisor}:${ratioH / divisor}`;
 
+        // Top info bar
+        document.getElementById('badge-diagonal').innerText = diagInch + '"';
+        document.getElementById('badge-resolution').innerText = `${resW.toLocaleString()} × ${resH.toLocaleString()} px`;
+        document.getElementById('badge-ratio').innerText = ratioTxt;
+
+        // Right panel — physical / optical
+        document.getElementById('res-layout').innerText = `${state.cols} (W) x ${state.rows} (H)`;
+        document.getElementById('res-total-cabs').innerText = totalCabs;
+        document.getElementById('res-area').innerText = dispArea;
+        document.getElementById('res-weight').innerText = dispWeight;
+        document.getElementById('res-diag').innerText = diagInch + '"';
+        document.getElementById('res-ratio').innerText = ratioTxt;
         document.getElementById('res-px').innerText = totalPx.toLocaleString();
         document.getElementById('res-power-max').innerText = ((totalCabs * cab.powerMax) / 1000).toFixed(2) + ' kW';
         document.getElementById('res-power-avg').innerText = ((totalCabs * cab.powerAvg) / 1000).toFixed(2) + ' kW';
 
-        // Processors
+        // Viewing distance
+        const vd = getViewingDistance(pitch);
+        document.getElementById('res-vd').innerText = `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
+
+        // Processing / hardware (based on 5G port capacity, consistent with the displayed metric)
+        let ports5G = Math.ceil(totalPx / CAP_NOVA_5G);
         let ports1G = Math.ceil(totalPx / CAP_NOVA_1G);
-        document.getElementById('res-nova-ports').innerText = Math.ceil(totalPx / CAP_NOVA_5G);
+        document.getElementById('res-nova-ports').innerText = ports5G;
         document.getElementById('res-brompton').innerText = Math.ceil(totalPx / CAP_BROM);
-        
-        let novaModel = ports1G <= 6 ? "VX600 Pro" : ports1G <= 10 ? "VX1000 Pro" : ports1G <= 20 ? "VX2000 Pro" : "H-Series";
+
+        let novaModel = ports5G <= 1 ? "VX600 Pro" : ports5G <= 2 ? "VX1000 Pro" : ports5G <= 4 ? "VX2000 Pro" : "H-Series";
         document.getElementById('res-nova').innerText = novaModel;
 
-        drawStage(totalW_mm, totalH_mm, dispW, dispH);
+        document.getElementById('res-sending').innerText = Math.max(1, ports1G);
+        document.getElementById('res-receiving').innerText = totalCabs;
+        document.getElementById('res-bracket').innerText = '1 SET';
+
+        updateModelDesc();
+        if (state.configMode === 'quick') renderQuickPresets();
+
+        drawStage(totalW_mm, totalH_mm, dispW, dispH, vd);
     }
 
-    function drawStage(ledW_mm, ledH_mm, dispW, dispH) {
+    /* ===========================================================
+       STAGE RENDERING
+    =========================================================== */
+    function drawStage(ledW_mm, ledH_mm, dispW, dispH, vd) {
         const stageWrapper = document.getElementById('stage-wrapper');
         const wallContainer = document.getElementById('wall-container');
         const bgWall = document.getElementById('mounting-wall');
         const grid = document.getElementById('wall-grid');
         const human = document.getElementById('human-svg');
         const stage = document.getElementById('stage-area');
-        
+
         let hasCustomWall = state.wallW > 0 && state.wallH > 0;
         let hasTexture = state.bgTexture !== 'none';
 
-        // CHECK IF LED EXCEEDS SPECIFIED WALL SIZE
-        if (hasCustomWall) {
-            if (ledW_mm > state.wallW || ledH_mm > state.wallH) {
-                showModal();
-                return; // Stop drawing until modal is handled
-            }
-        }
+        // Wall-fit validity was already checked in calculateAll() before this function runs.
 
-        // Se non viene dato un muro ma è richiesta una texture, genera un muro visivo di padding.
         let effectiveWallW = hasCustomWall ? state.wallW : (hasTexture ? ledW_mm + 2000 : 0);
         let effectiveWallH = hasCustomWall ? state.wallH : (hasTexture ? ledH_mm + 1500 : 0);
 
         let maxRenderW = Math.max(ledW_mm, effectiveWallW);
         let maxRenderH = Math.max(ledH_mm, effectiveWallH);
 
-        // Aumentato il margine di padding per fare spazio all'omino sulla SINISTRA
-        const stageMaxW = Math.max(100, stage.clientWidth - 320); // 320px for the man on the left
+        const stageMaxW = Math.max(100, stage.clientWidth - 320); // reserve room for the human figure + label on the left
         const stageMaxH = Math.max(100, stage.clientHeight - 200);
-        const BASE_SCALE = 160 / 1800; 
+        const BASE_SCALE = 160 / 1800;
 
         let preScaleW = maxRenderW * BASE_SCALE;
         let preScaleH = maxRenderH * BASE_SCALE;
@@ -664,12 +963,11 @@
         stageWrapper.style.width = (maxRenderW * BASE_SCALE * finalScale) + 'px';
         stageWrapper.style.height = (maxRenderH * BASE_SCALE * finalScale) + 'px';
 
-        // GESTIONE PARETE E TEXTURE
         if (hasCustomWall || hasTexture) {
             bgWall.style.display = 'block';
             bgWall.style.width = (effectiveWallW * BASE_SCALE * finalScale) + 'px';
             bgWall.style.height = (effectiveWallH * BASE_SCALE * finalScale) + 'px';
-            
+
             if (hasTexture) {
                 bgWall.style.backgroundImage = `url(${DB_WALLS[state.bgTexture]})`;
                 bgWall.style.backgroundSize = 'cover';
@@ -697,20 +995,23 @@
 
         wallContainer.style.width = (ledW_mm * BASE_SCALE * finalScale) + 'px';
         wallContainer.style.height = (ledH_mm * BASE_SCALE * finalScale) + 'px';
-        
+
         human.style.height = ((1800 * BASE_SCALE) * finalScale) + 'px';
 
         let unitTxt = state.unit.toUpperCase();
         document.getElementById('ruler-val-w').innerText = `${dispW} ${unitTxt}`;
         document.getElementById('ruler-val-h').innerText = `${dispH} ${unitTxt}`;
 
+        document.getElementById('vd-text-main').innerText = `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
+        document.getElementById('vd-text-sub').innerText = `Min. ${vd.min.toFixed(1)} m`;
+
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${state.cols}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${state.rows}, 1fr)`;
-        
+
         let totalCells = state.cols * state.rows;
-        if(totalCells < 2000) {
-            for(let i = 0; i < totalCells; i++) {
+        if (totalCells < 2000) {
+            for (let i = 0; i < totalCells; i++) {
                 const box = document.createElement('div');
                 box.className = 'cabinet-cell';
                 grid.appendChild(box);
@@ -718,27 +1019,87 @@
         }
     }
 
+    /* ===========================================================
+       EXPORT
+    =========================================================== */
+    function buildExportLines() {
+        const lines = [];
+        lines.push(['Series', `${state.env.toUpperCase()} (${state.cab}" Cabinet)`]);
+        lines.push(['Display Model', document.getElementById('model-select').selectedOptions[0].text]);
+        lines.push(['Configuration Mode', state.configMode === 'quick' ? 'Quick Configuration' : 'Custom Wall']);
+        lines.push(['Grid Layout', `${state.cols} Columns x ${state.rows} Rows`]);
+        lines.push(['Total Modules', `${state.cols * state.rows} Cabinets`]);
+        lines.push(['Dimensions', `${document.getElementById('target-w').value} x ${document.getElementById('target-h').value} ${state.unit}`]);
+        lines.push(['Mount Wall', state.wallW > 0 ? `${document.getElementById('wall-w').value} x ${document.getElementById('wall-h').value} ${state.unit}` : 'Not Specified']);
+        lines.push(['Display Area', document.getElementById('res-area').innerText]);
+        lines.push(['Total Weight', document.getElementById('res-weight').innerText]);
+        lines.push(['Aspect Ratio', document.getElementById('res-ratio').innerText]);
+        lines.push(['Resolution', document.getElementById('badge-resolution').innerText]);
+        lines.push(['Diagonal', document.getElementById('res-diag').innerText]);
+        lines.push(['Best Viewing Distance', document.getElementById('res-vd').innerText]);
+        lines.push(['Max Power Draw', document.getElementById('res-power-max').innerText]);
+        lines.push(['Avg Power Draw', document.getElementById('res-power-avg').innerText]);
+        lines.push(['Controller Required', state.requireController ? 'Yes' : 'No (customer-supplied)']);
+
+        if (state.requireController) {
+            lines.push(['Controller Model', document.getElementById('res-nova').innerText]);
+            lines.push(['Nova Ports (5G)', document.getElementById('res-nova-ports').innerText]);
+            lines.push(['Brompton Ports', document.getElementById('res-brompton').innerText]);
+            lines.push(['Sending Cards', document.getElementById('res-sending').innerText]);
+            lines.push(['Receiving Cards', document.getElementById('res-receiving').innerText]);
+            lines.push(['Mounting Brackets', document.getElementById('res-bracket').innerText]);
+        }
+
+        lines.push(['Special Requirements', state.specialRequirements ? (state.specialNotes || '(none specified)') : 'No']);
+        return lines;
+    }
+
     function exportConfiguration() {
-        const t = `PRIME-VIEW DIX-PLAY CONFIGURATION EXPORT\n` +
-                  `----------------------------------------\n` +
-                  `Series       : ${state.env.toUpperCase()} (${state.cab}" Cabinet)\n` +
-                  `Grid Layout  : ${state.cols} Columns x ${state.rows} Rows\n` +
-                  `Total Modules: ${state.cols * state.rows} Cabinets\n` +
-                  `Dimensions   : ${document.getElementById('target-w').value} x ${document.getElementById('target-h').value} ${state.unit}\n` +
-                  `Mount Wall   : ${state.wallW > 0 ? document.getElementById('wall-w').value + ' x ' + document.getElementById('wall-h').value + ' ' + state.unit : 'Not Specified'}\n` +
-                  `Display Area : ${document.getElementById('res-area').innerText}\n` +
-                  `Total Weight : ${document.getElementById('res-weight').innerText}\n` +
-                  `Aspect Ratio : ${document.getElementById('res-ratio').innerText}\n` +
-                  `Resolution   : ${document.getElementById('badge-resolution').innerText}\n` +
-                  `Max Power    : ${document.getElementById('res-power-max').innerText}\n` +
-                  `Avg Power    : ${document.getElementById('res-power-avg').innerText}\n` +
-                  `Controller   : ${document.getElementById('res-nova').innerText}\n`;
-                           
-        const blob = new Blob([t], {type: 'text/plain'});
+        const lines = buildExportLines();
+        let t = 'PRIMEVIEW DIX-PLAY CONFIGURATION EXPORT\n----------------------------------------\n';
+        lines.forEach(([l, v]) => { t += `${l.padEnd(22, ' ')}: ${v}\n`; });
+
+        const blob = new Blob([t], { type: 'text/plain' });
         const a = document.createElement('a');
         a.download = 'Primeview_LED_Configuration.txt';
         a.href = window.URL.createObjectURL(blob);
         a.click();
+    }
+
+    function exportPDF() {
+        if (!window.jspdf) {
+            alert('PDF library could not be loaded (check your internet connection). Use "Download Config" for a TXT export instead.');
+            return;
+        }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFillColor(227, 30, 36);
+        doc.rect(0, 0, 210, 24, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.text('PRIMEVIEW GLOBAL', 14, 12);
+        doc.setFontSize(10);
+        doc.text('Dix-Play LED Configuration — Export Summary', 14, 19);
+
+        doc.setTextColor(20, 20, 20);
+        let y = 36;
+        doc.setFontSize(11);
+        buildExportLines().forEach(([label, val]) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(label + ':', 14, y);
+            doc.setFont(undefined, 'normal');
+            const valText = doc.splitTextToSize(String(val), 110);
+            doc.text(valText, 80, y);
+            y += 7 * valText.length;
+            if (y > 280) { doc.addPage(); y = 20; }
+        });
+
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Specifications are indicative and subject to engineering review. Generated by the Primeview Global Configurator.', 14, 290);
+
+        doc.save('Primeview_LED_Configuration.pdf');
     }
 </script>
 
