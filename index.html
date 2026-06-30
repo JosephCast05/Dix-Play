@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primeview Global | Dix-Play LED Configurator</title>
+    <title>Primeview Global | Dix-Play LED Configurator V2.2</title>
     <style>
         :root {
             --pv-red: #e31e24;
@@ -71,10 +71,8 @@
         /* --- CENTER STAGE --- */
         .stage {
             flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
-            background-color: #050505; background-size: cover; background-position: center; transition: background 0.3s ease;
+            background-color: #050505;
         }
-        .stage-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.1); pointer-events: none; transition: background 0.3s; }
-        .stage.has-texture .stage-overlay { background: rgba(0,0,0,0.6); }
 
         .resolution-badge {
             position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 30;
@@ -86,8 +84,14 @@
         
         .stage-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
         
-        .mounting-wall { position: absolute; border: 2px dashed #888; background: rgba(255,255,255,0.05); display: none; z-index: 5; }
-        .mounting-wall.active { display: block; }
+        .mounting-wall { 
+            position: absolute; 
+            background: rgba(255,255,255,0.03); 
+            display: none; 
+            z-index: 5; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
         .wall-lbl-w { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
         .wall-lbl-h { position: absolute; right: -50px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
         
@@ -105,17 +109,41 @@
         .ruler-h { border-width: 1px 1px 1px 0; width: 16px; right: -30px; top: 0; height: 100%; }
         .ruler-h span { transform: translateX(35px) rotate(90deg); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; white-space: nowrap; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
 
-        /* OMINO RIPARATO: Ora è attaccato alla base e di fianco allo schermo/muro */
+        /* OMINO SPOSTATO A SINISTRA E VICINO AL MURO */
         .human-scale { 
             position: absolute; 
             bottom: 0; 
-            right: -70px; /* Sta 70px a destra della struttura */
+            left: -110px; /* Sta a sinistra della struttura per non coprire i dati a destra */
             opacity: 0.8; 
             z-index: 50; 
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); 
             transition: height 0.3s; 
             pointer-events: none; 
         }
+
+        /* --- POPUP MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: var(--pv-panel); width: 480px; padding: 30px; border-radius: 12px;
+            border: 2px solid var(--pv-red); box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            text-align: center; display: flex; flex-direction: column; gap: 20px;
+        }
+        .modal-icon { font-size: 4rem; color: var(--pv-red); }
+        .modal-title { font-size: 1.5rem; font-weight: 800; color: var(--pv-highlight); }
+        .modal-text { font-size: 0.95rem; line-height: 1.6; color: #aaa; }
+        .modal-actions { display: flex; gap: 15px; margin-top: 10px; }
+        .modal-btn {
+            flex: 1; padding: 14px; border: none; border-radius: 6px; cursor: pointer;
+            font-weight: 700; font-size: 0.9rem; transition: 0.2s;
+        }
+        .btn-scale { background: #222; color: #fff; border: 1px solid #444; }
+        .btn-scale:hover { background: #333; border-color: #666; }
+        .btn-expand { background: var(--pv-red); color: #fff; }
+        .btn-expand:hover { background: #c11216; }
 
         /* --- RIGHT PANEL: RESULTS --- */
         .panel-right {
@@ -263,11 +291,9 @@
         </aside>
 
         <main class="stage" id="stage-area">
-            <div class="stage-overlay"></div>
             <div class="resolution-badge" id="badge-resolution">0 x 0 px</div>
 
             <div class="render-area">
-                
                 <div class="stage-wrapper" id="stage-wrapper">
                     
                     <div class="mounting-wall" id="mounting-wall">
@@ -289,7 +315,6 @@
                         <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
                     </svg>
                 </div>
-
             </div>
         </main>
 
@@ -342,6 +367,20 @@
         </aside>
     </div>
 
+    <div class="modal-overlay" id="warning-modal">
+        <div class="modal-card">
+            <div class="modal-icon">⚠</div>
+            <div class="modal-title">WARNING: DISPLAY EXCEEDS WALL SIZE</div>
+            <div class="modal-text">
+                The configured LED display wall size is currently larger than the specified mounting wall dimensions. Please select how you would like to proceed.
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-scale" onclick="handleModalAction('scale')">SCALE DOWN DISPLAY</button>
+                <button class="modal-btn btn-expand" onclick="handleModalAction('expand')">AUTO-EXPAND WALL</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     const DB_PITCH = { indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5], outdoor: [2.6, 2.9, 3.9, 4.8, 6.0] };
     const DB_CAB = {
@@ -368,7 +407,9 @@
         rows: 3,
         wallW: 0,
         wallH: 0,
-        showRulers: true
+        bgTexture: 'none',
+        showRulers: true,
+        modalActive: false // Flag to prevent recursion
     };
 
     function getGCD(a, b) { return b === 0 ? a : getGCD(b, a % b); }
@@ -422,14 +463,8 @@
     }
 
     function setBackground(val) {
-        const stage = document.getElementById('stage-area');
-        if (val === 'none') {
-            stage.style.backgroundImage = '';
-            stage.classList.remove('has-texture');
-        } else {
-            stage.style.backgroundImage = `url(${DB_WALLS[val]})`;
-            stage.classList.add('has-texture');
-        }
+        state.bgTexture = val;
+        calculateAll();
     }
 
     function setMedia(val) {
@@ -491,7 +526,51 @@
         calculateAll();
     }
 
+    // MODAL HANDLING LOGIC
+    function showModal() {
+        document.getElementById('warning-modal').classList.add('active');
+        state.modalActive = true;
+    }
+
+    function closeModal() {
+        document.getElementById('warning-modal').classList.remove('active');
+        state.modalActive = false;
+    }
+
+    function handleModalAction(action) {
+        const cab = DB_CAB[state.cab];
+        const hasCustomWall = state.wallW > 0 && state.wallH > 0;
+        const hasTexture = state.bgTexture !== 'none';
+        
+        // Always work with effectively specified wall dimensions for modal scaling
+        let effectiveWallW = hasCustomWall ? state.wallW : (hasTexture ? (state.cols * cab.w) + 2000 : 0);
+        let effectiveWallH = hasCustomWall ? state.wallH : (hasTexture ? (state.rows * cab.h) + 1500 : 0);
+
+        if (action === 'scale') {
+            // SCALE DOWN DISPLAY: Reduce cols and rows to fit wall
+            state.cols = Math.floor(effectiveWallW / cab.w);
+            state.rows = Math.floor(effectiveWallH / cab.h);
+            document.getElementById('grid-cols').value = state.cols;
+            document.getElementById('grid-rows').value = state.rows;
+        } else if (action === 'expand') {
+            // AUTO-EXPAND WALL: Match LED size
+            state.wallW = state.cols * cab.w;
+            state.wallH = state.rows * cab.h;
+            
+            let unitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
+            let unitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
+            document.getElementById('wall-w').value = unitW;
+            document.getElementById('wall-h').value = unitH;
+        }
+        
+        closeModal();
+        calculateAll();
+    }
+
     function calculateAll() {
+        // Prevent recursive calls while modal is active
+        if (state.modalActive) return;
+
         const cab = DB_CAB[state.cab];
         const pitch = parseFloat(document.getElementById('pitch-select').value);
 
@@ -513,6 +592,7 @@
         document.getElementById('target-w').value = dispW;
         document.getElementById('target-h').value = dispH;
 
+        // UI Updates
         document.getElementById('badge-resolution').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} PX`;
         document.getElementById('res-layout').innerText = `${state.cols} (W) x ${state.rows} (H)`;
         document.getElementById('res-total-cabs').innerText = totalCabs;
@@ -531,6 +611,7 @@
         document.getElementById('res-power-max').innerText = ((totalCabs * cab.powerMax) / 1000).toFixed(2) + ' kW';
         document.getElementById('res-power-avg').innerText = ((totalCabs * cab.powerAvg) / 1000).toFixed(2) + ' kW';
 
+        // Processors
         let ports1G = Math.ceil(totalPx / CAP_NOVA_1G);
         document.getElementById('res-nova-ports').innerText = Math.ceil(totalPx / CAP_NOVA_5G);
         document.getElementById('res-brompton').innerText = Math.ceil(totalPx / CAP_BROM);
@@ -549,11 +630,26 @@
         const human = document.getElementById('human-svg');
         const stage = document.getElementById('stage-area');
         
-        let maxRenderW = Math.max(ledW_mm, state.wallW);
-        let maxRenderH = Math.max(ledH_mm, state.wallH);
+        let hasCustomWall = state.wallW > 0 && state.wallH > 0;
+        let hasTexture = state.bgTexture !== 'none';
 
-        // Aumentato il margine di padding per fare spazio all'omino sulla destra
-        const stageMaxW = Math.max(100, stage.clientWidth - 280); 
+        // CHECK IF LED EXCEEDS SPECIFIED WALL SIZE
+        if (hasCustomWall) {
+            if (ledW_mm > state.wallW || ledH_mm > state.wallH) {
+                showModal();
+                return; // Stop drawing until modal is handled
+            }
+        }
+
+        // Se non viene dato un muro ma è richiesta una texture, genera un muro visivo di padding.
+        let effectiveWallW = hasCustomWall ? state.wallW : (hasTexture ? ledW_mm + 2000 : 0);
+        let effectiveWallH = hasCustomWall ? state.wallH : (hasTexture ? ledH_mm + 1500 : 0);
+
+        let maxRenderW = Math.max(ledW_mm, effectiveWallW);
+        let maxRenderH = Math.max(ledH_mm, effectiveWallH);
+
+        // Aumentato il margine di padding per fare spazio all'omino sulla SINISTRA
+        const stageMaxW = Math.max(100, stage.clientWidth - 320); // 320px for the man on the left
         const stageMaxH = Math.max(100, stage.clientHeight - 200);
         const BASE_SCALE = 160 / 1800; 
 
@@ -568,17 +664,35 @@
         stageWrapper.style.width = (maxRenderW * BASE_SCALE * finalScale) + 'px';
         stageWrapper.style.height = (maxRenderH * BASE_SCALE * finalScale) + 'px';
 
-        if (state.wallW > 0 && state.wallH > 0) {
-            bgWall.style.width = (state.wallW * BASE_SCALE * finalScale) + 'px';
-            bgWall.style.height = (state.wallH * BASE_SCALE * finalScale) + 'px';
-            bgWall.classList.add('active');
+        // GESTIONE PARETE E TEXTURE
+        if (hasCustomWall || hasTexture) {
+            bgWall.style.display = 'block';
+            bgWall.style.width = (effectiveWallW * BASE_SCALE * finalScale) + 'px';
+            bgWall.style.height = (effectiveWallH * BASE_SCALE * finalScale) + 'px';
             
-            let wallUnitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
-            let wallUnitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
-            document.getElementById('lbl-wall-w').innerText = `${wallUnitW} ${state.unit.toUpperCase()}`;
-            document.getElementById('lbl-wall-h').innerText = `${wallUnitH} ${state.unit.toUpperCase()}`;
+            if (hasTexture) {
+                bgWall.style.backgroundImage = `url(${DB_WALLS[state.bgTexture]})`;
+                bgWall.style.backgroundSize = 'cover';
+                bgWall.style.backgroundPosition = 'center';
+                bgWall.style.border = hasCustomWall ? '2px dashed #888' : '1px solid #333';
+            } else {
+                bgWall.style.backgroundImage = '';
+                bgWall.style.border = '2px dashed #888';
+            }
+
+            if (hasCustomWall) {
+                document.getElementById('lbl-wall-w').style.display = 'block';
+                document.getElementById('lbl-wall-h').style.display = 'block';
+                let wallUnitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
+                let wallUnitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
+                document.getElementById('lbl-wall-w').innerText = `${wallUnitW} ${state.unit.toUpperCase()}`;
+                document.getElementById('lbl-wall-h').innerText = `${wallUnitH} ${state.unit.toUpperCase()}`;
+            } else {
+                document.getElementById('lbl-wall-w').style.display = 'none';
+                document.getElementById('lbl-wall-h').style.display = 'none';
+            }
         } else {
-            bgWall.classList.remove('active');
+            bgWall.style.display = 'none';
         }
 
         wallContainer.style.width = (ledW_mm * BASE_SCALE * finalScale) + 'px';
