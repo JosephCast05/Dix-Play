@@ -82,8 +82,8 @@
             font-weight: 800; font-size: 1.25rem; box-shadow: 0 8px 24px rgba(227,30,36,0.3); letter-spacing: 1px;
         }
 
-        /* V2.1 Fix: Stage Wrapper per unificare scalatura e non far volare via gli elementi */
         .render-area { position: relative; z-index: 10; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        
         .stage-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
         
         .mounting-wall { position: absolute; border: 2px dashed #888; background: rgba(255,255,255,0.05); display: none; z-index: 5; }
@@ -91,7 +91,7 @@
         .wall-lbl-w { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
         .wall-lbl-h { position: absolute; right: -50px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
         
-        .led-wall-container { position: absolute; background: #000; box-shadow: 0 20px 80px rgba(0,0,0,0.8); z-index: 15; }
+        .led-wall-container { position: absolute; background: #000; box-shadow: 0 20px 80px rgba(0,0,0,0.9); z-index: 15; }
         
         .media-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: none; z-index: 1; }
         .grid-layer { position: absolute; inset: 0; display: grid; z-index: 2; border: 2px solid #444; }
@@ -101,11 +101,21 @@
         .ruler { position: absolute; border: 1px solid var(--pv-red); display: none; align-items: center; justify-content: center; z-index: 20; pointer-events: none; }
         .ruler.active { display: flex; }
         .ruler-w { border-width: 0 1px 1px 1px; height: 16px; top: -30px; left: 0; width: 100%; }
-        .ruler-w span { transform: translateY(-22px); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; background: rgba(0,0,0,0.8); padding: 2px 8px; border-radius: 4px; }
+        .ruler-w span { transform: translateY(-22px); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
         .ruler-h { border-width: 1px 1px 1px 0; width: 16px; right: -30px; top: 0; height: 100%; }
-        .ruler-h span { transform: translateX(35px) rotate(90deg); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; white-space: nowrap; background: rgba(0,0,0,0.8); padding: 2px 8px; border-radius: 4px; }
+        .ruler-h span { transform: translateX(35px) rotate(90deg); color: var(--pv-red); font-weight: 700; font-size: 0.9rem; white-space: nowrap; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; }
 
-        .human-scale { position: absolute; bottom: 20px; right: 40px; opacity: 0.7; z-index: 50; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); transition: height 0.3s; pointer-events: none; }
+        /* OMINO RIPARATO: Ora è attaccato alla base e di fianco allo schermo/muro */
+        .human-scale { 
+            position: absolute; 
+            bottom: 0; 
+            right: -70px; /* Sta 70px a destra della struttura */
+            opacity: 0.8; 
+            z-index: 50; 
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); 
+            transition: height 0.3s; 
+            pointer-events: none; 
+        }
 
         /* --- RIGHT PANEL: RESULTS --- */
         .panel-right {
@@ -203,24 +213,24 @@
                 <div class="control-label">Target LED Dimensions (Auto-Fit)</div>
                 <div class="dim-inputs" style="margin-bottom: 12px;">
                     <div class="dim-wrapper">
+                        <span id="lbl-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Width (mm)</span>
                         <input type="number" id="target-w" placeholder="Target Width" oninput="calculateFromDimensions()">
-                        <span id="lbl-w-unit" style="font-size: 0.7rem; color: #777; text-align: right;">LED Width (mm)</span>
                     </div>
                     <div class="dim-wrapper">
+                        <span id="lbl-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Height (mm)</span>
                         <input type="number" id="target-h" placeholder="Target Height" oninput="calculateFromDimensions()">
-                        <span id="lbl-h-unit" style="font-size: 0.7rem; color: #777; text-align: right;">LED Height (mm)</span>
                     </div>
                 </div>
 
                 <div class="control-label">Mounting Wall Surface (Optional)</div>
                 <div class="dim-inputs">
                     <div class="dim-wrapper">
+                        <span id="lbl-wall-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Width (mm)</span>
                         <input type="number" id="wall-w" placeholder="Wall Width" oninput="updateWallInput()">
-                        <span id="lbl-wall-w-unit" style="font-size: 0.7rem; color: #777; text-align: right;">Wall Width (mm)</span>
                     </div>
                     <div class="dim-wrapper">
+                        <span id="lbl-wall-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Height (mm)</span>
                         <input type="number" id="wall-h" placeholder="Wall Height" oninput="updateWallInput()">
-                        <span id="lbl-wall-h-unit" style="font-size: 0.7rem; color: #777; text-align: right;">Wall Height (mm)</span>
                     </div>
                 </div>
             </div>
@@ -274,11 +284,12 @@
                         
                         <div class="grid-layer" id="wall-grid"></div>
                     </div>
+
+                    <svg class="human-scale" id="human-svg" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
+                    </svg>
                 </div>
 
-                <svg class="human-scale" id="human-svg" viewBox="0 0 320 700" fill="#aaaaaa" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M160 120C193.137 120 220 93.1371 220 60C220 26.8629 193.137 0 160 0C126.863 0 100 26.8629 100 60C100 93.1371 126.863 120 160 120ZM242.5 150H77.5C51.2665 150 30 171.266 30 197.5V360C30 376.569 43.4315 390 60 390C76.5685 390 90 376.569 90 360V250H100V670C100 686.569 113.431 700 130 700C146.569 700 160 686.569 160 670V480H160.1V670C160.1 686.569 173.531 700 190 700C206.469 700 220 686.569 220 670V250H230V360C230 376.569 243.431 390 260 390C276.569 390 290 376.569 290 360V197.5C290 171.266 268.734 150 242.5 150Z"/>
-                </svg>
             </div>
         </main>
 
@@ -310,7 +321,9 @@
                 <div class="data-row"><span class="data-lbl">Brompton Ports</span><span class="data-val" id="res-brompton">0</span></div>
             </div>
 
-            <div style="flex: 1;"></div> <button class="btn-action" onclick="exportConfiguration()">
+            <div style="flex: 1;"></div>
+
+            <button class="btn-action" onclick="exportConfiguration()">
                 <span class="btn-icon">⬇</span>
                 <div class="btn-text">
                     <h4>Download Config</h4>
@@ -330,7 +343,6 @@
     </div>
 
 <script>
-    // --- DATABASE ---
     const DB_PITCH = { indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5], outdoor: [2.6, 2.9, 3.9, 4.8, 6.0] };
     const DB_CAB = {
         '27': { w: 600, h: 337.5, weight: 4.8, powerMax: 80, powerAvg: 27 },
@@ -348,7 +360,6 @@
     const CAP_NOVA_5G = 5000000;
     const CAP_BROM = 524000;
 
-    // --- STATE ---
     let state = {
         unit: 'mm',
         env: 'indoor',
@@ -360,17 +371,13 @@
         showRulers: true
     };
 
-    // --- MATH HELPERS ---
-    // Calcola il Massimo Comune Divisore per restituire sempre e solo Numeri Interi nell'Aspect Ratio
     function getGCD(a, b) { return b === 0 ? a : getGCD(b, a % b); }
 
-    // --- INITIALIZATION ---
     window.onload = () => {
         updatePitchDropdown();
         calculateAll();
     };
 
-    // --- UI INTERACTION FUNCTIONS ---
     function setUnit(u) {
         state.unit = u;
         document.getElementById('btn-unit-mm').classList.toggle('active', u === 'mm');
@@ -382,7 +389,6 @@
         document.getElementById('lbl-wall-w-unit').innerText = `Wall Width ${unitTxt}`;
         document.getElementById('lbl-wall-h-unit').innerText = `Wall Height ${unitTxt}`;
         
-        // Converte i valori del muro visivamente negli input
         if(state.wallW > 0) document.getElementById('wall-w').value = (u === 'mm') ? Math.round(state.wallW) : (state.wallW / 25.4).toFixed(1);
         if(state.wallH > 0) document.getElementById('wall-h').value = (u === 'mm') ? Math.round(state.wallH) : (state.wallH / 25.4).toFixed(1);
 
@@ -451,7 +457,6 @@
         }
     }
 
-    // --- CORE LOGIC ---
     function adjustGrid(axis, delta) {
         state[axis] = Math.max(1, state[axis] + delta);
         document.getElementById('grid-' + axis).value = state[axis];
@@ -462,7 +467,7 @@
         let inW = parseFloat(document.getElementById('target-w').value);
         let inH = parseFloat(document.getElementById('target-h').value);
         
-        if (state.unit === 'in') { inW *= 25.4; inH *= 25.4; } // Lavoriamo sempre in MM
+        if (state.unit === 'in') { inW *= 25.4; inH *= 25.4; }
         
         let cabW = DB_CAB[state.cab].w;
         let cabH = DB_CAB[state.cab].h;
@@ -508,7 +513,6 @@
         document.getElementById('target-w').value = dispW;
         document.getElementById('target-h').value = dispH;
 
-        // UI Updates
         document.getElementById('badge-resolution').innerText = `${resW.toLocaleString()} x ${resH.toLocaleString()} PX`;
         document.getElementById('res-layout').innerText = `${state.cols} (W) x ${state.rows} (H)`;
         document.getElementById('res-total-cabs').innerText = totalCabs;
@@ -518,7 +522,6 @@
         let diagInch = (Math.sqrt(totalW_mm**2 + totalH_mm**2) / 25.4).toFixed(1);
         document.getElementById('res-diag').innerText = diagInch + '"';
 
-        // ASPECT RATIO INTERO PERFETTO (Usa la logica dei cabinet base 16x9)
         let ratioW = state.cols * 16;
         let ratioH = state.rows * 9;
         let divisor = getGCD(ratioW, ratioH);
@@ -528,7 +531,6 @@
         document.getElementById('res-power-max').innerText = ((totalCabs * cab.powerMax) / 1000).toFixed(2) + ' kW';
         document.getElementById('res-power-avg').innerText = ((totalCabs * cab.powerAvg) / 1000).toFixed(2) + ' kW';
 
-        // Processors
         let ports1G = Math.ceil(totalPx / CAP_NOVA_1G);
         document.getElementById('res-nova-ports').innerText = Math.ceil(totalPx / CAP_NOVA_5G);
         document.getElementById('res-brompton').innerText = Math.ceil(totalPx / CAP_BROM);
@@ -547,13 +549,13 @@
         const human = document.getElementById('human-svg');
         const stage = document.getElementById('stage-area');
         
-        // Stabilisce la scatola massima (LED o Parete)
         let maxRenderW = Math.max(ledW_mm, state.wallW);
         let maxRenderH = Math.max(ledH_mm, state.wallH);
 
-        const stageMaxW = Math.max(100, stage.clientWidth - 200);
+        // Aumentato il margine di padding per fare spazio all'omino sulla destra
+        const stageMaxW = Math.max(100, stage.clientWidth - 280); 
         const stageMaxH = Math.max(100, stage.clientHeight - 200);
-        const BASE_SCALE = 160 / 1800; // Human base scale (1800mm -> 160px)
+        const BASE_SCALE = 160 / 1800; 
 
         let preScaleW = maxRenderW * BASE_SCALE;
         let preScaleH = maxRenderH * BASE_SCALE;
@@ -563,11 +565,9 @@
             finalScale = Math.min(stageMaxW / preScaleW, stageMaxH / preScaleH);
         }
 
-        // Applica le dimensioni allo stage-wrapper così muro e LED rimangono perfettamente sovrapposti al centro
         stageWrapper.style.width = (maxRenderW * BASE_SCALE * finalScale) + 'px';
         stageWrapper.style.height = (maxRenderH * BASE_SCALE * finalScale) + 'px';
 
-        // Dimensioni fisiche Muro di Montaggio
         if (state.wallW > 0 && state.wallH > 0) {
             bgWall.style.width = (state.wallW * BASE_SCALE * finalScale) + 'px';
             bgWall.style.height = (state.wallH * BASE_SCALE * finalScale) + 'px';
@@ -581,19 +581,15 @@
             bgWall.classList.remove('active');
         }
 
-        // Dimensioni fisiche LED Wall
         wallContainer.style.width = (ledW_mm * BASE_SCALE * finalScale) + 'px';
         wallContainer.style.height = (ledH_mm * BASE_SCALE * finalScale) + 'px';
         
-        // Figura umana (slegata dal wrapper, ancorata in basso a destra dello schermo intero)
         human.style.height = ((1800 * BASE_SCALE) * finalScale) + 'px';
 
-        // Update Ruler Texts (Testo dei righelli Rossi)
         let unitTxt = state.unit.toUpperCase();
         document.getElementById('ruler-val-w').innerText = `${dispW} ${unitTxt}`;
         document.getElementById('ruler-val-h').innerText = `${dispH} ${unitTxt}`;
 
-        // Genera la griglia dei Cabinet
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${state.cols}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${state.rows}, 1fr)`;
