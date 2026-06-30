@@ -536,6 +536,11 @@
     const CAP_NOVA_5G = 5000000;
     const CAP_BROM = 524000;
 
+    // Default backdrop padding when no custom wall size is specified — proportional
+    // (not fixed mm) so the wall keeps a sensible visual size at any LED scale.
+    const AUTO_WALL_PAD_W = 1.4;
+    const AUTO_WALL_PAD_H = 1.5;
+
     let state = {
         unit: 'mm',
         env: 'indoor',
@@ -942,8 +947,8 @@
 
         // Wall-fit validity was already checked in calculateAll() before this function runs.
 
-        let effectiveWallW = hasCustomWall ? state.wallW : (hasTexture ? ledW_mm + 2000 : 0);
-        let effectiveWallH = hasCustomWall ? state.wallH : (hasTexture ? ledH_mm + 1500 : 0);
+        let effectiveWallW = hasCustomWall ? state.wallW : ledW_mm * AUTO_WALL_PAD_W;
+        let effectiveWallH = hasCustomWall ? state.wallH : ledH_mm * AUTO_WALL_PAD_H;
 
         let maxRenderW = Math.max(ledW_mm, effectiveWallW);
         let maxRenderH = Math.max(ledH_mm, effectiveWallH);
@@ -963,34 +968,33 @@
         stageWrapper.style.width = (maxRenderW * BASE_SCALE * finalScale) + 'px';
         stageWrapper.style.height = (maxRenderH * BASE_SCALE * finalScale) + 'px';
 
-        if (hasCustomWall || hasTexture) {
-            bgWall.style.display = 'block';
-            bgWall.style.width = (effectiveWallW * BASE_SCALE * finalScale) + 'px';
-            bgWall.style.height = (effectiveWallH * BASE_SCALE * finalScale) + 'px';
+        // The backdrop wall is now ALWAYS shown (proportionally sized) so the human
+        // figure is never left looking oversized next to an unpadded LED panel.
+        bgWall.style.display = 'block';
+        bgWall.style.width = (effectiveWallW * BASE_SCALE * finalScale) + 'px';
+        bgWall.style.height = (effectiveWallH * BASE_SCALE * finalScale) + 'px';
 
-            if (hasTexture) {
-                bgWall.style.backgroundImage = `url(${DB_WALLS[state.bgTexture]})`;
-                bgWall.style.backgroundSize = 'cover';
-                bgWall.style.backgroundPosition = 'center';
-                bgWall.style.border = hasCustomWall ? '2px dashed #888' : '1px solid #333';
-            } else {
-                bgWall.style.backgroundImage = '';
-                bgWall.style.border = '2px dashed #888';
-            }
-
-            if (hasCustomWall) {
-                document.getElementById('lbl-wall-w').style.display = 'block';
-                document.getElementById('lbl-wall-h').style.display = 'block';
-                let wallUnitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
-                let wallUnitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
-                document.getElementById('lbl-wall-w').innerText = `${wallUnitW} ${state.unit.toUpperCase()}`;
-                document.getElementById('lbl-wall-h').innerText = `${wallUnitH} ${state.unit.toUpperCase()}`;
-            } else {
-                document.getElementById('lbl-wall-w').style.display = 'none';
-                document.getElementById('lbl-wall-h').style.display = 'none';
-            }
+        if (hasTexture) {
+            bgWall.style.backgroundImage = `url(${DB_WALLS[state.bgTexture]})`;
+            bgWall.style.backgroundSize = 'cover';
+            bgWall.style.backgroundPosition = 'center';
+            bgWall.style.border = hasCustomWall ? '2px dashed #888' : '1px solid #333';
         } else {
-            bgWall.style.display = 'none';
+            bgWall.style.backgroundImage = '';
+            bgWall.style.background = 'rgba(255,255,255,0.04)';
+            bgWall.style.border = hasCustomWall ? '2px dashed #888' : '1px solid #333';
+        }
+
+        if (hasCustomWall) {
+            document.getElementById('lbl-wall-w').style.display = 'block';
+            document.getElementById('lbl-wall-h').style.display = 'block';
+            let wallUnitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
+            let wallUnitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
+            document.getElementById('lbl-wall-w').innerText = `${wallUnitW} ${state.unit.toUpperCase()}`;
+            document.getElementById('lbl-wall-h').innerText = `${wallUnitH} ${state.unit.toUpperCase()}`;
+        } else {
+            document.getElementById('lbl-wall-w').style.display = 'none';
+            document.getElementById('lbl-wall-h').style.display = 'none';
         }
 
         wallContainer.style.width = (ledW_mm * BASE_SCALE * finalScale) + 'px';
