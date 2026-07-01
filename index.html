@@ -87,7 +87,7 @@
 
         /* --- CENTER STAGE --- */
         .stage {
-            flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+            flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: visible;
             background-color: #050505;
         }
 
@@ -132,7 +132,7 @@
         .human-scale {
             position: absolute;
             bottom: 0;
-            left: -110px;
+            left: 0; /* overridden dynamically in drawStage() */
             opacity: 0.8;
             z-index: 50;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
@@ -141,7 +141,7 @@
         }
 
         .viewing-label {
-            position: absolute; bottom: 4px; left: -300px; width: 140px; z-index: 51;
+            position: absolute; bottom: 4px; left: 0; /* overridden dynamically */ width: 100px; z-index: 51;
             background: rgba(0,0,0,0.78); border: 1px solid var(--pv-red); border-radius: 6px;
             padding: 8px 10px; text-align: center; pointer-events: none;
         }
@@ -571,6 +571,19 @@
         return { min: pitchMm * 1, comfMin: pitchMm * 2.5, comfMax: pitchMm * 3.0 };
     }
 
+    // Imperial helpers
+    // Large dimensions (LED width/height, wall) → feet decimal for input fields
+    function mmToFt(mm) { return (mm / 304.8).toFixed(2); }
+    // Display label: X' Y.Y" for dimensions (rulers, wall labels, export)
+    function formatImperial(mm) {
+        const totalIn = mm / 25.4;
+        const ft = Math.floor(totalIn / 12);
+        const inches = (totalIn % 12).toFixed(1);
+        return ft > 0 ? `${ft}' ${inches}"` : `${inches}"`;
+    }
+    // Meters → feet (viewing distance)
+    function mToFt(m) { return (m * 3.28084).toFixed(1); }
+
     window.onload = () => {
         updateModelDropdown();
         calculateAll();
@@ -591,14 +604,15 @@
         document.getElementById('nav-unit-mm').classList.toggle('active', u === 'mm');
         document.getElementById('nav-unit-in').classList.toggle('active', u === 'in');
 
-        let unitTxt = `(${u})`;
-        document.getElementById('lbl-w-unit').innerText = `LED Width ${unitTxt}`;
-        document.getElementById('lbl-h-unit').innerText = `LED Height ${unitTxt}`;
-        document.getElementById('lbl-wall-w-unit').innerText = `Wall Width ${unitTxt}`;
-        document.getElementById('lbl-wall-h-unit').innerText = `Wall Height ${unitTxt}`;
+        const unitLbl = u === 'mm' ? '(mm)' : '(ft)';
+        document.getElementById('lbl-w-unit').innerText = `LED Width ${unitLbl}`;
+        document.getElementById('lbl-h-unit').innerText = `LED Height ${unitLbl}`;
+        document.getElementById('lbl-wall-w-unit').innerText = `Wall Width ${unitLbl}`;
+        document.getElementById('lbl-wall-h-unit').innerText = `Wall Height ${unitLbl}`;
 
-        if (state.wallW > 0) document.getElementById('wall-w').value = (u === 'mm') ? Math.round(state.wallW) : (state.wallW / 25.4).toFixed(1);
-        if (state.wallH > 0) document.getElementById('wall-h').value = (u === 'mm') ? Math.round(state.wallH) : (state.wallH / 25.4).toFixed(1);
+        // Convert existing wall values to the new unit
+        if (state.wallW > 0) document.getElementById('wall-w').value = u === 'mm' ? Math.round(state.wallW) : mmToFt(state.wallW);
+        if (state.wallH > 0) document.getElementById('wall-h').value = u === 'mm' ? Math.round(state.wallH) : mmToFt(state.wallH);
 
         calculateAll();
     }
@@ -639,8 +653,11 @@
     function updateModelDesc() {
         const pitch = parseFloat(document.getElementById('model-select').value);
         const vd = getViewingDistance(pitch);
+        const imp = state.unit === 'in';
+        const minStr  = imp ? `${mToFt(vd.min)} ft`  : `${vd.min.toFixed(1)} m`;
+        const comfStr = imp ? `${mToFt(vd.comfMin)}–${mToFt(vd.comfMax)} ft` : `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
         document.getElementById('model-desc').innerHTML =
-            `<b>${modelName(state.env, pitch)}</b>Min. viewing distance: ${vd.min.toFixed(1)}m · Comfortable: ${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)}m`;
+            `<b>${modelName(state.env, pitch)}</b>Min. viewing distance: ${minStr} · Comfortable: ${comfStr}`;
     }
 
     /* ===========================================================
@@ -660,12 +677,15 @@
         const wrap = document.getElementById('quick-presets-wrap');
         wrap.innerHTML = '';
         QUICK_PRESETS.forEach(p => {
-            const w = state.unit === 'mm' ? Math.round(p.cols * cab.w) : (p.cols * cab.w / 25.4).toFixed(1);
-            const h = state.unit === 'mm' ? Math.round(p.rows * cab.h) : (p.rows * cab.h / 25.4).toFixed(1);
+            const wMm = p.cols * cab.w;
+            const hMm = p.rows * cab.h;
+            const wDisp = state.unit === 'mm' ? Math.round(wMm) : mmToFt(wMm);
+            const hDisp = state.unit === 'mm' ? Math.round(hMm) : mmToFt(hMm);
+            const unitLbl = state.unit === 'mm' ? 'mm' : 'ft';
             const div = document.createElement('div');
             div.className = 'preset-card' + ((state.cols === p.cols && state.rows === p.rows) ? ' active' : '');
             div.onclick = () => applyQuickPreset(p.cols, p.rows);
-            div.innerHTML = `<h5>${p.label}</h5><span>${p.cols}×${p.rows} (${p.cols * p.rows} cabs)</span><span>${w}×${h} ${state.unit}</span>`;
+            div.innerHTML = `<h5>${p.label}</h5><span>${p.cols}×${p.rows} (${p.cols * p.rows} cabs)</span><span>${wDisp}×${hDisp} ${unitLbl}</span>`;
             wrap.appendChild(div);
         });
     }
@@ -688,13 +708,15 @@
         let inW = parseFloat(document.getElementById('target-w').value);
         let inH = parseFloat(document.getElementById('target-h').value);
 
-        if (state.unit === 'in') { inW *= 25.4; inH *= 25.4; }
+        // In imperial mode the input field shows feet → convert to mm
+        const inW_mm = state.unit === 'in' ? inW * 304.8 : inW;
+        const inH_mm = state.unit === 'in' ? inH * 304.8 : inH;
 
         let cabW = DB_CAB[state.cab].w;
         let cabH = DB_CAB[state.cab].h;
 
-        if (!isNaN(inW) && inW > 0) state.cols = Math.max(1, Math.round(inW / cabW));
-        if (!isNaN(inH) && inH > 0) state.rows = Math.max(1, Math.round(inH / cabH));
+        if (!isNaN(inW_mm) && inW_mm > 0) state.cols = Math.max(1, Math.round(inW_mm / cabW));
+        if (!isNaN(inH_mm) && inH_mm > 0) state.rows = Math.max(1, Math.round(inH_mm / cabH));
 
         document.getElementById('grid-cols').value = state.cols;
         document.getElementById('grid-rows').value = state.rows;
@@ -706,8 +728,9 @@
         let inWallW = parseFloat(document.getElementById('wall-w').value) || 0;
         let inWallH = parseFloat(document.getElementById('wall-h').value) || 0;
 
-        state.wallW = state.unit === 'in' ? inWallW * 25.4 : inWallW;
-        state.wallH = state.unit === 'in' ? inWallH * 25.4 : inWallH;
+        // In imperial mode the input field shows feet → convert to mm
+        state.wallW = state.unit === 'in' ? inWallW * 304.8 : inWallW;
+        state.wallH = state.unit === 'in' ? inWallH * 304.8 : inWallH;
 
         calculateAll();
     }
@@ -802,10 +825,8 @@
             if (state.cols * cab.w > effectiveWallW || state.rows * cab.h > effectiveWallH) {
                 state.wallW = state.cols * cab.w;
                 state.wallH = state.rows * cab.h;
-                let unitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
-                let unitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
-                document.getElementById('wall-w').value = unitW;
-                document.getElementById('wall-h').value = unitH;
+                document.getElementById('wall-w').value = state.unit === 'mm' ? state.wallW : mmToFt(state.wallW);
+                document.getElementById('wall-h').value = state.unit === 'mm' ? state.wallH : mmToFt(state.wallH);
             }
 
             document.getElementById('grid-cols').value = state.cols;
@@ -814,11 +835,8 @@
             // AUTO-EXPAND WALL: match the LED array size exactly
             state.wallW = state.cols * cab.w;
             state.wallH = state.rows * cab.h;
-
-            let unitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
-            let unitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
-            document.getElementById('wall-w').value = unitW;
-            document.getElementById('wall-h').value = unitH;
+            document.getElementById('wall-w').value = state.unit === 'mm' ? state.wallW : mmToFt(state.wallW);
+            document.getElementById('wall-h').value = state.unit === 'mm' ? state.wallH : mmToFt(state.wallH);
         }
 
         closeModal();
@@ -873,8 +891,8 @@
         let weightKg = totalCabs * cab.weight;
         let areaSqm = (totalW_mm / 1000) * (totalH_mm / 1000);
 
-        let dispW = state.unit === 'mm' ? totalW_mm : (totalW_mm / 25.4).toFixed(1);
-        let dispH = state.unit === 'mm' ? totalH_mm : (totalH_mm / 25.4).toFixed(1);
+        let dispW = state.unit === 'mm' ? totalW_mm : parseFloat(mmToFt(totalW_mm));
+        let dispH = state.unit === 'mm' ? totalH_mm : parseFloat(mmToFt(totalH_mm));
         let dispWeight = state.unit === 'mm' ? `${weightKg.toFixed(1)} kg` : `${(weightKg * 2.20462).toFixed(1)} lbs`;
         let dispArea = state.unit === 'mm' ? `${areaSqm.toFixed(2)} sqm` : `${(areaSqm * 10.7639).toFixed(2)} sqft`;
 
@@ -908,7 +926,14 @@
 
         // Viewing distance
         const vd = getViewingDistance(pitch);
-        document.getElementById('res-vd').innerText = `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
+        const imp = state.unit === 'in';
+        const vdRangeText = imp
+            ? `${mToFt(vd.comfMin)}–${mToFt(vd.comfMax)} ft`
+            : `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
+        const vdMinText = imp
+            ? `Min. ${mToFt(vd.min)} ft`
+            : `Min. ${vd.min.toFixed(1)} m`;
+        document.getElementById('res-vd').innerText = vdRangeText;
 
         // Processing / hardware (based on 5G port capacity, consistent with the displayed metric)
         let ports5G = Math.ceil(totalPx / CAP_NOVA_5G);
@@ -926,18 +951,19 @@
         updateModelDesc();
         if (state.configMode === 'quick') renderQuickPresets();
 
-        drawStage(totalW_mm, totalH_mm, dispW, dispH, vd);
+        drawStage(totalW_mm, totalH_mm, dispW, dispH, vdRangeText, vdMinText);
     }
 
     /* ===========================================================
        STAGE RENDERING
     =========================================================== */
-    function drawStage(ledW_mm, ledH_mm, dispW, dispH, vd) {
+    function drawStage(ledW_mm, ledH_mm, dispW, dispH, vdRangeText, vdMinText) {
         const stageWrapper = document.getElementById('stage-wrapper');
         const wallContainer = document.getElementById('wall-container');
         const bgWall = document.getElementById('mounting-wall');
         const grid = document.getElementById('wall-grid');
         const human = document.getElementById('human-svg');
+        const vdLabel = document.getElementById('viewing-label');
         const stage = document.getElementById('stage-area');
 
         let hasCustomWall = state.wallW > 0 && state.wallH > 0;
@@ -986,10 +1012,8 @@
         if (hasCustomWall) {
             document.getElementById('lbl-wall-w').style.display = 'block';
             document.getElementById('lbl-wall-h').style.display = 'block';
-            let wallUnitW = state.unit === 'mm' ? state.wallW : (state.wallW / 25.4).toFixed(1);
-            let wallUnitH = state.unit === 'mm' ? state.wallH : (state.wallH / 25.4).toFixed(1);
-            document.getElementById('lbl-wall-w').innerText = `${wallUnitW} ${state.unit.toUpperCase()}`;
-            document.getElementById('lbl-wall-h').innerText = `${wallUnitH} ${state.unit.toUpperCase()}`;
+            document.getElementById('lbl-wall-w').innerText = state.unit === 'mm' ? `${state.wallW} mm` : formatImperial(state.wallW);
+            document.getElementById('lbl-wall-h').innerText = state.unit === 'mm' ? `${state.wallH} mm` : formatImperial(state.wallH);
         } else {
             document.getElementById('lbl-wall-w').style.display = 'none';
             document.getElementById('lbl-wall-h').style.display = 'none';
@@ -998,14 +1022,25 @@
         wallContainer.style.width = (ledW_mm * BASE_SCALE * finalScale) + 'px';
         wallContainer.style.height = (ledH_mm * BASE_SCALE * finalScale) + 'px';
 
-        human.style.height = ((1800 * BASE_SCALE) * finalScale) + 'px';
+        // Human figure: width is proportional to height (SVG viewBox 320×700)
+        const humanH = (1800 * BASE_SCALE) * finalScale;
+        const humanW = Math.round(humanH * (320 / 700));
+        human.style.height = humanH + 'px';
+        human.style.left = -(humanW + 14) + 'px';
 
-        let unitTxt = state.unit.toUpperCase();
-        document.getElementById('ruler-val-w').innerText = `${dispW} ${unitTxt}`;
-        document.getElementById('ruler-val-h').innerText = `${dispH} ${unitTxt}`;
+        // VD label sits at the same horizontal position as the human, near the bottom
+        vdLabel.style.left = -(humanW + 14) + 'px';
+        vdLabel.style.width = (humanW + 2) + 'px';
+        vdLabel.style.bottom = '4px';
 
-        document.getElementById('vd-text-main').innerText = `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
-        document.getElementById('vd-text-sub').innerText = `Min. ${vd.min.toFixed(1)} m`;
+        // Rulers: mm or ft+in
+        const rulerW = state.unit === 'mm' ? `${ledW_mm} mm` : formatImperial(ledW_mm);
+        const rulerH = state.unit === 'mm' ? `${ledH_mm} mm` : formatImperial(ledH_mm);
+        document.getElementById('ruler-val-w').innerText = rulerW;
+        document.getElementById('ruler-val-h').innerText = rulerH;
+
+        document.getElementById('vd-text-main').innerText = vdRangeText;
+        document.getElementById('vd-text-sub').innerText = vdMinText;
 
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${state.cols}, 1fr)`;
