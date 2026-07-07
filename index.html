@@ -1000,16 +1000,19 @@
         // Available stage area: subtract only what's needed for human figure (left) and UI chrome (top/bottom)
         const stageMaxW = Math.max(100, stage.clientWidth - 220);
         const stageMaxH = Math.max(100, stage.clientHeight - 160);
-        const BASE_SCALE = 160 / 1800;
+        // BASE_SCALE targets 1:24 at 96 DPI → 0.1575 px/mm.
+        // finalScale = 1 in normal use; drops below 1 only when the wall exceeds the available stage area.
+        const BASE_SCALE = (96 / 25.4) / 24;
 
         const preScaleW = maxRenderW * BASE_SCALE;
         const preScaleH = maxRenderH * BASE_SCALE;
 
-        // Scale to FILL the available space — both up AND down — maintaining aspect ratio.
-        // Previously capped at 1 (never zoomed in), leaving large empty areas for small configs.
-        const finalScale = Math.min(stageMaxW / preScaleW, stageMaxH / preScaleH);
+        let finalScale = 1;
+        if (preScaleW > stageMaxW || preScaleH > stageMaxH) {
+            finalScale = Math.min(stageMaxW / preScaleW, stageMaxH / preScaleH);
+        }
 
-        // Visual scale badge (assuming standard 96 DPI screen)
+        // Visual scale badge (assumes 96 DPI)
         const pxPerMm = BASE_SCALE * finalScale;
         const scaleRatio = Math.round((96 / 25.4) / pxPerMm);
         document.getElementById('badge-scale').innerText = `1:${scaleRatio}`;
