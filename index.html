@@ -224,7 +224,7 @@
         <div class="nav-actions">
             <div class="nav-unit-toggle">
                 <button class="nav-unit-btn active" id="nav-unit-mm" onclick="setUnit('mm')" title="Millimeters">mm</button>
-                <button class="nav-unit-btn" id="nav-unit-in" onclick="setUnit('in')" title="Inches">″</button>
+                <button class="nav-unit-btn" id="nav-unit-in" onclick="setUnit('in')" title="Imperial ft/in">ft</button>
             </div>
             <button class="btn-outline" onclick="location.reload()">Reset Configuration</button>
         </div>
@@ -259,7 +259,7 @@
                 <div class="control-label">Unit of Measurement</div>
                 <div class="segmented-control" style="margin-bottom: 12px;">
                     <div class="seg-btn active" id="btn-unit-mm" onclick="setUnit('mm')">Millimeters (mm)</div>
-                    <div class="seg-btn" id="btn-unit-in" onclick="setUnit('in')">Inches (in)</div>
+                    <div class="seg-btn" id="btn-unit-in" onclick="setUnit('in')">Imperial (ft/in)</div>
                 </div>
 
                 <div class="control-label">Configuration Mode</div>
@@ -538,6 +538,10 @@
     // (not fixed mm) so the wall keeps a sensible visual size at any LED scale.
     const AUTO_WALL_PAD_W = 1.4;
     const AUTO_WALL_PAD_H = 1.5;
+    // Minimum backdrop height in mm — ensures the human silhouette is always
+    // visibly shorter than the mounting wall, even for tiny single-row configs.
+    // 3000mm ≈ 10ft (typical room/auditorium height).
+    const MIN_WALL_H_MM = 3000;
 
     let state = {
         unit: 'mm',
@@ -971,8 +975,18 @@
 
         // Wall-fit validity was already checked in calculateAll() before this function runs.
 
-        let effectiveWallW = hasCustomWall ? state.wallW : ledW_mm * AUTO_WALL_PAD_W;
-        let effectiveWallH = hasCustomWall ? state.wallH : ledH_mm * AUTO_WALL_PAD_H;
+        // Effective backdrop size:
+        // – Custom wall: use user-specified dimensions verbatim
+        // – Auto: at least MIN_WALL_H_MM tall (so person never towers over the wall),
+        //         and at least 1.2× effectiveWallH wide to keep a room-like aspect ratio
+        let effectiveWallW, effectiveWallH;
+        if (hasCustomWall) {
+            effectiveWallW = state.wallW;
+            effectiveWallH = state.wallH;
+        } else {
+            effectiveWallH = Math.max(ledH_mm * AUTO_WALL_PAD_H, MIN_WALL_H_MM);
+            effectiveWallW = Math.max(ledW_mm * AUTO_WALL_PAD_W, effectiveWallH * 1.2);
+        }
 
         let maxRenderW = Math.max(ledW_mm, effectiveWallW);
         let maxRenderH = Math.max(ledH_mm, effectiveWallH);
@@ -1027,11 +1041,20 @@
         const humanW = Math.round(humanH * (320 / 700));
         human.style.height = humanH + 'px';
         human.style.left = -(humanW + 14) + 'px';
+        human.style.bottom = '0';
 
-        // VD label sits at the same horizontal position as the human, near the bottom
-        vdLabel.style.left = -(humanW + 14) + 'px';
-        vdLabel.style.width = (humanW + 2) + 'px';
-        vdLabel.style.bottom = '4px';
+        // VD label: centred horizontally under the LED wall (not overlapping the human).
+        // The LED wall is centred in stage-wrapper both horizontally and vertically.
+        const wrapperW_px = maxRenderW * BASE_SCALE * finalScale;
+        const wrapperH_px = maxRenderH * BASE_SCALE * finalScale;
+        const ledH_px    = ledH_mm * BASE_SCALE * finalScale;
+        const VD_W = 150;
+        // Gap below LED wall = (wrapperH - ledH) / 2  (because LED is centred vertically)
+        const gapBelowLed = (wrapperH_px - ledH_px) / 2;
+        vdLabel.style.top    = 'auto';
+        vdLabel.style.left   = ((wrapperW_px - VD_W) / 2) + 'px';
+        vdLabel.style.width  = VD_W + 'px';
+        vdLabel.style.bottom = Math.max(8, gapBelowLed - 8) + 'px';
 
         // Rulers: mm or ft+in
         const rulerW = state.unit === 'mm' ? `${ledW_mm} mm` : formatImperial(ledW_mm);
@@ -1066,8 +1089,9 @@
         lines.push(['Configuration Mode', state.configMode === 'quick' ? 'Quick Configuration' : 'Custom Wall']);
         lines.push(['Grid Layout', `${state.cols} Columns x ${state.rows} Rows`]);
         lines.push(['Total Modules', `${state.cols * state.rows} Cabinets`]);
-        lines.push(['Dimensions', `${document.getElementById('target-w').value} x ${document.getElementById('target-h').value} ${state.unit}`]);
-        lines.push(['Mount Wall', state.wallW > 0 ? `${document.getElementById('wall-w').value} x ${document.getElementById('wall-h').value} ${state.unit}` : 'Not Specified']);
+        const unitLbl = state.unit === 'mm' ? 'mm' : 'ft';
+        lines.push(['Dimensions', `${document.getElementById('target-w').value} x ${document.getElementById('target-h').value} ${unitLbl}`]);
+        lines.push(['Mount Wall', state.wallW > 0 ? `${document.getElementById('wall-w').value} x ${document.getElementById('wall-h').value} ${unitLbl}` : 'Not Specified']);
         lines.push(['Display Area', document.getElementById('res-area').innerText]);
         lines.push(['Total Weight', document.getElementById('res-weight').innerText]);
         lines.push(['Aspect Ratio', document.getElementById('res-ratio').innerText]);
