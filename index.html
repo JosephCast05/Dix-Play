@@ -112,8 +112,12 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .wall-lbl-w { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
-        .wall-lbl-h { position: absolute; right: -50px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #aaa; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+        /* Wall dimension labels — direct children of stage-wrapper (NOT mounting-wall) so they
+           have their own z-index (25 > led-wall-container z:15). Positioned exclusively via JS
+           below stage-wrapper's bottom edge → LED rulers (above/right of LED inside the wrapper)
+           can never reach them geometrically. */
+        .wall-lbl-w { position: absolute; z-index: 25; display: none; color: #ccc; font-size: 0.78rem; font-weight: 700; white-space: nowrap; background: rgba(0,0,0,0.6); padding: 3px 9px; border-radius: 4px; border: 1px solid #555; pointer-events: none; }
+        .wall-lbl-h { display: none; } /* combined into wall-lbl-w; kept in DOM for backward compat */
 
         .led-wall-container { position: absolute; background: #000; box-shadow: 0 20px 80px rgba(0,0,0,0.9); z-index: 15; }
 
@@ -374,10 +378,11 @@
             <div class="render-area">
                 <div class="stage-wrapper" id="stage-wrapper">
 
-                    <div class="mounting-wall" id="mounting-wall">
-                        <span class="wall-lbl-w" id="lbl-wall-w">0</span>
-                        <span class="wall-lbl-h" id="lbl-wall-h">0</span>
-                    </div>
+                    <div class="mounting-wall" id="mounting-wall"></div>
+                    <!-- Wall labels are siblings of mounting-wall inside stage-wrapper so they
+                         carry their own z-index and are positioned by JS below the wrapper -->
+                    <span class="wall-lbl-w" id="lbl-wall-w"></span>
+                    <span class="wall-lbl-h" id="lbl-wall-h"></span>
 
                     <div class="led-wall-container" id="wall-container">
                         <div class="ruler ruler-w active" id="ruler-top"><span id="ruler-val-w">0 mm</span></div>
@@ -1024,10 +1029,22 @@
         }
 
         if (hasCustomWall) {
-            document.getElementById('lbl-wall-w').style.display = 'block';
-            document.getElementById('lbl-wall-h').style.display = 'block';
-            document.getElementById('lbl-wall-w').innerText = state.unit === 'mm' ? `${state.wallW} mm` : formatImperial(state.wallW);
-            document.getElementById('lbl-wall-h').innerText = state.unit === 'mm' ? `${state.wallH} mm` : formatImperial(state.wallH);
+            const lWallW = document.getElementById('lbl-wall-w');
+            const _wH   = maxRenderH * BASE_SCALE * finalScale; // stage-wrapper height px
+            const _wW   = maxRenderW * BASE_SCALE * finalScale; // stage-wrapper width px
+            const wallWtxt = state.unit === 'mm' ? `${state.wallW} mm` : formatImperial(state.wallW);
+            const wallHtxt = state.unit === 'mm' ? `${state.wallH} mm` : formatImperial(state.wallH);
+            // ONE combined badge, centred BELOW stage-wrapper.
+            // LED rulers live above/right of the LED container INSIDE the wrapper →
+            // below the wrapper's bottom edge they CANNOT exist → zero overlap guaranteed.
+            lWallW.innerText = `⬛ Mounting Wall: ${wallWtxt} × ${wallHtxt}`;
+            lWallW.style.display  = 'inline-block';
+            lWallW.style.top      = (_wH + 14) + 'px';
+            lWallW.style.left     = '50%';
+            lWallW.style.right    = 'auto';
+            lWallW.style.bottom   = 'auto';
+            lWallW.style.transform = 'translateX(-50%)';
+            document.getElementById('lbl-wall-h').style.display = 'none';
         } else {
             document.getElementById('lbl-wall-w').style.display = 'none';
             document.getElementById('lbl-wall-h').style.display = 'none';
@@ -1039,22 +1056,17 @@
         // Human figure: width is proportional to height (SVG viewBox 320×700)
         const humanH = (1800 * BASE_SCALE) * finalScale;
         const humanW = Math.round(humanH * (320 / 700));
+        const wrapperH_px = maxRenderH * BASE_SCALE * finalScale;
         human.style.height = humanH + 'px';
         human.style.left = -(humanW + 14) + 'px';
         human.style.bottom = '0';
 
-        // VD label: centred horizontally under the LED wall (not overlapping the human).
-        // The LED wall is centred in stage-wrapper both horizontally and vertically.
-        const wrapperW_px = maxRenderW * BASE_SCALE * finalScale;
-        const wrapperH_px = maxRenderH * BASE_SCALE * finalScale;
-        const ledH_px    = ledH_mm * BASE_SCALE * finalScale;
-        const VD_W = 150;
-        // Gap below LED wall = (wrapperH - ledH) / 2  (because LED is centred vertically)
-        const gapBelowLed = (wrapperH_px - ledH_px) / 2;
-        vdLabel.style.top    = 'auto';
-        vdLabel.style.left   = ((wrapperW_px - VD_W) / 2) + 'px';
-        vdLabel.style.width  = VD_W + 'px';
-        vdLabel.style.bottom = Math.max(8, gapBelowLed - 8) + 'px';
+        // VD label: always directly below the human figure's feet.
+        // Human feet are at bottom:0 of stage-wrapper → label goes just below stage-wrapper.
+        vdLabel.style.bottom = 'auto';
+        vdLabel.style.top    = (wrapperH_px + 4) + 'px';
+        vdLabel.style.left   = -(humanW + 14) + 'px';
+        vdLabel.style.width  = Math.max(humanW, 110) + 'px';
 
         // Rulers: mm or ft+in
         const rulerW = state.unit === 'mm' ? `${ledW_mm} mm` : formatImperial(ledW_mm);
