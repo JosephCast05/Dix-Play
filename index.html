@@ -267,6 +267,11 @@
                 </div>
 
                 <div class="control-label">Configuration Mode</div>
+                <div class="segmented-control" style="margin-bottom: 12px;">
+                    <div class="seg-btn active" id="btn-mode-custom" onclick="setConfigMode('custom')">Custom Wall</div>
+                    <div class="seg-btn" id="btn-mode-quick" onclick="setConfigMode('quick')">Quick Configuration</div>
+                </div>
+
                 <div id="custom-grid-wrap" style="display:flex; flex-direction:column; gap:8px; margin-bottom: 12px;">
                     <span class="control-label">Array Configuration (Cabinets)</span>
                     <div class="grid-spinners">
@@ -341,7 +346,26 @@
                     <div class="toggle-switch"></div>
                 </div>
             </div>
+
+            <div class="control-group">
+                <div class="section-title">5. Controller Requirement</div>
+                <div class="control-label">Does the project require a video processor / controller?</div>
+                <div class="segmented-control">
+                    <div class="seg-btn active" id="btn-ctrl-yes" onclick="setController(true)">Yes</div>
+                    <div class="seg-btn" id="btn-ctrl-no" onclick="setController(false)">No</div>
+                </div>
             </div>
+
+            <div class="control-group">
+                <div class="section-title">6. Special Requirements</div>
+                <div class="control-label">Any custom requirements for this project?</div>
+                <div class="segmented-control" style="margin-bottom: 10px;">
+                    <div class="seg-btn active" id="btn-spec-no" onclick="setSpecialReq(false)">No</div>
+                    <div class="seg-btn" id="btn-spec-yes" onclick="setSpecialReq(true)">Yes</div>
+                </div>
+                <div id="specialreq-wrap" style="display:none;">
+                    <textarea id="specialreq-text" placeholder="e.g. curved installation, custom service access, specific brightness requirements..." oninput="state.specialNotes = this.value"></textarea>
+                </div>
             </div>
 
         </aside>
