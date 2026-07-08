@@ -333,11 +333,13 @@
                 </select>
 
                 <div class="control-label">Content Preview</div>
-                <div class="segmented-control" style="margin-bottom: 12px;">
-                    <div class="seg-btn active" id="btn-media-none" onclick="setMedia('none')">Wireframe</div>
-                    <div class="seg-btn" id="btn-media-image" onclick="setMedia('image')">Sample Image</div>
-                    <div class="seg-btn" id="btn-media-video" onclick="setMedia('video')">Sample Video</div>
-                </div>
+                <select id="media-select" onchange="setMedia(this.value)" style="margin-bottom: 12px;">
+                    <option value="none">Wireframe</option>
+                    <option value="image">Sample Image</option>
+                    <option value="video">Sample Video</option>
+                    <option value="conference">Videoconference</option>
+                    <option value="cctv">CCTV Control Room</option>
+                </select>
 
                 <div class="toggle-container active" id="ruler-toggle" onclick="toggleRulers()">
                     <span class="control-label" style="color: #fff; margin: 0;">Show Dimensions (CAD Rulers)</span>
@@ -389,8 +391,8 @@
                         <div class="ruler ruler-w active" id="ruler-top"><span id="ruler-val-w">0 mm</span></div>
                         <div class="ruler ruler-h active" id="ruler-right"><span id="ruler-val-h">0 mm</span></div>
 
-                        <img id="media-img" src="example.jpg" class="media-layer" alt="Preview">
-                        <video id="media-vid" src="example.mp4" class="media-layer" autoplay loop muted playsinline></video>
+                        <img id="media-img" src="https://github.com/JosephCast05/Dix-Play/blob/main/example.jpg?raw=true" class="media-layer" alt="Preview">
+                        <video id="media-vid" class="media-layer" loop muted playsinline></video>
 
                         <div class="grid-layer" id="wall-grid"></div>
                     </div>
@@ -527,6 +529,12 @@
         theater: 'https://github.com/JosephCast05/Dix-Play/blob/main/theater.jpg?raw=true',
         whitewall: 'https://github.com/JosephCast05/Dix-Play/blob/main/whitewall.jpg?raw=true',
         bricks: 'https://github.com/JosephCast05/Dix-Play/blob/main/bricks.jpg?raw=true'
+    };
+    // Video preview sources keyed by dropdown value
+    const DB_VIDEOS = {
+        video: 'example.mp4',
+        conference: 'https://github.com/JosephCast05/Dix-Play/blob/main/conference.mp4?raw=true',
+        cctv: 'https://github.com/JosephCast05/Dix-Play/blob/main/cctv.mp4?raw=true'
     };
 
     const QUICK_PRESETS = [
@@ -758,15 +766,27 @@
         const vid = document.getElementById('media-vid');
         const grid = document.getElementById('wall-grid');
 
-        img.style.display = 'none'; vid.style.display = 'none'; vid.pause();
+        img.style.display = 'none';
+        vid.style.display = 'none';
+        vid.pause();
         grid.classList.remove('transparent');
 
-        document.getElementById('btn-media-none').classList.toggle('active', val === 'none');
-        document.getElementById('btn-media-image').classList.toggle('active', val === 'image');
-        document.getElementById('btn-media-video').classList.toggle('active', val === 'video');
-
-        if (val === 'image') { img.style.display = 'block'; grid.classList.add('transparent'); }
-        if (val === 'video') { vid.style.display = 'block'; vid.play(); grid.classList.add('transparent'); }
+        if (val === 'image') {
+            img.style.display = 'block';
+            grid.classList.add('transparent');
+        } else if (DB_VIDEOS[val]) {
+            // Only reload the source if it actually changed (avoids re-buffering on repeat selection)
+            const newSrc = DB_VIDEOS[val];
+            if (!vid.src.endsWith(newSrc) && vid.getAttribute('data-key') !== val) {
+                vid.src = newSrc;
+                vid.setAttribute('data-key', val);
+                vid.load();
+            }
+            vid.style.display = 'block';
+            vid.play().catch(() => {}); // ignore autoplay-block promise rejection
+            grid.classList.add('transparent');
+        }
+        // 'none' → wireframe: nothing shown, grid stays opaque
     }
 
     function toggleRulers() {
