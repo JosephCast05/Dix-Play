@@ -58,9 +58,6 @@
         select:focus, input:focus, textarea:focus { border-color: var(--pv-red); }
         textarea { resize: vertical; min-height: 72px; font-size: 0.85rem; }
 
-        .model-desc { font-size: 0.72rem; color: #888; line-height: 1.5; margin-top: 2px; }
-        .model-desc b { color: var(--pv-red); display: block; font-size: 0.78rem; margin-bottom: 2px; }
-
         .grid-spinners { display: flex; flex-direction: column; gap: 12px; }
         .spinner-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .spinner { display: flex; align-items: center; background: #000; border: 1px solid var(--pv-border); border-radius: 6px; overflow: hidden; }
@@ -71,13 +68,6 @@
         .dim-inputs { display: flex; flex-direction: column; gap: 12px; }
         .dim-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .dim-wrapper input { text-align: right; }
-
-        .quick-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .preset-card { background: #000; border: 1px solid var(--pv-border); border-radius: 6px; padding: 10px; cursor: pointer; text-align: center; transition: 0.2s; }
-        .preset-card:hover { border-color: var(--pv-red); }
-        .preset-card.active { border-color: var(--pv-red); background: #1a0808; }
-        .preset-card h5 { font-size: 0.82rem; color: #fff; margin-bottom: 4px; }
-        .preset-card span { display: block; font-size: 0.68rem; color: #888; line-height: 1.4; }
 
         .toggle-container { display: flex; align-items: center; justify-content: space-between; background: #000; border: 1px solid var(--pv-border); padding: 12px; border-radius: 6px; cursor: pointer; }
         .toggle-switch { width: 44px; height: 22px; background: #333; border-radius: 11px; position: relative; transition: 0.3s; }
@@ -254,7 +244,6 @@
                 <div class="section-title">2. Display Model</div>
                 <div class="control-label">Pixel Pitch / Model</div>
                 <select id="model-select" onchange="onModelChange()"></select>
-                <div class="model-desc" id="model-desc"></div>
             </div>
 
             <div class="control-group">
@@ -264,12 +253,6 @@
                 <div class="segmented-control" style="margin-bottom: 12px;">
                     <div class="seg-btn active" id="btn-unit-mm" onclick="setUnit('mm')">Millimeters (mm)</div>
                     <div class="seg-btn" id="btn-unit-in" onclick="setUnit('in')">Imperial (ft/in)</div>
-                </div>
-
-                <div class="control-label">Configuration Mode</div>
-                <div class="segmented-control" style="margin-bottom: 12px;">
-                    <div class="seg-btn active" id="btn-mode-custom" onclick="setConfigMode('custom')">Custom Wall</div>
-                    <div class="seg-btn" id="btn-mode-quick" onclick="setConfigMode('quick')">Quick Configuration</div>
                 </div>
 
                 <div id="custom-grid-wrap" style="display:flex; flex-direction:column; gap:8px; margin-bottom: 12px;">
@@ -293,8 +276,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div id="quick-presets-wrap" class="quick-presets" style="display:none; margin-bottom: 12px;"></div>
 
                 <div class="control-label">Target LED Dimensions (Auto-Fit)</div>
                 <div class="dim-inputs" style="margin-bottom: 12px;">
@@ -344,27 +325,6 @@
                 <div class="toggle-container active" id="ruler-toggle" onclick="toggleRulers()">
                     <span class="control-label" style="color: #fff; margin: 0;">Show Dimensions (CAD Rulers)</span>
                     <div class="toggle-switch"></div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <div class="section-title">5. Controller Requirement</div>
-                <div class="control-label">Does the project require a video processor / controller?</div>
-                <div class="segmented-control">
-                    <div class="seg-btn active" id="btn-ctrl-yes" onclick="setController(true)">Yes</div>
-                    <div class="seg-btn" id="btn-ctrl-no" onclick="setController(false)">No</div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <div class="section-title">6. Special Requirements</div>
-                <div class="control-label">Any custom requirements for this project?</div>
-                <div class="segmented-control" style="margin-bottom: 10px;">
-                    <div class="seg-btn active" id="btn-spec-no" onclick="setSpecialReq(false)">No</div>
-                    <div class="seg-btn" id="btn-spec-yes" onclick="setSpecialReq(true)">Yes</div>
-                </div>
-                <div id="specialreq-wrap" style="display:none;">
-                    <textarea id="specialreq-text" placeholder="e.g. curved installation, custom service access, specific brightness requirements..." oninput="state.specialNotes = this.value"></textarea>
                 </div>
             </div>
 
@@ -437,15 +397,6 @@
                     <div class="data-row"><span class="data-lbl">Novastar Unit</span><span class="data-val val-red" id="res-nova">-</span></div>
                     <div class="data-row"><span class="data-lbl">Nova Ports (5G)</span><span class="data-val" id="res-nova-ports">0</span></div>
                     <div class="data-row"><span class="data-lbl">Brompton Ports</span><span class="data-val" id="res-brompton">0</span></div>
-                </div>
-            </div>
-
-            <div id="hardware-card">
-                <div class="section-title" style="margin-top: 8px;">Installation Hardware</div>
-                <div class="data-card">
-                    <div class="data-row"><span class="data-lbl">Sending Cards</span><span class="data-val" id="res-sending">0</span></div>
-                    <div class="data-row"><span class="data-lbl">Receiving Cards</span><span class="data-val" id="res-receiving">0</span></div>
-                    <div class="data-row"><span class="data-lbl">Mounting Brackets</span><span class="data-val" id="res-bracket">1 SET</span></div>
                 </div>
             </div>
 
@@ -537,13 +488,6 @@
         cctv: 'https://github.com/JosephCast05/Dix-Play/blob/main/cctv.mp4?raw=true'
     };
 
-    const QUICK_PRESETS = [
-        { key: 's', label: 'Small', cols: 2, rows: 2 },
-        { key: 'm', label: 'Medium', cols: 4, rows: 3 },
-        { key: 'l', label: 'Large', cols: 6, rows: 4 },
-        { key: 'xl', label: 'XL', cols: 8, rows: 5 }
-    ];
-
     const CAP_NOVA_1G = 650000;
     const CAP_NOVA_5G = 5000000;
     const CAP_BROM = 524000;
@@ -567,10 +511,6 @@
         wallH: 0,
         bgTexture: 'none',
         showRulers: true,
-        configMode: 'custom',
-        requireController: true,
-        specialRequirements: false,
-        specialNotes: '',
         modalActive: false // Prevents recursive calculateAll() calls while a modal is open
     };
 
@@ -660,62 +600,15 @@
             if ((state.env === 'indoor' && p === 1.56) || (state.env === 'outdoor' && p === 3.9)) opt.selected = true;
             select.appendChild(opt);
         });
-        updateModelDesc();
     }
 
     function onModelChange() {
-        updateModelDesc();
         calculateAll();
-    }
-
-    function updateModelDesc() {
-        const pitch = parseFloat(document.getElementById('model-select').value);
-        const vd = getViewingDistance(pitch);
-        const imp = state.unit === 'in';
-        const minStr  = imp ? `${mToFt(vd.min)} ft`  : `${vd.min.toFixed(1)} m`;
-        const comfStr = imp ? `${mToFt(vd.comfMin)}–${mToFt(vd.comfMax)} ft` : `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
-        document.getElementById('model-desc').innerHTML =
-            `<b>${modelName(state.env, pitch)}</b>Min. viewing distance: ${minStr} · Comfortable: ${comfStr}`;
     }
 
     /* ===========================================================
-       SECTION 3: SIZE / CONFIG MODE
+       SECTION 3: SIZE
     =========================================================== */
-    function setConfigMode(mode) {
-        state.configMode = mode;
-        document.getElementById('btn-mode-custom').classList.toggle('active', mode === 'custom');
-        document.getElementById('btn-mode-quick').classList.toggle('active', mode === 'quick');
-        document.getElementById('custom-grid-wrap').style.display = mode === 'custom' ? 'flex' : 'none';
-        document.getElementById('quick-presets-wrap').style.display = mode === 'quick' ? 'grid' : 'none';
-        if (mode === 'quick') renderQuickPresets();
-    }
-
-    function renderQuickPresets() {
-        const cab = DB_CAB[state.cab];
-        const wrap = document.getElementById('quick-presets-wrap');
-        wrap.innerHTML = '';
-        QUICK_PRESETS.forEach(p => {
-            const wMm = p.cols * cab.w;
-            const hMm = p.rows * cab.h;
-            const wDisp = state.unit === 'mm' ? Math.round(wMm) : mmToFt(wMm);
-            const hDisp = state.unit === 'mm' ? Math.round(hMm) : mmToFt(hMm);
-            const unitLbl = state.unit === 'mm' ? 'mm' : 'ft';
-            const div = document.createElement('div');
-            div.className = 'preset-card' + ((state.cols === p.cols && state.rows === p.rows) ? ' active' : '');
-            div.onclick = () => applyQuickPreset(p.cols, p.rows);
-            div.innerHTML = `<h5>${p.label}</h5><span>${p.cols}×${p.rows} (${p.cols * p.rows} cabs)</span><span>${wDisp}×${hDisp} ${unitLbl}</span>`;
-            wrap.appendChild(div);
-        });
-    }
-
-    function applyQuickPreset(cols, rows) {
-        state.cols = cols;
-        state.rows = rows;
-        document.getElementById('grid-cols').value = cols;
-        document.getElementById('grid-rows').value = rows;
-        calculateAll();
-    }
-
     function adjustGrid(axis, delta) {
         state[axis] = Math.max(1, state[axis] + delta);
         document.getElementById('grid-' + axis).value = state[axis];
@@ -799,28 +692,6 @@
             toggle.classList.add('active'); rw.classList.add('active'); rh.classList.add('active');
         } else {
             toggle.classList.remove('active'); rw.classList.remove('active'); rh.classList.remove('active');
-        }
-    }
-
-    /* ===========================================================
-       SECTION 5-6: CONTROLLER / SPECIAL REQUIREMENTS
-    =========================================================== */
-    function setController(val) {
-        state.requireController = val;
-        document.getElementById('btn-ctrl-yes').classList.toggle('active', val === true);
-        document.getElementById('btn-ctrl-no').classList.toggle('active', val === false);
-        document.getElementById('processing-card').style.display = val ? 'block' : 'none';
-        document.getElementById('hardware-card').style.display = val ? 'block' : 'none';
-    }
-
-    function setSpecialReq(val) {
-        state.specialRequirements = val;
-        document.getElementById('btn-spec-yes').classList.toggle('active', val === true);
-        document.getElementById('btn-spec-no').classList.toggle('active', val === false);
-        document.getElementById('specialreq-wrap').style.display = val ? 'block' : 'none';
-        if (!val) {
-            state.specialNotes = '';
-            document.getElementById('specialreq-text').value = '';
         }
     }
 
@@ -965,21 +836,13 @@
             : `Min. ${vd.min.toFixed(1)} m`;
         document.getElementById('res-vd').innerText = vdRangeText;
 
-        // Processing / hardware (based on 5G port capacity, consistent with the displayed metric)
+        // Processing (based on 5G port capacity, consistent with the displayed metric)
         let ports5G = Math.ceil(totalPx / CAP_NOVA_5G);
-        let ports1G = Math.ceil(totalPx / CAP_NOVA_1G);
         document.getElementById('res-nova-ports').innerText = ports5G;
         document.getElementById('res-brompton').innerText = Math.ceil(totalPx / CAP_BROM);
 
         let novaModel = ports5G <= 1 ? "VX600 Pro" : ports5G <= 2 ? "VX1000 Pro" : ports5G <= 4 ? "VX2000 Pro" : "H-Series";
         document.getElementById('res-nova').innerText = novaModel;
-
-        document.getElementById('res-sending').innerText = Math.max(1, ports1G);
-        document.getElementById('res-receiving').innerText = totalCabs;
-        document.getElementById('res-bracket').innerText = '1 SET';
-
-        updateModelDesc();
-        if (state.configMode === 'quick') renderQuickPresets();
 
         drawStage(totalW_mm, totalH_mm, dispW, dispH, vdRangeText, vdMinText);
     }
@@ -1127,7 +990,6 @@
         const lines = [];
         lines.push(['Series', `${state.env.toUpperCase()} (${state.cab}" Cabinet)`]);
         lines.push(['Display Model', document.getElementById('model-select').selectedOptions[0].text]);
-        lines.push(['Configuration Mode', state.configMode === 'quick' ? 'Quick Configuration' : 'Custom Wall']);
         lines.push(['Grid Layout', `${state.cols} Columns x ${state.rows} Rows`]);
         lines.push(['Total Modules', `${state.cols * state.rows} Cabinets`]);
         const unitLbl = state.unit === 'mm' ? 'mm' : 'ft';
@@ -1141,18 +1003,9 @@
         lines.push(['Best Viewing Distance', document.getElementById('res-vd').innerText]);
         lines.push(['Max Power Draw', document.getElementById('res-power-max').innerText]);
         lines.push(['Avg Power Draw', document.getElementById('res-power-avg').innerText]);
-        lines.push(['Controller Required', state.requireController ? 'Yes' : 'No (customer-supplied)']);
-
-        if (state.requireController) {
-            lines.push(['Controller Model', document.getElementById('res-nova').innerText]);
-            lines.push(['Nova Ports (5G)', document.getElementById('res-nova-ports').innerText]);
-            lines.push(['Brompton Ports', document.getElementById('res-brompton').innerText]);
-            lines.push(['Sending Cards', document.getElementById('res-sending').innerText]);
-            lines.push(['Receiving Cards', document.getElementById('res-receiving').innerText]);
-            lines.push(['Mounting Brackets', document.getElementById('res-bracket').innerText]);
-        }
-
-        lines.push(['Special Requirements', state.specialRequirements ? (state.specialNotes || '(none specified)') : 'No']);
+        lines.push(['Controller Model', document.getElementById('res-nova').innerText]);
+        lines.push(['Nova Ports (5G)', document.getElementById('res-nova-ports').innerText]);
+        lines.push(['Brompton Ports', document.getElementById('res-brompton').innerText]);
         return lines;
     }
 
