@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Primeview Global | Dix-Play LED Configurator V3.0</title>
     <style>
         :root {
@@ -67,6 +66,9 @@
         .spin-val { flex: 1; text-align: center; border: none; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; }
 
         .dim-inputs { display: flex; flex-direction: column; gap: 12px; }
+        .dim-inputs.row { flex-direction: row; gap: 8px; }
+        .dim-inputs.row .dim-wrapper { flex: 1; min-width: 0; }
+        .dim-inputs.row .dim-wrapper input { width: 100%; }
         .dim-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .dim-wrapper input { text-align: right; }
 
@@ -280,26 +282,14 @@
                 </div>
 
                 <div class="control-label">Target LED Dimensions (Auto-Fit)</div>
-                <div class="dim-inputs" style="margin-bottom: 12px;">
+                <div class="dim-inputs row" style="margin-bottom: 12px;">
                     <div class="dim-wrapper">
                         <span id="lbl-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Width (mm)</span>
-                        <input type="number" id="target-w" placeholder="Target Width" onchange="calculateFromDimensions()">
+                        <input type="number" id="target-w" placeholder="Width" onchange="calculateFromDimensions()">
                     </div>
                     <div class="dim-wrapper">
                         <span id="lbl-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">LED Height (mm)</span>
-                        <input type="number" id="target-h" placeholder="Target Height" onchange="calculateFromDimensions()">
-                    </div>
-                </div>
-
-                <div class="control-label">Mounting Wall Surface (Optional)</div>
-                <div class="dim-inputs">
-                    <div class="dim-wrapper">
-                        <span id="lbl-wall-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Width (mm)</span>
-                        <input type="number" id="wall-w" placeholder="Wall Width" onchange="updateWallInput()">
-                    </div>
-                    <div class="dim-wrapper">
-                        <span id="lbl-wall-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Height (mm)</span>
-                        <input type="number" id="wall-h" placeholder="Wall Height" onchange="updateWallInput()">
+                        <input type="number" id="target-h" placeholder="Height" onchange="calculateFromDimensions()">
                     </div>
                 </div>
             </div>
@@ -324,9 +314,21 @@
                     <option value="cctv">CCTV Control Room</option>
                 </select>
 
-                <div class="toggle-container active" id="ruler-toggle" onclick="toggleRulers()">
+                <div class="toggle-container active" id="ruler-toggle" onclick="toggleRulers()" style="margin-bottom: 12px;">
                     <span class="control-label" style="color: #fff; margin: 0;">Show Dimensions (CAD Rulers)</span>
                     <div class="toggle-switch"></div>
+                </div>
+
+                <div class="control-label">Mounting Wall Surface (Optional)</div>
+                <div class="dim-inputs row">
+                    <div class="dim-wrapper">
+                        <span id="lbl-wall-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Width (mm)</span>
+                        <input type="number" id="wall-w" placeholder="Width" onchange="updateWallInput()">
+                    </div>
+                    <div class="dim-wrapper">
+                        <span id="lbl-wall-h-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Height (mm)</span>
+                        <input type="number" id="wall-h" placeholder="Height" onchange="updateWallInput()">
+                    </div>
                 </div>
             </div>
 
