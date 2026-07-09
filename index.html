@@ -221,6 +221,7 @@
                 <button class="nav-unit-btn" id="nav-unit-in" onclick="setUnit('in')" title="Imperial ft/in">ft</button>
             </div>
             <button class="btn-outline" onclick="location.reload()">Reset Configuration</button>
+            <button class="btn-outline" onclick="openVDModal()">📏 Viewing Distance Guide</button>
         </div>
     </nav>
 
@@ -244,16 +245,16 @@
                 <div class="section-title">2. Display Model</div>
                 <div class="control-label">Pixel Pitch / Model</div>
                 <select id="model-select" onchange="onModelChange()"></select>
+                <div class="control-label" style="margin-top: 8px;">LED Material</div>
+                <div class="segmented-control">
+                    <div class="seg-btn active" id="btn-mat-smd" onclick="setMaterial('SMD')">SMD</div>
+                    <div class="seg-btn" id="btn-mat-gob" onclick="setMaterial('GOB')">GOB</div>
+                    <div class="seg-btn" id="btn-mat-cob" onclick="setMaterial('COB')">COB</div>
+                </div>
             </div>
 
             <div class="control-group">
                 <div class="section-title">3. Display Size Definition</div>
-
-                <div class="control-label">Unit of Measurement</div>
-                <div class="segmented-control" style="margin-bottom: 12px;">
-                    <div class="seg-btn active" id="btn-unit-mm" onclick="setUnit('mm')">Millimeters (mm)</div>
-                    <div class="seg-btn" id="btn-unit-in" onclick="setUnit('in')">Imperial (ft/in)</div>
-                </div>
 
                 <div id="custom-grid-wrap" style="display:flex; flex-direction:column; gap:8px; margin-bottom: 12px;">
                     <span class="control-label">Array Configuration (Cabinets)</span>
@@ -402,6 +403,14 @@
 
             <div style="flex: 1;"></div>
 
+            <button class="btn-action" onclick="openTechSpecModal()">
+                <span class="btn-icon">🔍</span>
+                <div class="btn-text">
+                    <h4>See Full Tech Spec</h4>
+                    <p>Complete technical specification sheet</p>
+                </div>
+            </button>
+
             <button class="btn-action btn-action-primary" onclick="exportPDF()">
                 <span class="btn-icon">⬇</span>
                 <div class="btn-text">
@@ -415,14 +424,6 @@
                 <div class="btn-text">
                     <h4>Download Config</h4>
                     <p>Export system specs to TXT file</p>
-                </div>
-            </button>
-
-            <button class="btn-action" onclick="openVDModal()">
-                <span class="btn-icon">📏</span>
-                <div class="btn-text">
-                    <h4>Viewing Distance Guide</h4>
-                    <p>Reference table for all Dix-Play models</p>
                 </div>
             </button>
 
@@ -461,6 +462,20 @@
             </table>
             <div class="modal-actions">
                 <button class="modal-btn btn-expand" style="flex:1;" onclick="closeVDModal()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="techspec-modal">
+        <div class="modal-card wide">
+            <div class="modal-title">🔍 Full Technical Specification</div>
+            <div class="modal-text">Complete specification sheet for the current configuration.</div>
+            <table class="vd-table">
+                <tbody id="techspec-table-body"></tbody>
+            </table>
+            <div class="modal-actions">
+                <button class="modal-btn btn-scale" style="flex:1;" onclick="exportPDF()">EXPORT PDF</button>
+                <button class="modal-btn btn-expand" style="flex:1;" onclick="closeTechSpecModal()">CLOSE</button>
             </div>
         </div>
     </div>
@@ -511,6 +526,7 @@
         wallH: 0,
         bgTexture: 'none',
         showRulers: true,
+        material: 'SMD',
         modalActive: false // Prevents recursive calculateAll() calls while a modal is open
     };
 
@@ -557,8 +573,6 @@
     =========================================================== */
     function setUnit(u) {
         state.unit = u;
-        document.getElementById('btn-unit-mm').classList.toggle('active', u === 'mm');
-        document.getElementById('btn-unit-in').classList.toggle('active', u === 'in');
         document.getElementById('nav-unit-mm').classList.toggle('active', u === 'mm');
         document.getElementById('nav-unit-in').classList.toggle('active', u === 'in');
 
@@ -581,6 +595,13 @@
         document.getElementById('btn-env-outdoor').classList.toggle('active', e === 'outdoor');
         updateModelDropdown();
         calculateAll();
+    }
+
+    function setMaterial(m) {
+        state.material = m;
+        document.getElementById('btn-mat-smd').classList.toggle('active', m === 'SMD');
+        document.getElementById('btn-mat-gob').classList.toggle('active', m === 'GOB');
+        document.getElementById('btn-mat-cob').classList.toggle('active', m === 'COB');
     }
 
     function setCab(c) {
@@ -763,6 +784,21 @@
 
     function closeVDModal() {
         document.getElementById('vd-modal').classList.remove('active');
+    }
+
+    function openTechSpecModal() {
+        const body = document.getElementById('techspec-table-body');
+        body.innerHTML = '';
+        buildExportLines().forEach(([label, val]) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style="color:#e31e24;font-weight:700;white-space:nowrap;">${label}</td><td style="color:#fff;">${val}</td>`;
+            body.appendChild(tr);
+        });
+        document.getElementById('techspec-modal').classList.add('active');
+    }
+
+    function closeTechSpecModal() {
+        document.getElementById('techspec-modal').classList.remove('active');
     }
 
     /* ===========================================================
@@ -990,6 +1026,7 @@
         const lines = [];
         lines.push(['Series', `${state.env.toUpperCase()} (${state.cab}" Cabinet)`]);
         lines.push(['Display Model', document.getElementById('model-select').selectedOptions[0].text]);
+        lines.push(['LED Material', state.material]);
         lines.push(['Grid Layout', `${state.cols} Columns x ${state.rows} Rows`]);
         lines.push(['Total Modules', `${state.cols * state.rows} Cabinets`]);
         const unitLbl = state.unit === 'mm' ? 'mm' : 'ft';
