@@ -29,6 +29,8 @@
         .nav-actions { display: flex; gap: 12px; }
         .btn-outline { background: transparent; border: 1px solid #555; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
         .btn-outline:hover { background: var(--pv-red); border-color: var(--pv-red); }
+        .btn-outline.toggle-btn.active { background: var(--pv-red); border-color: var(--pv-red); }
+        .btn-outline.toggle-btn { border-color: #555; }
 
         .nav-unit-toggle { display: flex; background: #000; border: 1px solid #555; border-radius: 4px; overflow: hidden; }
         .nav-unit-btn { padding: 8px 16px; background: transparent; border: none; color: #888; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border-right: 1px solid #333; }
@@ -223,6 +225,7 @@
                 <button class="nav-unit-btn active" id="nav-unit-mm" onclick="setUnit('mm')" title="Millimeters">mm</button>
                 <button class="nav-unit-btn" id="nav-unit-in" onclick="setUnit('in')" title="Imperial ft/in">ft</button>
             </div>
+            <button class="btn-outline toggle-btn active" id="ruler-toggle" onclick="toggleRulers()" title="Show/hide CAD dimension rulers">📐 CAD Rulers</button>
             <button class="btn-outline" onclick="location.reload()">Reset Configuration</button>
             <button class="btn-outline" onclick="openVDModal()">📏 Viewing Distance Guide</button>
         </div>
@@ -297,30 +300,8 @@
             <div class="control-group">
                 <div class="section-title">4. Visualizer Tools</div>
 
-                <div class="control-label">Installation Environment (Texture)</div>
-                <select id="bg-select" onchange="setBackground(this.value)" style="margin-bottom: 8px;">
-                    <option value="none">Studio Black (Default)</option>
-                    <option value="theater">Theater / Auditorium</option>
-                    <option value="whitewall">White Wall</option>
-                    <option value="bricks">Industrial Brick Wall</option>
-                </select>
-
-                <div class="control-label">Content Preview</div>
-                <select id="media-select" onchange="setMedia(this.value)" style="margin-bottom: 12px;">
-                    <option value="none">Wireframe</option>
-                    <option value="image">Sample Image</option>
-                    <option value="video">Sample Video</option>
-                    <option value="conference">Videoconference</option>
-                    <option value="cctv">CCTV Control Room</option>
-                </select>
-
-                <div class="toggle-container active" id="ruler-toggle" onclick="toggleRulers()" style="margin-bottom: 12px;">
-                    <span class="control-label" style="color: #fff; margin: 0;">Show Dimensions (CAD Rulers)</span>
-                    <div class="toggle-switch"></div>
-                </div>
-
                 <div class="control-label">Mounting Wall Surface (Optional)</div>
-                <div class="dim-inputs row">
+                <div class="dim-inputs row" style="margin-bottom: 12px;">
                     <div class="dim-wrapper">
                         <span id="lbl-wall-w-unit" style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Wall Width (mm)</span>
                         <input type="number" id="wall-w" placeholder="Width" onchange="updateWallInput()">
@@ -330,6 +311,23 @@
                         <input type="number" id="wall-h" placeholder="Height" onchange="updateWallInput()">
                     </div>
                 </div>
+
+                <div class="control-label">Installation Environment (Texture)</div>
+                <select id="bg-select" onchange="setBackground(this.value)" style="margin-bottom: 8px;">
+                    <option value="none">Studio Black (Default)</option>
+                    <option value="theater">Theater / Auditorium</option>
+                    <option value="whitewall">White Wall</option>
+                    <option value="bricks">Industrial Brick Wall</option>
+                </select>
+
+                <div class="control-label">Content Preview</div>
+                <select id="media-select" onchange="setMedia(this.value)">
+                    <option value="none">Wireframe</option>
+                    <option value="image">Sample Image</option>
+                    <option value="video">Sample Video</option>
+                    <option value="conference">Videoconference</option>
+                    <option value="cctv">CCTV Control Room</option>
+                </select>
             </div>
 
         </aside>
