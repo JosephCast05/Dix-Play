@@ -423,8 +423,8 @@
             <button class="btn-action" onclick="exportConfiguration()">
                 <span class="btn-icon">⬇</span>
                 <div class="btn-text">
-                    <h4>Download Config</h4>
-                    <p>Export system specs to TXT file</p>
+                    <h4>Download CAD (DXF)</h4>
+                    <p>Scaled drawing for AutoCAD / DraftSight</p>
                 </div>
             </button>
 
@@ -482,6 +482,7 @@
     </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     /* ===========================================================
        DATA
@@ -1047,26 +1048,111 @@
         return lines;
     }
 
-    function exportConfiguration() {
-        const lines = buildExportLines();
-        let t = 'PRIMEVIEW DIX-PLAY CONFIGURATION EXPORT\n----------------------------------------\n';
-        lines.forEach(([l, v]) => { t += `${l.padEnd(22, ' ')}: ${v}\n`; });
+    /* ===========================================================
+       DXF EXPORT — real CAD file (opens in AutoCAD, DraftSight, LibreCAD…)
+       Drawn in real-world millimetres (1 unit = 1 mm).
+    =========================================================== */
+    function dxfLine(x1, y1, x2, y2, layer) {
+        return `0\nLINE\n8\n${layer}\n10\n${x1}\n20\n${y1}\n11\n${x2}\n21\n${y2}\n`;
+    }
+    function dxfText(x, y, h, txt, layer) {
+        return `0\nTEXT\n8\n${layer}\n10\n${x}\n20\n${y}\n40\n${h}\n1\n${txt}\n`;
+    }
 
-        const blob = new Blob([t], { type: 'text/plain' });
+    function exportConfiguration() {
+        const cab = DB_CAB[state.cab];
+        const cols = state.cols, rows = state.rows;
+        const cabW = cab.w, cabH = cab.h;
+        const ledW = cols * cabW, ledH = rows * cabH;
+
+        let body = '';
+
+        // --- Layer: CABINETS (the LED grid, real mm) ---
+        for (let c = 0; c <= cols; c++) {
+            body += dxfLine(c * cabW, 0, c * cabW, ledH, 'CABINETS');
+        }
+        for (let r = 0; r <= rows; r++) {
+            body += dxfLine(0, r * cabH, ledW, r * cabH, 'CABINETS');
+        }
+
+        // --- Layer: WALL (mounting wall outline if specified) ---
+        if (state.wallW > 0 && state.wallH > 0) {
+            // centre the LED on the wall
+            const ox = (state.wallW - ledW) / 2;
+            const oy = (state.wallH - ledH) / 2;
+            body += dxfLine(-ox, -oy, state.wallW - ox, -oy, 'WALL');
+            body += dxfLine(state.wallW - ox, -oy, state.wallW - ox, state.wallH - oy, 'WALL');
+            body += dxfLine(state.wallW - ox, state.wallH - oy, -ox, state.wallH - oy, 'WALL');
+            body += dxfLine(-ox, state.wallH - oy, -ox, -oy, 'WALL');
+            body += dxfText(-ox, state.wallH - oy + 120, 90, `MOUNTING WALL ${Math.round(state.wallW)} x ${Math.round(state.wallH)} mm`, 'DIMENSIONS');
+        }
+
+        // --- Layer: DIMENSIONS (overall width/height quotes) ---
+        const dimOff = 250;
+        body += dxfLine(0, -dimOff, ledW, -dimOff, 'DIMENSIONS');
+        body += dxfLine(0, -dimOff + 40, 0, -dimOff - 40, 'DIMENSIONS');
+        body += dxfLine(ledW, -dimOff + 40, ledW, -dimOff - 40, 'DIMENSIONS');
+        body += dxfText(ledW / 2 - 300, -dimOff - 140, 100, `${Math.round(ledW)} mm (${cols} cab)`, 'DIMENSIONS');
+
+        body += dxfLine(-dimOff, 0, -dimOff, ledH, 'DIMENSIONS');
+        body += dxfLine(-dimOff + 40, 0, -dimOff - 40, 0, 'DIMENSIONS');
+        body += dxfLine(-dimOff + 40, ledH, -dimOff - 40, ledH, 'DIMENSIONS');
+        body += dxfText(-dimOff - 550, ledH / 2, 100, `${Math.round(ledH)} mm (${rows} cab)`, 'DIMENSIONS');
+
+        // --- Layer: NOTES (title block / specs as text) ---
+        const model = document.getElementById('model-select').selectedOptions[0].text;
+        const notes = [
+            `PRIMEVIEW DIX-PLAY LED WALL`,
+            `Model: ${model}`,
+            `Material: ${state.material}`,
+            `Grid: ${cols} x ${rows} = ${cols * rows} cabinets (${state.cab}" ${cabW}x${cabH}mm each)`,
+            `Overall: ${Math.round(ledW)} x ${Math.round(ledH)} mm`,
+            `Resolution: ${document.getElementById('badge-resolution').innerText}`,
+            `Aspect Ratio: ${document.getElementById('res-ratio').innerText}`,
+            `Diagonal: ${document.getElementById('res-diag').innerText}`,
+            `Weight: ${document.getElementById('res-weight').innerText}`,
+            `Max Power: ${document.getElementById('res-power-max').innerText}`,
+            `Best Viewing Distance: ${document.getElementById('res-vd').innerText}`,
+            `Controller: ${document.getElementById('res-nova').innerText}`
+        ];
+        let ny = -dimOff - 500;
+        notes.forEach((line, i) => {
+            body += dxfText(0, ny - i * 160, i === 0 ? 130 : 100, line, 'NOTES');
+        });
+
+        // --- DXF wrapper (minimal R12 ASCII, universally compatible) ---
+        const dxf =
+`0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n4\n` +
+`0\nLAYER\n2\nCABINETS\n70\n0\n62\n5\n6\nCONTINUOUS\n` +
+`0\nLAYER\n2\nWALL\n70\n0\n62\n8\n6\nCONTINUOUS\n` +
+`0\nLAYER\n2\nDIMENSIONS\n70\n0\n62\n1\n6\nCONTINUOUS\n` +
+`0\nLAYER\n2\nNOTES\n70\n0\n62\n7\n6\nCONTINUOUS\n` +
+`0\nENDTAB\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n` +
+body +
+`0\nENDSEC\n0\nEOF\n`;
+
+        const blob = new Blob([dxf], { type: 'application/dxf' });
         const a = document.createElement('a');
-        a.download = 'Primeview_LED_Configuration.txt';
+        a.download = 'Primeview_LED_Configuration.dxf';
         a.href = window.URL.createObjectURL(blob);
         a.click();
     }
 
-    function exportPDF() {
+    /* ===========================================================
+       PDF EXPORT — screenshot of the stage + full spec table
+    =========================================================== */
+    async function exportPDF() {
         if (!window.jspdf) {
-            alert('PDF library could not be loaded (check your internet connection). Use "Download Config" for a TXT export instead.');
+            alert('PDF library could not be loaded (check your internet connection). Use "Download Config" for a DXF export instead.');
             return;
         }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        const btn = document.querySelector('.btn-action-primary');
+        const origHTML = btn ? btn.innerHTML : '';
+        if (btn) btn.innerHTML = '<div class="btn-text"><h4>Generating PDF…</h4><p>Capturing preview</p></div>';
 
+        // Header band
         doc.setFillColor(227, 30, 36);
         doc.rect(0, 0, 210, 24, 'F');
         doc.setTextColor(255, 255, 255);
@@ -1075,17 +1161,42 @@
         doc.setFontSize(10);
         doc.text('Dix-Play LED Configuration — Export Summary', 14, 19);
 
+        let y = 32;
+
+        // --- Stage screenshot ---
+        try {
+            const stage = document.getElementById('stage-area');
+            if (window.html2canvas) {
+                const canvas = await html2canvas(stage, {
+                    backgroundColor: '#050505',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                const imgW = 182; // mm, fits A4 with 14mm margins
+                const imgH = imgW * (canvas.height / canvas.width);
+                const finalH = Math.min(imgH, 105); // cap height
+                const finalW = finalH === imgH ? imgW : imgW * (finalH / imgH);
+                doc.addImage(imgData, 'JPEG', 14, y, finalW, finalH);
+                y += finalH + 8;
+            }
+        } catch (e) {
+            // If capture fails, continue with the table only
+            console.warn('Stage capture failed:', e);
+        }
+
+        // --- Spec table ---
         doc.setTextColor(20, 20, 20);
-        let y = 36;
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         buildExportLines().forEach(([label, val]) => {
+            if (y > 280) { doc.addPage(); y = 20; }
             doc.setFont(undefined, 'bold');
             doc.text(label + ':', 14, y);
             doc.setFont(undefined, 'normal');
             const valText = doc.splitTextToSize(String(val), 110);
             doc.text(valText, 80, y);
-            y += 7 * valText.length;
-            if (y > 280) { doc.addPage(); y = 20; }
+            y += 6 * valText.length;
         });
 
         doc.setFontSize(8);
@@ -1093,6 +1204,7 @@
         doc.text('Specifications are indicative and subject to engineering review. Generated by the Primeview Global Configurator.', 14, 290);
 
         doc.save('Primeview_LED_Configuration.pdf');
+        if (btn) btn.innerHTML = origHTML;
     }
 </script>
 
