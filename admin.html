@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primeview | Product Back-Office</title>
+<style>
+    :root{--pv-red:#e31e24;--pv-bg:#0a0a0a;--pv-panel:#141414;--pv-border:#2a2a2a;--pv-text:#e0e0e0;--pv-muted:#888;}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}
+    body{background:var(--pv-bg);color:var(--pv-text);min-height:100vh;}
+
+    .navbar{height:64px;background:var(--pv-panel);display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:2px solid var(--pv-red);box-shadow:0 4px 12px rgba(0,0,0,.5);position:sticky;top:0;z-index:100;}
+    .nav-brand{display:flex;align-items:center;gap:16px;}
+    .nav-title{font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:1px;border-left:1px solid #333;padding-left:16px;text-transform:uppercase;}
+    .nav-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .btn{border:none;border-radius:5px;padding:9px 16px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px;}
+    .btn-red{background:var(--pv-red);color:#fff;} .btn-red:hover{background:#c11216;}
+    .btn-ghost{background:transparent;border:1px solid #555;color:#fff;} .btn-ghost:hover{background:#222;border-color:var(--pv-red);}
+    .btn-green{background:#1a7f37;color:#fff;} .btn-green:hover{background:#15682d;}
+    .btn-sm{padding:5px 11px;font-size:.78rem;}
+
+    .wrap{max-width:1500px;margin:0 auto;padding:24px;}
+
+    .banner{background:#1a0808;border:1px solid var(--pv-red);border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:.85rem;line-height:1.6;color:#ddd;}
+    .banner b{color:var(--pv-red);}
+
+    .toolbar{display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+    .toolbar input[type=text]{background:#000;border:1px solid var(--pv-border);color:#fff;border-radius:6px;padding:9px 14px;font-size:.9rem;min-width:260px;outline:none;}
+    .toolbar input:focus{border-color:var(--pv-red);}
+    .count-pill{background:#000;border:1px solid var(--pv-border);border-radius:20px;padding:6px 16px;font-size:.8rem;color:var(--pv-muted);}
+    .count-pill b{color:var(--pv-red);}
+
+    table{width:100%;border-collapse:collapse;background:var(--pv-panel);border-radius:8px;overflow:hidden;font-size:.82rem;}
+    thead th{background:#000;color:var(--pv-red);text-transform:uppercase;font-size:.68rem;letter-spacing:.5px;padding:11px 9px;text-align:left;white-space:nowrap;border-bottom:2px solid var(--pv-red);}
+    tbody td{padding:9px;border-bottom:1px solid var(--pv-border);white-space:nowrap;}
+    tbody tr:hover{background:#1c1c1c;}
+    .badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:.68rem;font-weight:700;}
+    .badge-in{background:#123a5c;color:#7ec2ff;} .badge-out{background:#5c3312;color:#ffb36b;}
+    .col-actions{display:flex;gap:6px;}
+    .visible-tag{font-size:.6rem;color:#1a7f37;font-weight:700;text-transform:uppercase;}
+    .hidden-tag{font-size:.6rem;color:#777;font-weight:700;text-transform:uppercase;}
+
+    /* Modal form */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:1000;overflow-y:auto;padding:40px 20px;}
+    .overlay.active{display:flex;}
+    .card{background:var(--pv-panel);width:640px;max-width:100%;border-radius:12px;border:2px solid var(--pv-red);box-shadow:0 20px 60px rgba(0,0,0,.9);}
+    .card-head{padding:20px 24px;border-bottom:1px solid var(--pv-border);display:flex;justify-content:space-between;align-items:center;}
+    .card-head h2{font-size:1.2rem;color:#fff;}
+    .card-body{padding:24px;}
+    .card-foot{padding:18px 24px;border-top:1px solid var(--pv-border);display:flex;justify-content:space-between;gap:12px;}
+
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .fld{display:flex;flex-direction:column;gap:5px;}
+    .fld.full{grid-column:1/3;}
+    .fld label{font-size:.72rem;color:#bbb;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+    .fld label .req{color:var(--pv-red);}
+    .fld label .hint{color:#666;text-transform:none;font-weight:400;font-size:.68rem;}
+    .fld input,.fld select{background:#000;border:1px solid var(--pv-border);color:#fff;border-radius:6px;padding:10px 12px;font-size:.9rem;outline:none;}
+    .fld input:focus,.fld select:focus{border-color:var(--pv-red);}
+    .fld.visible-field input,.fld.visible-field select{border-color:#1a7f37;}
+    .section-lbl{grid-column:1/3;font-size:.75rem;font-weight:800;color:var(--pv-muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--pv-border);padding-bottom:6px;margin-top:8px;}
+    .section-lbl:first-child{margin-top:0;}
+    .field-err{border-color:var(--pv-red)!important;}
+    .err-msg{color:var(--pv-red);font-size:.72rem;min-height:1em;}
+
+    .empty{text-align:center;padding:60px 20px;color:var(--pv-muted);}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a7f37;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:.3s;pointer-events:none;z-index:2000;}
+    .toast.show{opacity:1;}
+    .toast.err{background:var(--pv-red);}
+    input[type=file]{display:none;}
+    ::-webkit-scrollbar{width:9px;height:9px;}::-webkit-scrollbar-track{background:var(--pv-bg);}::-webkit-scrollbar-thumb{background:#333;border-radius:4px;}::-webkit-scrollbar-thumb:hover{background:var(--pv-red);}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-brand">
+        <img src="logo.png" alt="Primeview" style="height:30px;" onerror="this.src='https://via.placeholder.com/150x30/141414/e31e24?text=PRIMEVIEW'">
+        <span class="nav-title">Product Back-Office</span>
+    </div>
+    <div class="nav-actions">
+        <button class="btn btn-ghost" onclick="document.getElementById('import-file').click()">📁 Import JSON</button>
+        <input type="file" id="import-file" accept=".json" onchange="importJSON(event)">
+        <button class="btn btn-green" onclick="exportJSON()">💾 Export JSON</button>
+        <button class="btn btn-red" onclick="openForm()">➕ Add Product</button>
+    </div>
+</nav>
+
+<div class="wrap">
+    <div class="banner">
+        <b>How this works (read once):</b> Add, edit or delete products below. When you're done, click <b>💾 Export JSON</b> to download <b>products.json</b>, then upload that file to your GitHub repo (drag &amp; drop, replace the old one). The calculator reads it automatically.<br>
+        Use <b>📁 Import JSON</b> to load an existing products.json and keep editing it. &nbsp;•&nbsp; Fields marked <span class="visible-tag">● shown to customer</span> are the ONLY things visible in the calculator — everything else is internal technical data.
+    </div>
+
+    <div class="toolbar">
+        <input type="text" id="search" placeholder="🔍 Search by series, type or model code…" oninput="renderTable()">
+        <span class="count-pill"><b id="cnt">0</b> products</span>
+        <span class="count-pill"><b id="cnt-series">0</b> series</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Type <span class="visible-tag">●shown</span></th>
+                <th>PRV Product Series <span class="visible-tag">●shown</span></th>
+                <th>Model Code <span class="hidden-tag">hidden</span></th>
+                <th>Pitch</th><th>Cabinet (W×H×D)</th><th>Res (W×H)</th>
+                <th>Weight</th><th>Bright.</th><th>Power/㎡</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none;">No products. Click <b>➕ Add Product</b> or <b>📁 Import JSON</b> to start.</div>
+</div>
+
+<!-- FORM MODAL -->
+<div class="overlay" id="overlay">
+    <div class="card">
+        <div class="card-head">
+            <h2 id="form-title">Add Product</h2>
+            <button class="btn btn-ghost btn-sm" onclick="closeForm()">✕ Close</button>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="section-lbl">Customer-Visible (shown in calculator)</div>
+                <div class="fld visible-field">
+                    <label>Product Type <span class="req">*</span></label>
+                    <select id="f-type"><option value="Indoor">Indoor</option><option value="Outdoor">Outdoor</option></select>
+                </div>
+                <div class="fld visible-field">
+                    <label>PRV Product Series <span class="req">*</span> <span class="hint">(e.g. Fusion Series)</span></label>
+                    <input type="text" id="f-series" placeholder="Fusion Series" list="series-list">
+                    <datalist id="series-list"></datalist>
+                </div>
+
+                <div class="section-lbl">Internal / Technical (never shown to customer)</div>
+                <div class="fld">
+                    <label>Model Code <span class="req">*</span> <span class="hint">(unique ID)</span></label>
+                    <input type="text" id="f-id" placeholder="PRVFSN-12S">
+                </div>
+                <div class="fld">
+                    <label>Pixel Pitch (mm) <span class="req">*</span></label>
+                    <input type="number" id="f-pitch" step="0.01" placeholder="1.5">
+                </div>
+                <div class="fld"><label>Cabinet Width (mm) <span class="req">*</span></label><input type="number" id="f-cabW" step="0.1" placeholder="600"></div>
+                <div class="fld"><label>Cabinet Height (mm) <span class="req">*</span></label><input type="number" id="f-cabH" step="0.1" placeholder="337.5"></div>
+                <div class="fld"><label>Cabinet Depth (mm)</label><input type="number" id="f-cabD" step="0.1" placeholder="31"></div>
+                <div class="fld"><label>Resolution Width (px) <span class="req">*</span></label><input type="number" id="f-resW" placeholder="480"></div>
+                <div class="fld"><label>Resolution Height (px) <span class="req">*</span></label><input type="number" id="f-resH" placeholder="270"></div>
+                <div class="fld"><label>Weight per cabinet (kg)</label><input type="number" id="f-weight" step="0.01" placeholder="4.8"></div>
+                <div class="fld"><label>Brightness (nits)</label><input type="number" id="f-brightness" placeholder="800"></div>
+                <div class="fld"><label>Max Power per ㎡ (W)</label><input type="number" id="f-maxPowerSqm" placeholder="406"></div>
+            </div>
+            <div class="err-msg" id="form-err"></div>
+        </div>
+        <div class="card-foot">
+            <button class="btn btn-ghost" onclick="closeForm()">Cancel</button>
+            <button class="btn btn-red" onclick="saveForm()" id="save-btn">Save Product</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DEFAULT DATA (embedded) ================= */
+const DEFAULT_PRODUCTS = [{"id": "PRVFSN-XL-12S", "type": "Indoor", "series": "Fusion XL", "pitch": 1.2, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 512, "resH": 384, "weight": 6.2, "brightness": 550, "maxPowerSqm": 423}, {"id": "PRVFSN-XL-15S", "type": "Indoor", "series": "Fusion XL", "pitch": 1.5, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 416, "resH": 312, "weight": 6.2, "brightness": 800, "maxPowerSqm": 293}, {"id": "PRVFSN-XL-18S", "type": "Indoor", "series": "Fusion XL", "pitch": 1.8, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 348, "resH": 261, "weight": 6.2, "brightness": 800, "maxPowerSqm": 358}, {"id": "PRVFSN-XL-25S", "type": "Indoor", "series": "Fusion XL", "pitch": 2, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 256, "resH": 192, "weight": 6.2, "brightness": 800, "maxPowerSqm": 355}, {"id": "PRVFSN-12S", "type": "Indoor", "series": "Fusion Series", "pitch": 1.2, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 480, "resH": 270, "weight": 4.8, "brightness": 800, "maxPowerSqm": 406}, {"id": "PRVFSN-15S", "type": "Indoor", "series": "Fusion Series", "pitch": 1.5, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 384, "resH": 216, "weight": 4.8, "brightness": 550, "maxPowerSqm": 330}, {"id": "PRVFSN-19S", "type": "Indoor", "series": "Fusion Series", "pitch": 1.9, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 320, "resH": 180, "weight": 4.8, "brightness": 800, "maxPowerSqm": 286}, {"id": "PRVFSN-25S", "type": "Indoor", "series": "Fusion Series", "pitch": 2.5, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 240, "resH": 135, "weight": 4.8, "brightness": 800, "maxPowerSqm": 301}, {"id": "PRVFSN-SM-12S", "type": "Indoor", "series": "Fusion SM", "pitch": 1.2, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 480, "resH": 270, "weight": 4.5, "brightness": 600, "maxPowerSqm": 368}, {"id": "PRVFSN-SM-15S", "type": "Indoor", "series": "Fusion SM", "pitch": 1.5, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 384, "resH": 216, "weight": 4.5, "brightness": 600, "maxPowerSqm": 310}, {"id": "PRVFSN-SM-18S", "type": "Indoor", "series": "Fusion SM", "pitch": 1.8, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 320, "resH": 180, "weight": 4.5, "brightness": 600, "maxPowerSqm": 385}, {"id": "PRVFSN-SM-25S", "type": "Indoor", "series": "Fusion SM", "pitch": 2.5, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 240, "resH": 135, "weight": 4.5, "brightness": 600, "maxPowerSqm": 340}, {"id": "PRVFSN-SM-07C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 0.7, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 768, "resH": 432, "weight": 3.8, "brightness": 600, "maxPowerSqm": 380}, {"id": "PRVFSN-SM-09C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 0.9, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 640, "resH": 360, "weight": 3.8, "brightness": 800, "maxPowerSqm": 287}, {"id": "PRVFSN-SM-12C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 1.2, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 480, "resH": 270, "weight": 3.8, "brightness": 800, "maxPowerSqm": 339}, {"id": "PRVFSN-SM-15C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 1.5, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 384, "resH": 216, "weight": 3.8, "brightness": 800, "maxPowerSqm": 285}, {"id": "PRVOUDFPP-39S", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 3.9, "cabW": 500, "cabH": 500, "cabD": 68, "resW": 128, "resH": 128, "weight": 8.75, "brightness": 6000, "maxPowerSqm": 540}, {"id": "PRVOUDFPP-29S", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 2.9, "cabW": 500, "cabH": 500, "cabD": 68, "resW": 168, "resH": 168, "weight": 8.75, "brightness": 5500, "maxPowerSqm": 520}, {"id": "PRVOUD40", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 4, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 240, "resH": 240, "weight": 20.5, "brightness": 6500, "maxPowerSqm": 520}, {"id": "PRVOUD60", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 6.6, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 144, "resH": 144, "weight": 20.5, "brightness": 8000, "maxPowerSqm": 570}, {"id": "PRVOUD80", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 8, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 120, "resH": 120, "weight": 20.5, "brightness": 8000, "maxPowerSqm": 570}, {"id": "PRVOUDA0", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 10, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 96, "resH": 96, "weight": 20.5, "brightness": 8000, "maxPowerSqm": 570}];
+
+const FIELDS = ['id','type','series','pitch','cabW','cabH','cabD','resW','resH','weight','brightness','maxPowerSqm'];
+const REQUIRED = ['id','type','series','pitch','cabW','cabH','resW','resH'];
+const NUMERIC = ['pitch','cabW','cabH','cabD','resW','resH','weight','brightness','maxPowerSqm'];
+
+let products = [];
+let editingId = null; // null = adding new
+
+/* ------- persistence within THIS session only (working copy) ------- */
+function load() {
+    // Working copy kept in memory; starts from embedded defaults.
+    products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+    renderTable();
+}
+
+function toast(msg, isErr) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isErr ? ' err' : '');
+    setTimeout(() => t.className = 'toast', 2200);
+}
+
+/* ================= TABLE ================= */
+function renderTable() {
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+
+    const filtered = products.filter(p =>
+        !q || (p.series||'').toLowerCase().includes(q) || (p.type||'').toLowerCase().includes(q) || (p.id||'').toLowerCase().includes(q)
+    );
+
+    document.getElementById('empty').style.display = products.length === 0 ? 'block' : 'none';
+
+    filtered.forEach(p => {
+        const tr = document.createElement('tr');
+        const badge = p.type === 'Outdoor' ? 'badge-out' : 'badge-in';
+        tr.innerHTML = `
+            <td><span class="badge ${badge}">${esc(p.type)}</span></td>
+            <td><b>${esc(p.series)}</b></td>
+            <td style="color:#888;">${esc(p.id)}</td>
+            <td>${p.pitch} mm</td>
+            <td>${p.cabW}×${p.cabH}×${p.cabD||'-'}</td>
+            <td>${p.resW}×${p.resH}</td>
+            <td>${p.weight||'-'} kg</td>
+            <td>${p.brightness||'-'}</td>
+            <td>${p.maxPowerSqm||'-'} W</td>
+            <td class="col-actions">
+                <button class="btn btn-ghost btn-sm" onclick="openForm('${esc(p.id)}')">✏️ Edit</button>
+                <button class="btn btn-ghost btn-sm" onclick="delProduct('${esc(p.id)}')" style="border-color:#7a2a2a;">🗑️</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById('cnt').textContent = products.length;
+    document.getElementById('cnt-series').textContent = new Set(products.map(p => p.series)).size;
+
+    // refresh series datalist
+    const dl = document.getElementById('series-list');
+    dl.innerHTML = '';
+    [...new Set(products.map(p => p.series))].sort().forEach(s => {
+        const o = document.createElement('option'); o.value = s; dl.appendChild(o);
+    });
+}
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+/* ================= FORM ================= */
+function openForm(id) {
+    editingId = id || null;
+    document.getElementById('form-title').textContent = id ? 'Edit Product' : 'Add Product';
+    document.getElementById('save-btn').textContent = id ? 'Save Changes' : 'Add Product';
+    document.getElementById('form-err').textContent = '';
+
+    if (id) {
+        const p = products.find(x => x.id === id);
+        FIELDS.forEach(f => { const el = document.getElementById('f-' + f); if (el) el.value = p[f] == null ? '' : p[f]; });
+    } else {
+        FIELDS.forEach(f => { const el = document.getElementById('f-' + f); if (el) el.value = ''; });
+        document.getElementById('f-type').value = 'Indoor';
+    }
+    document.querySelectorAll('.fld input,.fld select').forEach(e => e.classList.remove('field-err'));
+    document.getElementById('overlay').classList.add('active');
+}
+
+function closeForm() { document.getElementById('overlay').classList.remove('active'); }
+
+function saveForm() {
+    const err = document.getElementById('form-err');
+    err.textContent = '';
+    document.querySelectorAll('.fld input,.fld select').forEach(e => e.classList.remove('field-err'));
+
+    const obj = {};
+    let bad = null;
+    FIELDS.forEach(f => {
+        const el = document.getElementById('f-' + f);
+        let v = el ? el.value.trim() : '';
+        if (NUMERIC.includes(f)) { v = v === '' ? null : parseFloat(v); }
+        obj[f] = v;
+    });
+
+    // Validate required
+    for (const f of REQUIRED) {
+        if (obj[f] === '' || obj[f] === null || (NUMERIC.includes(f) && isNaN(obj[f]))) {
+            bad = f; break;
+        }
+    }
+    if (bad) {
+        document.getElementById('f-' + bad).classList.add('field-err');
+        err.textContent = '⚠ Please fill the highlighted required field: ' + bad;
+        return;
+    }
+
+    // Unique ID check
+    const clash = products.find(p => p.id.toLowerCase() === obj.id.toLowerCase() && p.id !== editingId);
+    if (clash) {
+        document.getElementById('f-id').classList.add('field-err');
+        err.textContent = '⚠ Model Code "' + obj.id + '" already exists. Codes must be unique.';
+        return;
+    }
+
+    if (editingId) {
+        const i = products.findIndex(p => p.id === editingId);
+        products[i] = obj;
+        toast('✓ Product updated');
+    } else {
+        products.push(obj);
+        toast('✓ Product added');
+    }
+    closeForm();
+    renderTable();
+}
+
+function delProduct(id) {
+    if (!confirm('Delete "' + id + '"? This cannot be undone (unless you re-import).')) return;
+    products = products.filter(p => p.id !== id);
+    toast('✓ Product deleted');
+    renderTable();
+}
+
+/* ================= IMPORT / EXPORT ================= */
+function exportJSON() {
+    if (products.length === 0 && !confirm('Export an EMPTY product list?')) return;
+    const clean = products.map(p => {
+        const o = {};
+        FIELDS.forEach(f => o[f] = p[f] == null ? (NUMERIC.includes(f) ? null : '') : p[f]);
+        return o;
+    });
+    const blob = new Blob([JSON.stringify(clean, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.download = 'products.json';
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    toast('✓ products.json downloaded — now upload it to GitHub');
+}
+
+function importJSON(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!Array.isArray(data)) throw new Error('File is not a product array');
+            // basic validation of each entry
+            const valid = data.filter(d => d && d.id && d.series && d.type);
+            if (valid.length === 0) throw new Error('No valid products found');
+            products = valid.map(d => {
+                const o = {};
+                FIELDS.forEach(f => o[f] = d[f] == null ? (NUMERIC.includes(f) ? null : '') : d[f]);
+                return o;
+            });
+            renderTable();
+            toast('✓ Imported ' + products.length + ' products');
+        } catch (err) {
+            toast('✗ Import failed: ' + err.message, true);
+        }
+        ev.target.value = ''; // allow re-import of same file
+    };
+    reader.readAsText(file);
+}
+
+/* close modal on overlay click */
+document.getElementById('overlay').addEventListener('click', e => { if (e.target.id === 'overlay') closeForm(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeForm(); });
+
+load();
+</script>
+</body>
+</html>
