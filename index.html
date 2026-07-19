@@ -238,18 +238,16 @@
             <div class="control-group">
                 <div class="section-title">1. Product Series</div>
                 <div class="segmented-control" style="margin-bottom: 8px;">
-                    <div class="seg-btn active" id="btn-env-indoor" onclick="setEnv('indoor')">Indoor Series</div>
-                    <div class="seg-btn" id="btn-env-outdoor" onclick="setEnv('outdoor')">Outdoor Series</div>
+                    <div class="seg-btn active" id="btn-env-indoor" onclick="setEnv('indoor')">Indoor</div>
+                    <div class="seg-btn" id="btn-env-outdoor" onclick="setEnv('outdoor')">Outdoor</div>
                 </div>
-                <div class="segmented-control">
-                    <div class="seg-btn active" id="btn-cab-27" onclick="setCab('27')">27" Cabinet (16:9)</div>
-                    <div class="seg-btn" id="btn-cab-55" onclick="setCab('55')">55" Cabinet (16:9)</div>
-                </div>
+                <div class="control-label">PRV Product Series</div>
+                <select id="series-select" onchange="onSeriesChange()"></select>
             </div>
 
             <div class="control-group">
                 <div class="section-title">2. Display Model</div>
-                <div class="control-label">Pixel Pitch / Model</div>
+                <div class="control-label">Pixel Pitch</div>
                 <select id="model-select" onchange="onModelChange()"></select>
                 <div class="control-label" style="margin-top: 8px;">LED Material</div>
                 <div class="segmented-control">
@@ -487,11 +485,11 @@
     /* ===========================================================
        DATA
     =========================================================== */
-    const DB_MODELS = { indoor: [0.7, 0.9, 1.25, 1.56, 1.9, 2.1, 2.5], outdoor: [2.6, 2.9, 3.9, 4.8, 6.0] };
-    const DB_CAB = {
-        '27': { w: 600, h: 337.5, weight: 4.8, powerMax: 80, powerAvg: 27 },
-        '55': { w: 1200, h: 675, weight: 12.5, powerMax: 320, powerAvg: 110 }
-    };
+    // Embedded product catalogue — overwritten at load if products.json is present.
+    // ONLY 'type' and 'series' are ever shown to the customer. 'id' (model code) stays internal.
+    const DEFAULT_PRODUCTS = [{"id": "PRVFSN-XL-12S", "type": "Indoor", "series": "Fusion XL", "pitch": 1.2, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 512, "resH": 384, "weight": 6.2, "brightness": 550, "maxPowerSqm": 423}, {"id": "PRVFSN-XL-15S", "type": "Indoor", "series": "Fusion XL", "pitch": 1.5, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 416, "resH": 312, "weight": 6.2, "brightness": 800, "maxPowerSqm": 293}, {"id": "PRVFSN-XL-18S", "type": "Indoor", "series": "Fusion XL", "pitch": 1.8, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 348, "resH": 261, "weight": 6.2, "brightness": 800, "maxPowerSqm": 358}, {"id": "PRVFSN-XL-25S", "type": "Indoor", "series": "Fusion XL", "pitch": 2, "cabW": 640, "cabH": 480, "cabD": 31, "resW": 256, "resH": 192, "weight": 6.2, "brightness": 800, "maxPowerSqm": 355}, {"id": "PRVFSN-12S", "type": "Indoor", "series": "Fusion Series", "pitch": 1.2, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 480, "resH": 270, "weight": 4.8, "brightness": 800, "maxPowerSqm": 406}, {"id": "PRVFSN-15S", "type": "Indoor", "series": "Fusion Series", "pitch": 1.5, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 384, "resH": 216, "weight": 4.8, "brightness": 550, "maxPowerSqm": 330}, {"id": "PRVFSN-19S", "type": "Indoor", "series": "Fusion Series", "pitch": 1.9, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 320, "resH": 180, "weight": 4.8, "brightness": 800, "maxPowerSqm": 286}, {"id": "PRVFSN-25S", "type": "Indoor", "series": "Fusion Series", "pitch": 2.5, "cabW": 610, "cabH": 343, "cabD": 31, "resW": 240, "resH": 135, "weight": 4.8, "brightness": 800, "maxPowerSqm": 301}, {"id": "PRVFSN-SM-12S", "type": "Indoor", "series": "Fusion SM", "pitch": 1.2, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 480, "resH": 270, "weight": 4.5, "brightness": 600, "maxPowerSqm": 368}, {"id": "PRVFSN-SM-15S", "type": "Indoor", "series": "Fusion SM", "pitch": 1.5, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 384, "resH": 216, "weight": 4.5, "brightness": 600, "maxPowerSqm": 310}, {"id": "PRVFSN-SM-18S", "type": "Indoor", "series": "Fusion SM", "pitch": 1.8, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 320, "resH": 180, "weight": 4.5, "brightness": 600, "maxPowerSqm": 385}, {"id": "PRVFSN-SM-25S", "type": "Indoor", "series": "Fusion SM", "pitch": 2.5, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 240, "resH": 135, "weight": 4.5, "brightness": 600, "maxPowerSqm": 340}, {"id": "PRVFSN-SM-07C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 0.7, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 768, "resH": 432, "weight": 3.8, "brightness": 600, "maxPowerSqm": 380}, {"id": "PRVFSN-SM-09C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 0.9, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 640, "resH": 360, "weight": 3.8, "brightness": 800, "maxPowerSqm": 287}, {"id": "PRVFSN-SM-12C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 1.2, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 480, "resH": 270, "weight": 3.8, "brightness": 800, "maxPowerSqm": 339}, {"id": "PRVFSN-SM-15C", "type": "Indoor", "series": "Fusion SM-COB", "pitch": 1.5, "cabW": 600, "cabH": 337.5, "cabD": 31, "resW": 384, "resH": 216, "weight": 3.8, "brightness": 800, "maxPowerSqm": 285}, {"id": "PRVOUDFPP-39S", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 3.9, "cabW": 500, "cabH": 500, "cabD": 68, "resW": 128, "resH": 128, "weight": 8.75, "brightness": 6000, "maxPowerSqm": 540}, {"id": "PRVOUDFPP-29S", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 2.9, "cabW": 500, "cabH": 500, "cabD": 68, "resW": 168, "resH": 168, "weight": 8.75, "brightness": 5500, "maxPowerSqm": 520}, {"id": "PRVOUD40", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 4, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 240, "resH": 240, "weight": 20.5, "brightness": 6500, "maxPowerSqm": 520}, {"id": "PRVOUD60", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 6.6, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 144, "resH": 144, "weight": 20.5, "brightness": 8000, "maxPowerSqm": 570}, {"id": "PRVOUD80", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 8, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 120, "resH": 120, "weight": 20.5, "brightness": 8000, "maxPowerSqm": 570}, {"id": "PRVOUDA0", "type": "Outdoor", "series": "FusionMax Outdoor", "pitch": 10, "cabW": 960, "cabH": 960, "cabD": 68, "resW": 96, "resH": 96, "weight": 20.5, "brightness": 8000, "maxPowerSqm": 570}];
+    let PRODUCTS = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+
     const DB_WALLS = {
         none: '',
         theater: 'https://github.com/JosephCast05/Dix-Play/blob/main/theater.jpg?raw=true',
@@ -509,19 +507,15 @@
     const CAP_NOVA_5G = 5000000;
     const CAP_BROM = 524000;
 
-    // Default backdrop padding when no custom wall size is specified — proportional
-    // (not fixed mm) so the wall keeps a sensible visual size at any LED scale.
     const AUTO_WALL_PAD_W = 1.4;
     const AUTO_WALL_PAD_H = 1.5;
-    // Minimum backdrop height in mm — ensures the human silhouette is always
-    // visibly shorter than the mounting wall, even for tiny single-row configs.
-    // 3000mm ≈ 10ft (typical room/auditorium height).
     const MIN_WALL_H_MM = 3000;
 
     let state = {
         unit: 'mm',
-        env: 'indoor',
-        cab: '27',
+        env: 'indoor',       // 'indoor' | 'outdoor' (maps to product.type)
+        series: null,        // currently selected PRV Product Series
+        productId: null,     // internal id of selected model (NEVER shown)
         cols: 4,
         rows: 3,
         wallW: 0,
@@ -529,17 +523,19 @@
         bgTexture: 'none',
         showRulers: true,
         material: 'SMD',
-        modalActive: false // Prevents recursive calculateAll() calls while a modal is open
+        modalActive: false
     };
 
     let resizeTimer = null;
 
     function getGCD(a, b) { return b === 0 ? a : getGCD(b, a % b); }
 
-    function modelName(env, pitch) {
-        const prefix = env === 'indoor' ? 'IN' : 'OUT';
-        return `Dix-Play ${prefix} P${pitch}`;
-    }
+    // ---- Product helpers ----
+    function typeLabel() { return state.env === 'indoor' ? 'Indoor' : 'Outdoor'; }
+    function productsForType() { return PRODUCTS.filter(p => (p.type || '').toLowerCase() === typeLabel().toLowerCase()); }
+    function seriesForType() { return [...new Set(productsForType().map(p => p.series))]; }
+    function productsForSeries() { return productsForType().filter(p => p.series === state.series); }
+    function currentProduct() { return PRODUCTS.find(p => p.id === state.productId) || productsForSeries()[0] || PRODUCTS[0]; }
 
     // Industry rule-of-thumb approximation: ~1m minimum distance per 1mm pitch,
     // comfortable viewing distance roughly 2.5x-3x the minimum.
@@ -561,9 +557,30 @@
     function mToFt(m) { return (m * 3.28084).toFixed(1); }
 
     window.onload = () => {
-        updateModelDropdown();
-        calculateAll();
+        loadProducts();
     };
+
+    // Load products.json if present (published catalogue), else use embedded defaults.
+    function loadProducts() {
+        fetch('products.json', { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(data => {
+                if (Array.isArray(data) && data.length) PRODUCTS = data;
+            })
+            .catch(() => { /* keep embedded DEFAULT_PRODUCTS */ })
+            .finally(() => {
+                initSelectors();
+                calculateAll();
+            });
+    }
+
+    function initSelectors() {
+        // pick a valid default series/model for the current type
+        const seriesList = seriesForType();
+        state.series = seriesList[0] || null;
+        updateSeriesDropdown();
+        updateModelDropdown();
+    }
 
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
@@ -571,7 +588,7 @@
     });
 
     /* ===========================================================
-       SECTION 1-2: SERIES / MODEL
+       SECTION 1-2: TYPE / SERIES / MODEL  (products-driven)
     =========================================================== */
     function setUnit(u) {
         state.unit = u;
@@ -584,7 +601,6 @@
         document.getElementById('lbl-wall-w-unit').innerText = `Wall Width ${unitLbl}`;
         document.getElementById('lbl-wall-h-unit').innerText = `Wall Height ${unitLbl}`;
 
-        // Convert existing wall values to the new unit
         if (state.wallW > 0) document.getElementById('wall-w').value = u === 'mm' ? Math.round(state.wallW) : mmToFt(state.wallW);
         if (state.wallH > 0) document.getElementById('wall-h').value = u === 'mm' ? Math.round(state.wallH) : mmToFt(state.wallH);
 
@@ -595,6 +611,10 @@
         state.env = e;
         document.getElementById('btn-env-indoor').classList.toggle('active', e === 'indoor');
         document.getElementById('btn-env-outdoor').classList.toggle('active', e === 'outdoor');
+        // reset series to first available for the new type
+        const seriesList = seriesForType();
+        state.series = seriesList[0] || null;
+        updateSeriesDropdown();
         updateModelDropdown();
         calculateAll();
     }
@@ -606,26 +626,42 @@
         document.getElementById('btn-mat-cob').classList.toggle('active', m === 'COB');
     }
 
-    function setCab(c) {
-        state.cab = c;
-        document.getElementById('btn-cab-27').classList.toggle('active', c === '27');
-        document.getElementById('btn-cab-55').classList.toggle('active', c === '55');
+    // Populate the PRV Product Series dropdown (customer-visible)
+    function updateSeriesDropdown() {
+        const sel = document.getElementById('series-select');
+        sel.innerHTML = '';
+        seriesForType().forEach(s => {
+            const o = document.createElement('option');
+            o.value = s; o.text = s;
+            if (s === state.series) o.selected = true;
+            sel.appendChild(o);
+        });
+    }
+
+    function onSeriesChange() {
+        state.series = document.getElementById('series-select').value;
+        updateModelDropdown();
         calculateAll();
     }
 
+    // Populate the Model dropdown — labelled by PITCH ONLY (never the model code)
     function updateModelDropdown() {
         const select = document.getElementById('model-select');
         select.innerHTML = '';
-        DB_MODELS[state.env].forEach(p => {
-            let opt = document.createElement('option');
-            opt.value = p;
-            opt.text = `${modelName(state.env, p)} — ${p}mm pitch`;
-            if ((state.env === 'indoor' && p === 1.56) || (state.env === 'outdoor' && p === 3.9)) opt.selected = true;
-            select.appendChild(opt);
+        const list = productsForSeries();
+        // keep current product if still valid, else first
+        if (!list.find(p => p.id === state.productId)) state.productId = list[0] ? list[0].id : null;
+        list.forEach(p => {
+            const o = document.createElement('option');
+            o.value = p.id; // internal id as value (not displayed text)
+            o.text = `P${p.pitch} — ${p.pitch}mm pitch`;
+            if (p.id === state.productId) o.selected = true;
+            select.appendChild(o);
         });
     }
 
     function onModelChange() {
+        state.productId = document.getElementById('model-select').value;
         calculateAll();
     }
 
@@ -646,8 +682,8 @@
         const inW_mm = state.unit === 'in' ? inW * 304.8 : inW;
         const inH_mm = state.unit === 'in' ? inH * 304.8 : inH;
 
-        let cabW = DB_CAB[state.cab].w;
-        let cabH = DB_CAB[state.cab].h;
+        let cabW = currentProduct().cabW;
+        let cabH = currentProduct().cabH;
 
         if (!isNaN(inW_mm) && inW_mm > 0) state.cols = Math.max(1, Math.round(inW_mm / cabW));
         if (!isNaN(inH_mm) && inH_mm > 0) state.rows = Math.max(1, Math.round(inH_mm / cabH));
@@ -732,7 +768,8 @@
     }
 
     function handleModalAction(action) {
-        const cab = DB_CAB[state.cab];
+        const cp = currentProduct();
+        const cab = { w: cp.cabW, h: cp.cabH };
         const hasCustomWall = state.wallW > 0 && state.wallH > 0;
         const hasTexture = state.bgTexture !== 'none';
 
@@ -773,13 +810,20 @@
     function openVDModal() {
         const body = document.getElementById('vd-table-body');
         body.innerHTML = '';
-        ['indoor', 'outdoor'].forEach(env => {
-            DB_MODELS[env].forEach(p => {
-                const vd = getViewingDistance(p);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${modelName(env, p)}</td><td>${p} mm</td><td>${vd.min.toFixed(2)} m</td><td>${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m</td>`;
-                body.appendChild(tr);
-            });
+        const imp = state.unit === 'in';
+        // Sort by type then series then pitch; show ONLY type/series/pitch (never model code)
+        const sorted = [...PRODUCTS].sort((a, b) =>
+            (a.type || '').localeCompare(b.type || '') ||
+            (a.series || '').localeCompare(b.series || '') ||
+            a.pitch - b.pitch
+        );
+        sorted.forEach(p => {
+            const vd = getViewingDistance(p.pitch);
+            const minTxt  = imp ? `${mToFt(vd.min)} ft` : `${vd.min.toFixed(2)} m`;
+            const comfTxt = imp ? `${mToFt(vd.comfMin)}–${mToFt(vd.comfMax)} ft` : `${vd.comfMin.toFixed(1)}–${vd.comfMax.toFixed(1)} m`;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${p.type} · ${p.series}</td><td>${p.pitch} mm</td><td>${minTxt}</td><td>${comfTxt}</td>`;
+            body.appendChild(tr);
         });
         document.getElementById('vd-modal').classList.add('active');
     }
@@ -809,8 +853,10 @@
     function calculateAll() {
         if (state.modalActive) return; // Prevent recursive calls while modal is active
 
-        const cab = DB_CAB[state.cab];
-        const pitch = parseFloat(document.getElementById('model-select').value);
+        const cp = currentProduct();
+        if (!cp) return;
+        const cab = { w: cp.cabW, h: cp.cabH };
+        const pitch = cp.pitch;
 
         let totalW_mm = state.cols * cab.w;
         let totalH_mm = state.rows * cab.h;
@@ -823,11 +869,13 @@
         }
 
         let totalCabs = state.cols * state.rows;
-        let resW = Math.round(totalW_mm / pitch);
-        let resH = Math.round(totalH_mm / pitch);
+        // Use the cabinet's native pixel resolution from the product sheet (exact),
+        // falling back to pitch-derived if not provided.
+        let resW = cp.resW ? state.cols * cp.resW : Math.round(totalW_mm / pitch);
+        let resH = cp.resH ? state.rows * cp.resH : Math.round(totalH_mm / pitch);
         let totalPx = resW * resH;
 
-        let weightKg = totalCabs * cab.weight;
+        let weightKg = totalCabs * (cp.weight || 0);
         let areaSqm = (totalW_mm / 1000) * (totalH_mm / 1000);
 
         let dispW = state.unit === 'mm' ? totalW_mm : parseFloat(mmToFt(totalW_mm));
@@ -852,6 +900,10 @@
         document.getElementById('badge-resolution').innerText = `${resW.toLocaleString()} × ${resH.toLocaleString()} px`;
         document.getElementById('badge-ratio').innerText = ratioTxt;
 
+        // Power: sheet gives Max Power per m². Avg ≈ 1/3 of max (industry rule of thumb).
+        const maxPowerKw = (areaSqm * (cp.maxPowerSqm || 0)) / 1000;
+        const avgPowerKw = maxPowerKw / 3;
+
         // Right panel — physical / optical
         document.getElementById('res-layout').innerText = `${state.cols} (W) x ${state.rows} (H)`;
         document.getElementById('res-total-cabs').innerText = totalCabs;
@@ -860,8 +912,8 @@
         document.getElementById('res-diag').innerText = diagInch + '"';
         document.getElementById('res-ratio').innerText = ratioTxt;
         document.getElementById('res-px').innerText = totalPx.toLocaleString();
-        document.getElementById('res-power-max').innerText = ((totalCabs * cab.powerMax) / 1000).toFixed(2) + ' kW';
-        document.getElementById('res-power-avg').innerText = ((totalCabs * cab.powerAvg) / 1000).toFixed(2) + ' kW';
+        document.getElementById('res-power-max').innerText = maxPowerKw.toFixed(2) + ' kW';
+        document.getElementById('res-power-avg').innerText = avgPowerKw.toFixed(2) + ' kW';
 
         // Viewing distance
         const vd = getViewingDistance(pitch);
@@ -1025,10 +1077,13 @@
        EXPORT
     =========================================================== */
     function buildExportLines() {
+        const cp = currentProduct();
         const lines = [];
-        lines.push(['Series', `${state.env.toUpperCase()} (${state.cab}" Cabinet)`]);
-        lines.push(['Display Model', document.getElementById('model-select').selectedOptions[0].text]);
+        lines.push(['Product Type', typeLabel()]);
+        lines.push(['PRV Product Series', state.series || '-']);
+        lines.push(['Pixel Pitch', `${cp ? cp.pitch : '-'} mm`]);
         lines.push(['LED Material', state.material]);
+        lines.push(['Cabinet Size', cp ? `${cp.cabW} x ${cp.cabH} mm` : '-']);
         lines.push(['Grid Layout', `${state.cols} Columns x ${state.rows} Rows`]);
         lines.push(['Total Modules', `${state.cols * state.rows} Cabinets`]);
         const unitLbl = state.unit === 'mm' ? 'mm' : 'ft';
@@ -1039,6 +1094,7 @@
         lines.push(['Aspect Ratio', document.getElementById('res-ratio').innerText]);
         lines.push(['Resolution', document.getElementById('badge-resolution').innerText]);
         lines.push(['Diagonal', document.getElementById('res-diag').innerText]);
+        lines.push(['Brightness', cp && cp.brightness ? `${cp.brightness} nits` : '-']);
         lines.push(['Best Viewing Distance', document.getElementById('res-vd').innerText]);
         lines.push(['Max Power Draw', document.getElementById('res-power-max').innerText]);
         lines.push(['Avg Power Draw', document.getElementById('res-power-avg').innerText]);
@@ -1060,9 +1116,9 @@
     }
 
     function exportConfiguration() {
-        const cab = DB_CAB[state.cab];
+        const cp = currentProduct();
         const cols = state.cols, rows = state.rows;
-        const cabW = cab.w, cabH = cab.h;
+        const cabW = cp.cabW, cabH = cp.cabH;
         const ledW = cols * cabW, ledH = rows * cabH;
 
         let body = '';
@@ -1100,12 +1156,11 @@
         body += dxfText(-dimOff - 550, ledH / 2, 100, `${Math.round(ledH)} mm (${rows} cab)`, 'DIMENSIONS');
 
         // --- Layer: NOTES (title block / specs as text) ---
-        const model = document.getElementById('model-select').selectedOptions[0].text;
         const notes = [
             `PRIMEVIEW DIX-PLAY LED WALL`,
-            `Model: ${model}`,
-            `Material: ${state.material}`,
-            `Grid: ${cols} x ${rows} = ${cols * rows} cabinets (${state.cab}" ${cabW}x${cabH}mm each)`,
+            `Type: ${typeLabel()}  |  Series: ${state.series || '-'}`,
+            `Pitch: ${cp.pitch}mm  |  Material: ${state.material}`,
+            `Grid: ${cols} x ${rows} = ${cols * rows} cabinets (${cabW}x${cabH}mm each)`,
             `Overall: ${Math.round(ledW)} x ${Math.round(ledH)} mm`,
             `Resolution: ${document.getElementById('badge-resolution').innerText}`,
             `Aspect Ratio: ${document.getElementById('res-ratio').innerText}`,
